@@ -251,10 +251,10 @@
             {% include "shared/footer.html" %}
         {% endif %}
 
-        {% if not request.headers.HX_Request %}
+        {% comment %} {% if not request.headers.HX_Request %}
             <!-- Chatbot Widget -->
             {% include 'chatbot/chatbot.html' %}
-        {% endif %}
+        {% endif %} {% endcomment %}
 
         <!-- Single consolidated script block -->
         <script>

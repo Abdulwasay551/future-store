@@ -24,7 +24,17 @@
             <div class="text-sm text-mc-light-grey mb-2">{{ product.company.name }}</div>
             <h3 class="text-lg sm:text-xl font-bold text-mc-white mb-2">{{ product.name }}</h3>
             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
-                <span class="text-xl font-bold text-mc-white">{{ product.price }} Rs</span>
+                <div class="flex items-center gap-2">
+                    {% if product.has_discount %}
+                        <span class="text-xl font-bold text-mc-white">{{ product.discounted_price }} Rs</span>
+                        <span class="text-lg text-mc-light-grey line-through">{{ product.price }} Rs</span>
+                        {% if product.discount_type == 'percentage' %}
+                            <span class="text-sm text-mc-accent">-{{ product.discount_value }}%</span>
+                        {% endif %}
+                    {% else %}
+                        <span class="text-xl font-bold text-mc-white">{{ product.price }} Rs</span>
+                    {% endif %}
+                </div>
                 <div class="flex items-center bg-mc-black/50 px-2 py-1 rounded-full self-start sm:self-auto">
                     <span class="text-yellow-400">★</span>
                     <span class="ml-1 text-mc-white text-sm">{{ product.average_rating|floatformat:1 }}</span>

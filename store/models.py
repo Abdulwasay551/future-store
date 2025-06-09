@@ -94,6 +94,20 @@ class Product(models.Model):
             return first_image.get_image_url
         return None
 
+    @property
+    def discounted_price(self):
+        if self.discount_type == 'none':
+            return self.price
+        elif self.discount_type == 'percentage':
+            return round(self.price - (self.price * self.discount_value / 100), 2)
+        elif self.discount_type == 'fixed':
+            return round(max(self.price - self.discount_value, 0), 2)
+        return self.price
+
+    @property
+    def has_discount(self):
+        return self.discount_type != 'none' and self.discount_value > 0
+
 class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -110,7 +124,7 @@ class CartItem(models.Model):
     
     @property
     def subtotal(self):
-        return self.product.price * self.quantity
+        return self.product.discounted_price * self.quantity
 
 class Review(models.Model):
     product = models.ForeignKey(Product, related_name='reviews', on_delete=models.CASCADE)
@@ -201,3 +215,26 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.quantity}x {self.product.name} in Order #{self.order.id}"
+
+class Contact(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    subject = models.CharField(max_length=200)
+    message = models.TextField()
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ('new', 'New'),
+            ('in_progress', 'In Progress'),
+            ('resolved', 'Resolved'),
+        ],
+        default='new'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.name} - {self.subject}"
+
+    class Meta:
+        ordering = ['-created_at']

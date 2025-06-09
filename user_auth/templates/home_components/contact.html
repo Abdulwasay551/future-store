@@ -1,4 +1,6 @@
 <!-- Contact Section -->
+ {% extends 'shared/skeleton.html' %}
+ {% block content %}
 <section class="py-20 px-6 bg-mc-black">
     <div class="container mx-auto max-w-4xl">
         <div class="text-center mb-16">
@@ -61,7 +63,7 @@
                             </div>
                             <div>
                                 <p class="text-mc-white font-medium">Address</p>
-                                <p class="text-mc-light-grey">123 Mobile Street, Tech City</p>
+                                <a href="https://maps.app.goo.gl/aCX6eRab7staFQMa9" class="text-mc-light-grey">Dubai Plaza, shop#13 basment, Bahawalpur, 63100</a>
                             </div>
                         </div>
                         <div class="flex items-start space-x-4">
@@ -70,7 +72,7 @@
                             </div>
                             <div>
                                 <p class="text-mc-white font-medium">Phone</p>
-                                <p class="text-mc-light-grey">+1 (555) 123-4567</p>
+                                <a href="tel:+923009681212" class="text-mc-light-grey">+92 300 9681212</a> | <a href="tel:+923159682684" class="text-mc-light-grey">+92 315 9682684</a>
                             </div>
                         </div>
                         <div class="flex items-start space-x-4">
@@ -79,7 +81,7 @@
                             </div>
                             <div>
                                 <p class="text-mc-white font-medium">Email</p>
-                                <p class="text-mc-light-grey">contact@mobilecorner.com</p>
+                                <a href="mailto:mobilercornerbwp@gmail.com" class="text-mc-light-grey">mobilercornerbwp@gmail.com</a>
                             </div>
                         </div>
                     </div>
@@ -90,15 +92,15 @@
                     <h3 class="text-xl font-bold text-mc-white mb-4">Business Hours</h3>
                     <div class="space-y-2">
                         <div class="flex justify-between">
-                            <span class="text-mc-light-grey">Monday - Friday</span>
-                            <span class="text-mc-white">9:00 AM - 6:00 PM</span>
+                            <span class="text-mc-light-grey">Monday - Thursday</span>
+                            <span class="text-mc-white">11:00 AM - 11:00 PM</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-mc-light-grey">Saturday</span>
-                            <span class="text-mc-white">10:00 AM - 4:00 PM</span>
+                            <span class="text-mc-light-grey">Saturday - Sunday</span>
+                            <span class="text-mc-white">12:00 PM - 11:00 PM</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-mc-light-grey">Sunday</span>
+                            <span class="text-mc-light-grey">Friday</span>
                             <span class="text-mc-white">Closed</span>
                         </div>
                     </div>
@@ -107,3 +109,4 @@
         </div>
     </div>
 </section>
+{% endblock %}

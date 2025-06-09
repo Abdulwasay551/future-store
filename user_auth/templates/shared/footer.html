@@ -1,14 +1,15 @@
   <!-- Footer -->
-    <footer class="bg-mc-black border-t border-mc-grey/30 py-12 px-6">
+  {% load static %}
+  <footer class="bg-mc-black border-t border-mc-grey/30 py-12 px-6">
         <div class="container mx-auto">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div>
                     <div class="flex items-center space-x-4 mb-6">
-                        <div class="w-10 h-10 bg-mc-white rounded-full flex items-center justify-center">
-                            <span class="text-lg font-bold text-mc-black">MC</span>
+                        <div class="w-10 h-10 bg-mc-black rounded-full flex items-center justify-center">
+                            <img src="{% static 'logo-dark.JPG' %}" class="w-full h-full object-cover block ">
                         </div>
                         <div>
-                            <h3 class="text-xl font-bold">Mobile Corner</h3>
+                            <h3 class="text-xl text-mc-white font-bold">Mobile Corner</h3>
                             <p class="text-xs text-mc-light-grey">PEER G</p>
                         </div>
                     </div>
@@ -38,13 +39,13 @@
                 <div>
                     <h4 class="font-bold text-mc-white mb-4">CONNECT</h4>
                     <div class="flex space-x-4">
-                        <a href="#" class="w-10 h-10 bg-mc-grey rounded-lg flex items-center justify-center hover:bg-mc-white hover:text-mc-black transition-colors">
+                        <a href="https://www.facebook.com/people/Mobile-corner-BWP/100063889190155/" class="w-10 h-10 bg-mc-grey rounded-lg flex items-center justify-center hover:bg-mc-white hover:text-mc-black transition-colors">
                             <i class="fab fa-facebook-f"></i>
                         </a>
-                        <a href="#" class="w-10 h-10 bg-mc-grey rounded-lg flex items-center justify-center hover:bg-mc-white hover:text-mc-black transition-colors">
+                        <a href="https://www.instagram.com/mobile_corner_bwp/#" class="w-10 h-10 bg-mc-grey rounded-lg flex items-center justify-center hover:bg-mc-white hover:text-mc-black transition-colors">
                             <i class="fab fa-instagram"></i>
                         </a>
-                        <a href="#" class="w-10 h-10 bg-mc-grey rounded-lg flex items-center justify-center hover:bg-mc-white hover:text-mc-black transition-colors">
+                        <a href="https://wa.me/923009681212" class="w-10 h-10 bg-mc-grey rounded-lg flex items-center justify-center hover:bg-mc-white hover:text-mc-black transition-colors">
                             <i class="fab fa-whatsapp"></i>
                         </a>
                     </div>
@@ -52,7 +53,7 @@
             </div>
             
             <div class="border-t border-mc-grey/30 mt-12 pt-8 text-center text-mc-light-grey">
-                <p>&copy; 2025 Mobile Corner. All rights reserved. Made with ❤️ in Peer G</p>
+                <p>&copy; 2025 Mobile Corner. All rights reserved.</p>
             </div>
         </div>
     </footer>

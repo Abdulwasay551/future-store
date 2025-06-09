@@ -60,7 +60,19 @@
                 <span class="ml-2 text-mc-light-grey">({{ product.reviews.count }} reviews)</span>
             </div>
             <p class="text-mc-light-grey mb-6">{{ product.description }}</p>
-            <div class="text-3xl font-bold text-mc-white mb-6">{{ product.price }} Rs</div>
+            <div class="flex items-center gap-4 mb-6">
+                {% if product.has_discount %}
+                    <div class="flex items-center gap-2">
+                        <span class="text-3xl font-bold text-mc-white">{{ product.discounted_price }} Rs</span>
+                        <span class="text-2xl text-mc-light-grey line-through">{{ product.price }} Rs</span>
+                        {% if product.discount_type == 'percentage' %}
+                            <span class="text-lg text-mc-accent">-{{ product.discount_value }}%</span>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <span class="text-3xl font-bold text-mc-white">{{ product.price }} Rs</span>
+                {% endif %}
+            </div>
             {% if user.is_authenticated %}
             {% if product.stock > 0 %}
             <form hx-post="{% url 'add_to_cart' product.id %}" 

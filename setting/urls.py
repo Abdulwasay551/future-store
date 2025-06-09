@@ -25,4 +25,5 @@ urlpatterns = [
     path('store/', include('store.urls')),  # Include store app URLs
     path('chatbot/', include('chatbot.urls')),  # Include chatbot app URLs
     path('erp/', include('inventory_erp.urls')),  # Include inventory_erp app URLs
+    path('social-auth/', include('social_django.urls', namespace='social')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

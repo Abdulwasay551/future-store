@@ -2,8 +2,13 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 from .models import User
 from django.http import HttpResponse
+from social_django.utils import load_strategy
+from social_core.exceptions import AuthAlreadyAssociated
+from store.models import Contact
 
 def home(request):
     # Get featured products (newest and highest rated)
@@ -15,16 +20,18 @@ def login_view(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
+        remember_me = request.POST.get('remember-me')
+
         user = authenticate(request, email=email, password=password)
-        
         if user is not None:
             login(request, user)
-            messages.success(request, 'Successfully logged in!')
+            if not remember_me:
+                request.session.set_expiry(0)
             return redirect('home')
         else:
-            messages.error(request, 'Invalid email or password.')
+            messages.error(request, 'Invalid email or password')
             return render(request, 'auth/login.html')
-    
+
     return render(request, 'auth/login.html')
 
 def signup_view(request):
@@ -32,26 +39,31 @@ def signup_view(request):
         email = request.POST.get('email')
         password1 = request.POST.get('password1')
         password2 = request.POST.get('password2')
-        
-        if password1 != password2:
-            messages.error(request, 'Passwords do not match.')
-            return render(request, 'auth/signup.html')
-        
+
         if User.objects.filter(email=email).exists():
-            messages.error(request, 'Email already exists.')
+            messages.error(request, 'Email already exists')
             return render(request, 'auth/signup.html')
-        
+
+        if password1 != password2:
+            messages.error(request, 'Passwords do not match')
+            return render(request, 'auth/signup.html')
+
+        try:
+            # Validate password strength
+            validate_password(password1)
+        except ValidationError as e:
+            messages.error(request, '\n'.join(e.messages))
+            return render(request, 'auth/signup.html')
+
         user = User.objects.create_user(email=email, password=password1)
         login(request, user)
-        messages.success(request, 'Account created successfully!')
         return redirect('home')
-    
+
     return render(request, 'auth/signup.html')
 
 @login_required
 def logout_view(request):
     logout(request)
-    messages.success(request, 'Successfully logged out!')
     return redirect('home')
 
 @login_required
@@ -80,13 +92,30 @@ def contact(request):
         email = request.POST.get('email')
         subject = request.POST.get('subject')
         message = request.POST.get('message')
-        
-        # Here you could add code to send email, save to database, etc.
-        
-        return HttpResponse(
-            '<div class="p-4 bg-green-100 text-green-800 rounded-lg">'
-            'Thank you for your message! We will get back to you soon.'
-            '</div>'
-        )
+
+        if all([name, email, subject, message]):
+            Contact.objects.create(
+                name=name,
+                email=email,
+                subject=subject,
+                message=message
+            )
+            messages.success(request, 'Your message has been sent successfully!')
+            return redirect('contact')
+        else:
+            messages.error(request, 'Please fill in all fields')
     
     return render(request, 'home_components/contact.html')
+
+def social_auth_complete(request, backend):
+    strategy = load_strategy(request)
+    try:
+        user = strategy.backend.complete(request=request)
+        if user and user.is_active:
+            login(request, user)
+            return redirect('home')
+    except AuthAlreadyAssociated:
+        messages.error(request, 'This Google account is already associated with another user')
+    except Exception as e:
+        messages.error(request, str(e))
+    return redirect('login')
