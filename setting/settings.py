@@ -107,6 +107,10 @@ DATABASES = {
     }
 }
 
+# Add this for better database connection handling
+CONN_MAX_AGE = 0  # Close connections after each request
+ATOMIC_REQUESTS = True  # Wrap each request in a transaction
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
