@@ -1,0 +1,28 @@
+{% for review in reviews %}
+<div class="bg-mc-dark rounded-xl p-6 border border-mc-grey/30">
+    <div class="flex justify-between items-start mb-4">
+        <div>
+            <div class="flex items-center">
+                <span class="text-yellow-400">
+                    {% for i in review.rating|ljust:5 %}★{% endfor %}
+                </span>
+            </div>
+            <p class="text-mc-light-grey mt-1">by {{ review.user.email }}</p>
+        </div>
+        <span class="text-mc-light-grey">{{ review.created_at|date:"M d, Y" }}</span>
+    </div>
+    <p class="text-mc-white">{{ review.comment }}</p>
+</div>
+{% endfor %}
+
+{% if next_page %}
+<div class="text-center mt-8">
+    <button hx-get="{% url 'load_more_reviews' product.id %}?page={{ next_page }}"
+            hx-target="#reviews-list"
+            hx-swap="beforeend"
+            hx-trigger="click"
+            class="px-6 py-2 bg-mc-dark text-mc-white hover:bg-mc-grey/30 transition-colors duration-300 rounded-lg border border-mc-grey/30">
+        Load More Reviews
+    </button>
+</div>
+{% endif %}

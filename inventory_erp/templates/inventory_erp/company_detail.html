@@ -1,0 +1,90 @@
+{% extends 'inventory_erp/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-6">
+                    <div class="flex items-center">
+                        {% if company.logo %}
+                        <img src="{{ company.logo.url }}" alt="{{ company.name }} logo" class="w-20 h-20 object-cover rounded-lg mr-4">
+                        {% endif %}
+                        <div>
+                            <h1 class="text-2xl font-bold">{{ company.name }}</h1>
+                            <span class="{% if company.is_active %}bg-green-200 text-green-600{% else %}bg-red-200 text-red-600{% endif %} py-1 px-3 rounded-full text-xs">
+                                {{ company.is_active|yesno:"Active,Inactive" }}
+                            </span>
+                        </div>
+                    </div>
+                    <a href="{% url 'inventory_erp:company_update' company.pk %}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        Edit Company
+                    </a>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div>
+                        <h2 class="text-lg font-semibold mb-4">Contact Information</h2>
+                        <dl class="space-y-2">
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Contact Person</dt>
+                                <dd class="text-sm text-gray-900">{{ company.contact_person }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Phone</dt>
+                                <dd class="text-sm text-gray-900">{{ company.phone }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Email</dt>
+                                <dd class="text-sm text-gray-900">{{ company.email|default:"Not provided" }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Website</dt>
+                                <dd class="text-sm text-gray-900">
+                                    {% if company.website %}
+                                    <a href="{{ company.website }}" target="_blank" class="text-blue-600 hover:text-blue-800">{{ company.website }}</a>
+                                    {% else %}
+                                    Not provided
+                                    {% endif %}
+                                </dd>
+                            </div>
+                        </dl>
+                    </div>
+
+                    <div>
+                        <h2 class="text-lg font-semibold mb-4">Additional Information</h2>
+                        <dl class="space-y-2">
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Address</dt>
+                                <dd class="text-sm text-gray-900">{{ company.address|linebreaks|default:"Not provided" }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Notes</dt>
+                                <dd class="text-sm text-gray-900">{{ company.notes|linebreaks|default:"No notes" }}</dd>
+                            </div>
+                        </dl>
+                    </div>
+                </div>
+
+                <div class="mt-8">
+                    <h2 class="text-xl font-semibold mb-4">Devices ({{ devices|length }})</h2>
+                    {% if devices %}
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {% for device in devices %}
+                        <div class="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                            <h3 class="font-semibold">{{ device.name }}</h3>
+                            <p class="text-sm text-gray-600">Model: {{ device.model_number }}</p>
+                            <p class="text-sm text-gray-600">MRP: ${{ device.mrp }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-gray-500">No devices found for this company.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

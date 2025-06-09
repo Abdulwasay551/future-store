@@ -1,0 +1,109 @@
+<!-- Contact Section -->
+<section class="py-20 px-6 bg-mc-black">
+    <div class="container mx-auto max-w-4xl">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl md:text-5xl font-bold mb-4">
+                <span class="text-mc-white">GET IN </span>
+                <span class="text-gradient">TOUCH</span>
+            </h2>
+            <p class="text-mc-light-grey text-lg">Have questions? We'd love to hear from you.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Contact Form -->
+            <div class="bg-mc-dark rounded-xl p-6 border border-mc-grey/30">
+                <form hx-post="{% url 'contact' %}" hx-target="#contact-form-response">
+                    {% csrf_token %}
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-mc-white mb-2" for="name">Name</label>
+                            <input type="text" id="name" name="name" required
+                                   class="w-full px-4 py-2 bg-mc-black border border-mc-grey/30 rounded-lg text-mc-white focus:border-mc-accent transition-colors"
+                                   placeholder="Your name">
+                        </div>
+                        <div>
+                            <label class="block text-mc-white mb-2" for="email">Email</label>
+                            <input type="email" id="email" name="email" required
+                                   class="w-full px-4 py-2 bg-mc-black border border-mc-grey/30 rounded-lg text-mc-white focus:border-mc-accent transition-colors"
+                                   placeholder="your@email.com">
+                        </div>
+                        <div>
+                            <label class="block text-mc-white mb-2" for="subject">Subject</label>
+                            <input type="text" id="subject" name="subject" required
+                                   class="w-full px-4 py-2 bg-mc-black border border-mc-grey/30 rounded-lg text-mc-white focus:border-mc-accent transition-colors"
+                                   placeholder="How can we help?">
+                        </div>
+                        <div>
+                            <label class="block text-mc-white mb-2" for="message">Message</label>
+                            <textarea id="message" name="message" rows="4" required
+                                    class="w-full px-4 py-2 bg-mc-black border border-mc-grey/30 rounded-lg text-mc-white focus:border-mc-accent transition-colors"
+                                    placeholder="Your message..."></textarea>
+                        </div>
+                        <div>
+                            <button type="submit"
+                                    class="w-full px-6 py-3 bg-mc-white text-mc-black rounded-lg hover:bg-mc-accent transition-colors duration-300">
+                                Send Message
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                <div id="contact-form-response"></div>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="space-y-8">
+                <div class="bg-mc-dark rounded-xl p-6 border border-mc-grey/30">
+                    <h3 class="text-xl font-bold text-mc-white mb-4">Contact Information</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-4">
+                            <div class="p-2 bg-mc-black rounded-lg">
+                                <i class="fas fa-map-marker-alt text-mc-accent"></i>
+                            </div>
+                            <div>
+                                <p class="text-mc-white font-medium">Address</p>
+                                <p class="text-mc-light-grey">123 Mobile Street, Tech City</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <div class="p-2 bg-mc-black rounded-lg">
+                                <i class="fas fa-phone text-mc-accent"></i>
+                            </div>
+                            <div>
+                                <p class="text-mc-white font-medium">Phone</p>
+                                <p class="text-mc-light-grey">+1 (555) 123-4567</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <div class="p-2 bg-mc-black rounded-lg">
+                                <i class="fas fa-envelope text-mc-accent"></i>
+                            </div>
+                            <div>
+                                <p class="text-mc-white font-medium">Email</p>
+                                <p class="text-mc-light-grey">contact@mobilecorner.com</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Business Hours -->
+                <div class="bg-mc-dark rounded-xl p-6 border border-mc-grey/30">
+                    <h3 class="text-xl font-bold text-mc-white mb-4">Business Hours</h3>
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <span class="text-mc-light-grey">Monday - Friday</span>
+                            <span class="text-mc-white">9:00 AM - 6:00 PM</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-mc-light-grey">Saturday</span>
+                            <span class="text-mc-white">10:00 AM - 4:00 PM</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-mc-light-grey">Sunday</span>
+                            <span class="text-mc-white">Closed</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

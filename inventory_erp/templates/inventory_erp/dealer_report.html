@@ -1,0 +1,115 @@
+{% extends 'inventory_erp/base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-8">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-2xl font-bold">Dealer Report</h1>
+        <div class="space-x-4">
+            <button onclick="window.print()" class="px-6 py-2 rounded-lg bg-mc-accent hover:bg-mc-accent/80 transition-colors duration-300">
+                <i class="fas fa-print mr-2"></i>Print Report
+            </button>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="bg-mc-grey/10 rounded-lg p-6 mb-8">
+        <h2 class="text-lg font-semibold mb-4">Filter Report</h2>
+        <form method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label for="type" class="block text-sm font-medium mb-2">Dealer Type</label>
+                <select name="type" id="type" class="w-full bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent">
+                    <option value="">All Types</option>
+                    {% for value, label in dealer_types %}
+                    <option value="{{ value }}" {% if dealer_type == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label for="start_date" class="block text-sm font-medium mb-2">Start Date</label>
+                <input type="date" name="start_date" id="start_date" 
+                       value="{{ start_date|default:'' }}"
+                       class="w-full bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent">
+            </div>
+
+            <div>
+                <label for="end_date" class="block text-sm font-medium mb-2">End Date</label>
+                <input type="date" name="end_date" id="end_date" 
+                       value="{{ end_date|default:'' }}"
+                       class="w-full bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent">
+            </div>
+        </form>
+    </div>
+
+    <!-- Total Outstanding -->
+    <div class="bg-mc-grey/10 rounded-lg p-6 mb-8">
+        <h2 class="text-lg font-semibold mb-4">Total Outstanding Balance</h2>
+        <p class="text-3xl font-bold {% if total_outstanding > 0 %}text-red-500{% else %}text-green-500{% endif %}">
+            {{ total_outstanding }}
+        </p>
+    </div>
+
+    <!-- Dealer Details Table -->
+    <div class="bg-mc-grey/10 rounded-lg overflow-hidden">
+        <div class="p-6">
+            <h2 class="text-lg font-semibold mb-4">Dealer Details</h2>
+            {% if dealers %}
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="text-left border-b border-mc-grey/20">
+                            <th class="pb-3">Dealer</th>
+                            <th class="pb-3">Type</th>
+                            <th class="pb-3 text-right">Total Purchases</th>
+                            <th class="pb-3 text-right">Total Paid</th>
+                            <th class="pb-3 text-right">Balance</th>
+                            <th class="pb-3">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-mc-grey/20">
+                        {% for dealer in dealers %}
+                        <tr class="hover:bg-mc-grey/5">
+                            <td class="py-4">
+                                <a href="{% url 'inventory_erp:dealer_detail' dealer.id %}" 
+                                   class="hover:text-mc-accent transition-colors duration-300">
+                                    {{ dealer.name }}
+                                </a>
+                            </td>
+                            <td class="py-4">{{ dealer.get_dealer_type_display }}</td>
+                            <td class="py-4 text-right">{{ dealer.total_purchases|default:0 }}</td>
+                            <td class="py-4 text-right">{{ dealer.total_paid|default:0 }}</td>
+                            <td class="py-4 text-right {% if dealer.balance > 0 %}text-red-500{% elif dealer.balance < 0 %}text-green-500{% endif %}">
+                                {{ dealer.balance|default:0 }}
+                            </td>
+                            <td class="py-4">
+                                <span class="px-2 py-1 rounded-full text-xs
+                                    {% if dealer.balance > dealer.credit_limit %}bg-red-500/20 text-red-500
+                                    {% elif dealer.balance > 0 %}bg-yellow-500/20 text-yellow-500
+                                    {% else %}bg-green-500/20 text-green-500{% endif %}">
+                                    {% if dealer.balance > dealer.credit_limit %}
+                                        Over Credit
+                                    {% elif dealer.balance > 0 %}
+                                        Due Payment
+                                    {% else %}
+                                        Clear
+                                    {% endif %}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-8 text-mc-white/50">
+                {% if request.GET %}
+                No dealers found matching your filters.
+                {% else %}
+                No dealers have been recorded yet.
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

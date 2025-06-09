@@ -1,0 +1,15 @@
+<!-- Single Review Item -->
+<div class="bg-mc-dark rounded-xl p-6 border border-mc-grey/30">
+    <div class="flex justify-between items-start mb-4">
+        <div>
+            <div class="flex items-center">
+                <span class="text-yellow-400">
+                    {% for i in review.rating|ljust:5 %}★{% endfor %}
+                </span>
+            </div>
+            <p class="text-mc-light-grey mt-1">by {{ review.user.email }}</p>
+        </div>
+        <span class="text-mc-light-grey">{{ review.created_at|date:"M d, Y" }}</span>
+    </div>
+    <p class="text-mc-white">{{ review.comment }}</p>
+</div>

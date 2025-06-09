@@ -1,0 +1,318 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#1a1a1a" />
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Mobile Corner - Premium Tech Store</title>    
+    
+    <!-- Scripts -->
+    <script src="{% static 'js/tailwind.js' %}"></script>
+    <script src="{% static 'js/alpine.min.js' %}" defer></script>
+    <script src="{% static 'js/htmx.js' %}"></script>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="{% static 'css/skeleton.css' %}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{% static 'logo-dark.JPG' %}">
+
+    <script>        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        // Dark mode colors
+                        'mc-black': 'var(--mc-black)',
+                        'mc-dark': 'var(--mc-dark)',
+                        'mc-grey': 'var(--mc-grey)',
+                        'mc-light-grey': 'var(--mc-light-grey)',
+                        'mc-white': 'var(--mc-white)',
+                        'mc-accent': 'var(--mc-accent)',
+                        'mc-text': 'var(--mc-text)',
+                        'mc-bg': 'var(--mc-bg)'
+                    },
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif']
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.8s ease-out',
+                        'slide-up': 'slideUp 0.6s ease-out',
+                        'float': 'float 3s ease-in-out infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate'
+                    },
+                    screens: {
+                        'xs': '375px',
+                        'sm': '640px',
+                        'md': '768px',
+                        'lg': '1024px',
+                        'xl': '1280px',
+                        '2xl': '1536px',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Theme Colors */
+        :root {
+            /* Light mode */
+            --mc-black: #ffffff;
+            --mc-dark: #f5f5f5;
+            --mc-grey: #e5e5e5;
+            --mc-light-grey: #757575;
+            --mc-white: #1a1a1a;
+            --mc-accent: #2d2d2d;
+            --mc-text: #1a1a1a;
+            --mc-bg: #ffffff;
+        }
+
+        /* Dark mode */
+        html.dark {
+            --mc-black: #1a1a1a;
+            --mc-dark: #2d2d2d;
+            --mc-grey: #404040;
+            --mc-light-grey: #666666;
+            --mc-white: #ffffff;
+            --mc-accent: #f5f5f5;
+            --mc-text: #ffffff;
+            --mc-bg: #1a1a1a;
+        }
+
+        /* Theme transition */
+        * {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes glow {
+            from { box-shadow: 0 0 20px rgba(255, 255, 255, 0.1); }
+            to { box-shadow: 0 0 40px rgba(255, 255, 255, 0.2); }
+        }
+        .geometric-bg {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .geometric-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(45deg, rgba(255,255,255,0.02) 25%, transparent 25%), 
+                linear-gradient(-45deg, rgba(255,255,255,0.02) 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.02) 75%), 
+                linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.02) 75%);
+            background-size: 60px 60px;
+            background-position: 0 0, 0 30px, 30px -30px, -30px 0px;
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        .text-gradient {
+            background: linear-gradient(135deg, #ffffff 0%, #cccccc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Loader Animation */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .loader {
+            animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        /* Simpler lazy loading styles */
+        .lazy-image {
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .lazy-image.loading {
+            opacity: 0.5;
+            background-color: #2d2d2d;
+        }
+
+        /* Responsive typography */
+        html {
+            font-size: 14px;
+        }
+        @media (min-width: 640px) {
+            html {
+                font-size: 16px;
+            }
+        }
+
+        /* Smooth scrolling and better touch handling */
+        html {
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Remove tap highlight on mobile */
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Better form elements on mobile */
+        input, select, textarea {
+            font-size: 16px !important; /* Prevents zoom on focus in iOS */
+        }
+
+        /* Prevent horizontal scroll */
+        body {
+            overflow-x: hidden;
+            width: 100%;
+        }
+        
+        /* Hide scrollbar while maintaining functionality */
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+
+        /* Image styles */
+        .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background-color: #2d2d2d;
+        }
+    </style>
+</head>
+<body class="bg-mc-black min-h-screen">
+    {% if not request.headers.HX_Request %}
+        <div class="tech-background">
+          <!-- Grid Effect -->
+          <div class="grid-effect"></div>
+          
+          <!-- Rinnegan Effect -->
+          <div class="rinnegan-container">
+            <div class="rinnegan-circle c1"></div>
+            <div class="rinnegan-circle c2"></div>
+            <div class="rinnegan-circle c3"></div>
+            <div class="rinnegan-lines"></div>
+          </div>
+        </div>
+        <div id="particles-container" class="fixed inset-0 overflow-hidden"></div>
+      <svg id="connection-svg" class="fixed inset-0 w-full h-full" style="pointer-events: none;"></svg>
+      <div>
+      <!-- Grid Pattern (Dark Mode) -->
+      <div class="dark-animation fixed inset-0 opacity-20">
+        <div class="absolute inset-0 bg-grid-pattern"></div>
+      </div>
+      
+      <!-- Floating shapes (Light Mode) -->
+      <div class="light-animation fixed inset-0 opacity-20">
+        <div class="absolute inset-0 bg-floating-shapes"></div>
+      </div>
+        <nav id="navbar" x-data="{ open: false }" class="bg-transparent">
+          {% include 'shared/navbar.html' %}
+        </nav>
+        <script src="{% static 'js/dark_mode_toggle.js' %}"></script>
+        {% endif %}
+        <!-- Toast Notification -->
+        <div id="toast" class="fixed top-4 right-4 z-50 transform translate-x-full opacity-0 transition-all duration-300">
+            <div class="flex items-center gap-2 bg-mc-dark text-mc-white px-4 py-3 rounded-lg shadow-lg border border-mc-grey/30">
+                <i class="fas fa-check-circle text-green-500"></i>
+                <span id="toast-message"></span>
+            </div>
+        </div>
+
+        <div id="content-comp">
+            {% block content %}{% endblock %}
+        </div>
+
+        {% if not request.headers.HX_Request %}
+            {% include "shared/footer.html" %}
+        {% endif %}
+
+        {% if not request.headers.HX_Request %}
+            <!-- Chatbot Widget -->
+            {% include 'chatbot/chatbot.html' %}
+        {% endif %}
+
+        <!-- Single consolidated script block -->
+        <script>
+            // Toast notification
+            function showToast(message, duration = 3000) {
+                const toast = document.getElementById('toast');
+                if (toast) {
+                    const toastMessage = document.getElementById('toast-message');
+                    toastMessage.textContent = message;
+                    
+                    toast.classList.remove('translate-x-full', 'opacity-0');
+                    toast.classList.add('translate-x-0', 'opacity-100');
+                    
+                    setTimeout(() => {
+                        toast.classList.remove('translate-x-0', 'opacity-100');
+                        toast.classList.add('translate-x-full', 'opacity-0');
+                    }, duration);
+                }
+            }
+
+            // Initialize animations
+            document.addEventListener('DOMContentLoaded', function() {
+                // Animation observer
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.style.opacity = '1';
+                            entry.target.style.transform = 'translateY(0)';
+                        }
+                    });
+                }, {
+                    threshold: 0.1,
+                    rootMargin: '0px 0px -50px 0px'
+                });
+
+                function initializeAnimations() {
+                    document.querySelectorAll('.animate-slide-up').forEach(el => {
+                        el.style.opacity = '0';
+                        el.style.transform = 'translateY(30px)';
+                        el.style.transition = 'opacity 0.8s ease-out, transform 0.8s ease-out';
+                        observer.observe(el);
+                    });
+                }
+
+                // Initialize on load and after HTMX swaps
+                initializeAnimations();
+                document.body.addEventListener('htmx:afterSwap', initializeAnimations);
+            });
+
+            // Dark mode toggle (only if element exists)
+            document.addEventListener('DOMContentLoaded', function() {
+                const darkModeToggle = document.getElementById('darkModeToggle');
+                if (darkModeToggle) {
+                    darkModeToggle.addEventListener('click', function() {
+                        document.documentElement.classList.toggle('dark');
+                    });
+                }
+            });
+        </script>
+    </body>
+</html>

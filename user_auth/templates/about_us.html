@@ -1,0 +1,483 @@
+{% extends "shared/skeleton.html" %}
+{% load static %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="relative min-h-[70vh] flex items-center justify-center" style="z-index: 1;">
+    <!-- Background Elements -->
+    <div class="absolute inset-0 bg-gradient-to-br from-mc-black to-mc-dark overflow-hidden">
+        <!-- Animated background patterns -->
+        <div class="absolute inset-0 opacity-5">
+            <div class="absolute inset-0 bg-repeat pattern-grid dark:opacity-20 light:opacity-10"></div>
+        </div>
+        <!-- Gradient Overlay -->
+        <div class="absolute inset-0 bg-gradient-to-t from-mc-black/80 to-transparent opacity-80"></div>
+        <!-- Animated Circles -->
+        <div class="absolute top-20 left-10 w-64 h-64 bg-mc-accent/10 rounded-full filter blur-3xl animate-float"></div>
+        <div class="absolute bottom-20 right-10 w-96 h-96 bg-mc-accent/10 rounded-full filter blur-3xl animate-float" style="animation-delay: 1s"></div>
+    </div>
+
+    <!-- Content -->
+    <div class="relative z-10 pt-32 pb-20 px-6">
+        <div class="container mx-auto text-center">
+            <div class="animate-fade-in">
+                <h1 class="text-5xl md:text-7xl font-black mb-8">
+                    <span class="bg-gradient-to-r from-mc-white via-mc-accent to-mc-white bg-clip-text text-transparent">
+                        ABOUT US
+                    </span>
+                </h1>
+                <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-mc-text/80">
+                    Discover the story behind Mobile Corner - Your trusted technology partner in Peer G
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Our Story Section -->
+<section class="py-20 px-6 bg-mc-dark">
+    <div class="container mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div class="animate-slide-up">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 text-gradient">
+                    OUR STORY
+                </h2>
+                <p class="text-mc-light-grey text-lg mb-6 leading-relaxed">
+                    Founded with a vision to revolutionize mobile technology access in Pakistan, Mobile Corner began its journey in the bustling tech hub of Peer G. What started as a small passion project has grown into one of the region's most trusted mobile technology destinations.
+                </p>
+                <p class="text-mc-light-grey text-lg mb-6 leading-relaxed">
+                    We believe that everyone deserves access to premium mobile technology without compromise. Our commitment to authenticity, quality, and customer satisfaction has earned us the trust of thousands of satisfied customers across Pakistan.
+                </p>
+                <p class="text-mc-light-grey text-lg mb-8 leading-relaxed">
+                    Today, Mobile Corner stands as a beacon of reliability in the tech retail space, offering not just products, but complete technology solutions that enhance lives and connect communities.
+                </p>
+            </div>
+            
+            <!-- Interactive Stats Card -->
+            <div class="animate-slide-up" style="animation-delay: 300ms;">
+                <div class="bg-mc-black rounded-2xl p-8 border border-mc-grey/30 card-hover">
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="text-center">
+                            <div class="text-4xl font-bold text-mc-white mb-2 counter" data-target="5000">0</div>
+                            <div class="text-mc-light-grey">Happy Customers</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-4xl font-bold text-mc-white mb-2 counter" data-target="500">0</div>
+                            <div class="text-mc-light-grey">Products Sold</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-4xl font-bold text-mc-white mb-2 counter" data-target="3">0</div>
+                            <div class="text-mc-light-grey">Years Experience</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-4xl font-bold text-mc-white mb-2">24/7</div>
+                            <div class="text-mc-light-grey">Support</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Mission & Vision Section -->
+<section class="py-20 px-6 bg-mc-black">
+    <div class="container mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl md:text-5xl font-bold mb-4">
+                <span class="text-mc-white">OUR </span>
+                <span class="text-gradient">MISSION</span>
+            </h2>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <!-- Mission -->
+            <div class="bg-mc-dark rounded-2xl p-8 card-hover animate-slide-up border border-mc-grey/30">
+                <div class="w-16 h-16 bg-mc-white rounded-full mx-auto mb-6 flex items-center justify-center">
+                    <i class="fas fa-rocket text-2xl text-mc-black"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-center mb-6 text-mc-white">MISSION</h3>
+                <p class="text-mc-light-grey text-center leading-relaxed">
+                    To democratize access to premium mobile technology by providing authentic, high-quality devices and exceptional customer service that exceeds expectations. We strive to be the bridge between cutting-edge technology and the Pakistani market.
+                </p>
+            </div>
+            
+            <!-- Vision -->
+            <div class="bg-mc-dark rounded-2xl p-8 card-hover animate-slide-up border border-mc-grey/30" style="animation-delay: 200ms;">
+                <div class="w-16 h-16 bg-mc-white rounded-full mx-auto mb-6 flex items-center justify-center">
+                    <i class="fas fa-eye text-2xl text-mc-black"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-center mb-6 text-mc-white">VISION</h3>
+                <p class="text-mc-light-grey text-center leading-relaxed">
+                    To become Pakistan's leading mobile technology retailer, known for innovation, trust, and customer-centricity. We envision a future where every Pakistani has access to the latest mobile technology to enhance their digital lifestyle.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Why Choose Us Section -->
+<section class="py-20 px-6 bg-mc-dark">
+    <div class="container mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl md:text-5xl font-bold mb-4">
+                <span class="text-mc-white">WHY CHOOSE </span>
+                <span class="text-gradient">MOBILE CORNER</span>
+            </h2>
+            <p class="text-mc-light-grey text-lg">Experience the difference that sets us apart</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Feature 1 -->
+            <div class="text-center group animate-slide-up">
+                <div class="w-20 h-20 bg-mc-white rounded-full mx-auto mb-6 flex items-center justify-center animate-float group-hover:animate-glow">
+                    <i class="fas fa-shield-alt text-2xl text-mc-black"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-4 group-hover:text-mc-accent transition-colors">
+                    100% AUTHENTIC
+                </h3>
+                <p class="text-mc-light-grey">Every product comes with official warranty and authenticity guarantee. No compromises on quality.</p>
+            </div>
+            
+            <!-- Feature 2 -->
+            <div class="text-center group animate-slide-up" style="animation-delay: 200ms;">
+                <div class="w-20 h-20 bg-mc-white rounded-full mx-auto mb-6 flex items-center justify-center animate-float group-hover:animate-glow" style="animation-delay: 0.5s;">
+                    <i class="fas fa-shipping-fast text-2xl text-mc-black"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-4 group-hover:text-mc-accent transition-colors">
+                    FAST DELIVERY
+                </h3>
+                <p class="text-mc-light-grey">Lightning-fast delivery across Pakistan with real-time tracking and secure packaging.</p>
+            </div>
+            
+            <!-- Feature 3 -->
+            <div class="text-center group animate-slide-up" style="animation-delay: 400ms;">
+                <div class="w-20 h-20 bg-mc-white rounded-full mx-auto mb-6 flex items-center justify-center animate-float group-hover:animate-glow" style="animation-delay: 1s;">
+                    <i class="fas fa-headset text-2xl text-mc-black"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-4 group-hover:text-mc-accent transition-colors">
+                    24/7 SUPPORT
+                </h3>
+                <p class="text-mc-light-grey">Round-the-clock customer support with expert technicians ready to help you anytime.</p>
+            </div>
+            
+            <!-- Feature 4 -->
+            <div class="text-center group animate-slide-up" style="animation-delay: 600ms;">
+                <div class="w-20 h-20 bg-mc-white rounded-full mx-auto mb-6 flex items-center justify-center animate-float group-hover:animate-glow" style="animation-delay: 1.5s;">
+                    <i class="fas fa-money-bill-wave text-2xl text-mc-black"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-4 group-hover:text-mc-accent transition-colors">
+                    BEST PRICES
+                </h3>
+                <p class="text-mc-light-grey">Competitive pricing with regular deals and discounts. Get premium quality at affordable rates.</p>
+            </div>
+            
+            <!-- Feature 5 -->
+            <div class="text-center group animate-slide-up" style="animation-delay: 800ms;">
+                <div class="w-20 h-20 bg-mc-white rounded-full mx-auto mb-6 flex items-center justify-center animate-float group-hover:animate-glow" style="animation-delay: 2s;">
+                    <i class="fas fa-sync-alt text-2xl text-mc-black"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-4 group-hover:text-mc-accent transition-colors">
+                    EASY RETURNS
+                </h3>
+                <p class="text-mc-light-grey">Hassle-free return and exchange policy. Your satisfaction is our top priority.</p>
+            </div>
+            
+            <!-- Feature 6 -->
+            <div class="text-center group animate-slide-up" style="animation-delay: 1000ms;">
+                <div class="w-20 h-20 bg-mc-white rounded-full mx-auto mb-6 flex items-center justify-center animate-float group-hover:animate-glow" style="animation-delay: 2.5s;">
+                    <i class="fas fa-users text-2xl text-mc-black"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-4 group-hover:text-mc-accent transition-colors">
+                    TRUSTED COMMUNITY
+                </h3>
+                <p class="text-mc-light-grey">Join thousands of satisfied customers who trust Mobile Corner for their tech needs.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Location & Contact Section -->
+<section class="py-20 px-6 bg-mc-black">
+    <div class="container mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <!-- Contact Info -->
+            <div class="animate-slide-up">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 text-gradient">
+                    VISIT US
+                </h2>
+                <p class="text-mc-light-grey text-lg mb-8 leading-relaxed">
+                    Located in the heart of Peer G, our store is your gateway to the latest mobile technology. Visit us for hands-on experience with our products and personalized assistance from our expert team.
+                </p>
+                
+                <div class="space-y-6">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 bg-mc-white rounded-full flex items-center justify-center">
+                            <i class="fas fa-map-marker-alt text-mc-black"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-mc-white">Address</h4>
+                            <p class="text-mc-light-grey">Main Market, Peer G, Punjab, Pakistan</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 bg-mc-white rounded-full flex items-center justify-center">
+                            <i class="fas fa-phone text-mc-black"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-mc-white">Phone</h4>
+                            <p class="text-mc-light-grey">+92 XXX XXXXXXX</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 bg-mc-white rounded-full flex items-center justify-center">
+                            <i class="fas fa-clock text-mc-black"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-mc-white">Store Hours</h4>
+                            <p class="text-mc-light-grey">Mon - Sun: 9:00 AM - 10:00 PM</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Interactive Store Image -->
+            <div class="animate-slide-up" style="animation-delay: 300ms;">
+                <div class="card-container">
+                    <div class="card">
+                        <!-- Front of the card -->
+                        <div class="card-face card-front">
+                            <div class="image-wrapper">
+                                <img src="{% static 'card.jpg' %}" 
+                                     class="card-image rounded-3xl" 
+                                     alt="Mobile Corner Store">
+                            </div>
+                        </div>
+                        <!-- Back of the card -->
+                        <div class="card-face card-back">
+                            <div class="image-wrapper">
+                                <img src="{% static 'card-back.jpg' %}" 
+                                     class="card-image rounded-3xl" 
+                                     alt="Mobile Corner Interior">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-20 px-6 bg-mc-dark">
+    <div class="container mx-auto text-center">
+        <div class="bg-mc-black rounded-2xl p-12 max-w-4xl mx-auto border border-mc-grey/30 animate-slide-up">
+            <h2 class="text-3xl md:text-4xl font-bold mb-6 text-gradient">
+                READY TO EXPERIENCE THE DIFFERENCE?
+            </h2>
+            <p class="text-mc-light-grey text-lg mb-8">
+                Join thousands of satisfied customers who have made Mobile Corner their trusted tech partner.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="{% url 'product_list' %}"
+                   hx-get="{% url 'product_list' %}"
+                   hx-target="#content-comp"
+                   hx-push-url="true"
+                   class="bg-mc-white text-mc-black px-8 py-3 rounded-lg font-semibold hover:bg-mc-accent transition-colors">
+                    SHOP NOW
+                </a>
+                <a href="#contact"
+                   class="border border-mc-white text-mc-white px-8 py-3 rounded-lg font-semibold hover:bg-mc-white hover:text-mc-black transition-colors">
+                    CONTACT US
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .pattern-grid {
+        background-image: 
+            linear-gradient(var(--mc-accent) 1px, transparent 1px),
+            linear-gradient(90deg, var(--mc-accent) 1px, transparent 1px);
+        background-size: 20px 20px;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+    }
+
+    .animate-float {
+        animation: float 6s ease-in-out infinite;
+    }
+
+    /* Card flip container styles */
+    .card-container {
+        position: relative;
+        width: min(90vw, 437px);
+        height: min(60vh, 310px);
+        margin: 0 auto;
+        perspective: 1000px;
+    }
+
+    @media (min-width: 1024px) {
+        .card-container {
+            width: min(100%, 583px);
+            height: min(70vh, 413px);
+        }
+    }
+
+    .card {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+        transform-style: preserve-3d;
+        transition: transform 2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .card:hover {
+        transform: rotateY(180deg);
+    }
+
+    .card-face {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+        overflow: hidden;
+        border-radius: 1rem;
+    }
+
+    .image-wrapper {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .card-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        transition: transform 0.3s ease;
+        transform: scale(1.05);
+    }
+
+    .card-front {
+        z-index: 2;
+        transform: rotateY(0deg);
+    }
+
+    .card-back {
+        transform: rotateY(180deg);
+    }
+
+    /* Counter animation */
+    .counter {
+        transition: all 0.3s ease;
+    }
+
+    /* Glow effect on hover */
+    .card-container::before {
+        content: '';
+        position: absolute;
+        top: -5px;
+        left: -5px;
+        right: -5px;
+        bottom: -5px;
+        background: linear-gradient(45deg, var(--mc-accent), var(--mc-white));
+        border-radius: 25px;
+        z-index: -1;
+        filter: blur(20px);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .card-container:hover::before {
+        opacity: 0.15;
+        animation: glow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+        from {
+            filter: blur(20px);
+            opacity: 0.15;
+        }
+        to {
+            filter: blur(25px);
+            opacity: 0.2;
+        }
+    }
+
+    .card-container {
+        animation: float 6s ease-in-out infinite;
+    }
+</style>
+
+<script>
+    // Counter animation
+    function animateCounters() {
+        const counters = document.querySelectorAll('.counter');
+        const speed = 200;
+
+        counters.forEach(counter => {
+            const updateCount = () => {
+                const target = +counter.getAttribute('data-target');
+                const count = +counter.innerText;
+                const inc = target / speed;
+
+                if (count < target) {
+                    counter.innerText = Math.ceil(count + inc);
+                    setTimeout(updateCount, 1);
+                } else {
+                    counter.innerText = target;
+                }
+            };
+            updateCount();
+        });
+    }
+
+    // Intersection Observer for counter animation
+    const counterObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                animateCounters();
+                counterObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.5 });
+
+    // Add click functionality for card flip on mobile
+    document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            card.addEventListener('click', function() {
+                this.style.transform = 
+                    this.style.transform === 'rotateY(180deg)' 
+                        ? 'rotateY(0deg)' 
+                        : 'rotateY(180deg)';
+            });
+
+            // Prevent image drag
+            card.querySelectorAll('img').forEach(img => {
+                img.addEventListener('dragstart', e => e.preventDefault());
+            });
+        });
+
+        // Start counter animation when stats section is visible
+        const statsSection = document.querySelector('.counter');
+        if (statsSection) {
+            counterObserver.observe(statsSection.closest('section'));
+        }
+    });
+</script>
+
+{% endblock %}

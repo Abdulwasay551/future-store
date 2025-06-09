@@ -1,0 +1,227 @@
+{% extends 'inventory_erp/base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-8">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-2xl font-bold">{% if purchase %}Edit{% else %}New{% endif %} Purchase Entry</h1>
+        <a href="{% url 'inventory_erp:purchase_list' %}" class="text-mc-white/70 hover:text-mc-white transition-colors duration-300">
+            <i class="fas fa-arrow-left mr-2"></i>Back to List
+        </a>
+    </div>
+
+    <form method="POST" class="max-w-5xl mx-auto" hx-post="{{ request.path }}" hx-swap="outerHTML">
+        {% csrf_token %}
+        <div class="bg-mc-grey/10 rounded-lg p-6 mb-8">
+            <h2 class="text-lg font-semibold mb-4">Purchase Details</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Dealer Selection -->
+                <div>
+                    <label for="dealer" class="block text-sm font-medium mb-2">Dealer*</label>
+                    <select name="dealer" id="dealer" class="w-full bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent" required>
+                        <option value="">Select Dealer</option>
+                        {% for dealer in dealers %}
+                        <option value="{{ dealer.id }}" {% if purchase.dealer_id == dealer.id %}selected{% endif %}>
+                            {{ dealer.name }} ({{ dealer.get_dealer_type_display }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Invoice Number -->
+                <div>
+                    <label for="dealer_invoice_number" class="block text-sm font-medium mb-2">Dealer Invoice Number*</label>
+                    <input type="text" name="dealer_invoice_number" id="dealer_invoice_number" 
+                           value="{{ purchase.dealer_invoice_number|default:'' }}" required
+                           class="w-full bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent">
+                </div>
+
+                <!-- Purchase Date -->
+                <div>
+                    <label for="purchase_date" class="block text-sm font-medium mb-2">Purchase Date*</label>
+                    <input type="date" name="purchase_date" id="purchase_date" 
+                           value="{{ purchase.purchase_date|date:'Y-m-d'|default:today|date:'Y-m-d' }}" required
+                           class="w-full bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent">
+                </div>
+
+                <!-- Purchase Type -->
+                <div>
+                    <label for="purchase_type" class="block text-sm font-medium mb-2">Purchase Type*</label>
+                    <select name="purchase_type" id="purchase_type" class="w-full bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent" required>
+                        <option value="new" {% if purchase.purchase_type == 'new' %}selected{% endif %}>New Stock</option>
+                        <option value="second_hand" {% if purchase.purchase_type == 'second_hand' %}selected{% endif %}>Second Hand</option>
+                    </select>
+                </div>
+
+                <!-- Seller CNIC (for second-hand) -->
+                <div id="sellerCnicGroup" class="{% if purchase.purchase_type != 'second_hand' %}hidden{% endif %}">
+                    <label for="seller_cnic" class="block text-sm font-medium mb-2">Seller CNIC</label>
+                    <input type="text" name="seller_cnic" id="seller_cnic" 
+                           value="{{ purchase.seller_cnic|default:'' }}"
+                           class="w-full bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent">
+                </div>
+
+                <!-- Payment Due Date -->
+                <div>
+                    <label for="payment_due_date" class="block text-sm font-medium mb-2">Payment Due Date</label>
+                    <input type="date" name="payment_due_date" id="payment_due_date" 
+                           value="{{ purchase.payment_due_date|date:'Y-m-d'|default:'' }}"
+                           class="w-full bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent">
+                </div>
+            </div>
+        </div>
+
+        <!-- Purchase Items -->
+        <div class="bg-mc-grey/10 rounded-lg p-6 mb-8">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold">Purchase Items</h2>
+                <button type="button" id="addItemBtn" class="text-mc-accent hover:text-mc-accent/80 transition-colors duration-300">
+                    <i class="fas fa-plus mr-2"></i>Add Item
+                </button>
+            </div>
+
+            <div id="itemsContainer">
+                {% for item in purchase_items|default:'' %}
+                <div class="item-row grid grid-cols-12 gap-4 mb-4">
+                    <!-- Device -->
+                    <div class="col-span-4">
+                        <select name="device[]" class="w-full bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent" required>
+                            <option value="">Select Device</option>
+                            {% for device in devices %}
+                            <option value="{{ device.id }}" {% if item.device_id == device.id %}selected{% endif %}>
+                                {{ device.name }} ({{ device.company.name }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Quantity -->
+                    <div class="col-span-2">
+                        <input type="number" name="quantity[]" value="{{ item.quantity|default:1 }}" min="1"
+                               class="w-full bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent"
+                               placeholder="Qty" required>
+                    </div>
+
+                    <!-- Unit Price -->
+                    <div class="col-span-2">
+                        <input type="number" name="unit_price[]" value="{{ item.unit_price|default:0 }}" min="0" step="0.01"
+                               class="w-full bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent"
+                               placeholder="Price" required>
+                    </div>
+
+                    <!-- Device Identifiers -->
+                    <div class="col-span-3">
+                        <input type="text" name="identifiers[]" value="{{ item.identifiers|default:'' }}"
+                               class="w-full bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent"
+                               placeholder="IMEI/Serial (comma separated)">
+                    </div>
+
+                    <!-- Remove Button -->
+                    <div class="col-span-1">
+                        <button type="button" class="remove-item text-red-500 hover:text-red-400">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Item Template -->
+            <template id="itemTemplate">
+                <div class="item-row grid grid-cols-12 gap-4 mb-4">
+                    <div class="col-span-4">
+                        <select name="device[]" class="w-full bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent" required>
+                            <option value="">Select Device</option>
+                            {% for device in devices %}
+                            <option value="{{ device.id }}">{{ device.name }} ({{ device.company.name }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-span-2">
+                        <input type="number" name="quantity[]" value="1" min="1"
+                               class="w-full bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent"
+                               placeholder="Qty" required>
+                    </div>
+                    <div class="col-span-2">
+                        <input type="number" name="unit_price[]" value="0" min="0" step="0.01"
+                               class="w-full bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent"
+                               placeholder="Price" required>
+                    </div>
+                    <div class="col-span-3">
+                        <input type="text" name="identifiers[]"
+                               class="w-full bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent"
+                               placeholder="IMEI/Serial (comma separated)">
+                    </div>
+                    <div class="col-span-1">
+                        <button type="button" class="remove-item text-red-500 hover:text-red-400">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <!-- Notes -->
+        <div class="bg-mc-grey/10 rounded-lg p-6 mb-8">
+            <label for="notes" class="block text-sm font-medium mb-2">Notes</label>
+            <textarea name="notes" id="notes" rows="3"
+                      class="w-full bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent">{{ purchase.notes|default:'' }}</textarea>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="flex justify-end space-x-4">
+            <a href="{% url 'inventory_erp:purchase_list' %}" class="px-6 py-2 rounded-lg bg-mc-grey/20 hover:bg-mc-grey/30 transition-colors duration-300">
+                Cancel
+            </a>
+            <button type="submit" class="px-6 py-2 rounded-lg bg-mc-accent hover:bg-mc-accent/80 transition-colors duration-300">
+                {% if purchase %}Update{% else %}Create{% endif %} Purchase
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const itemsContainer = document.getElementById('itemsContainer');
+    const itemTemplate = document.getElementById('itemTemplate');
+    const addItemBtn = document.getElementById('addItemBtn');
+    const purchaseType = document.getElementById('purchase_type');
+    const sellerCnicGroup = document.getElementById('sellerCnicGroup');
+
+    // Add new item
+    addItemBtn.addEventListener('click', function() {
+        const clone = document.importNode(itemTemplate.content, true);
+        itemsContainer.appendChild(clone);
+        setupRemoveButton(itemsContainer.lastElementChild);
+    });
+
+    // Remove item
+    function setupRemoveButton(row) {
+        const removeBtn = row.querySelector('.remove-item');
+        removeBtn.addEventListener('click', function() {
+            row.remove();
+        });
+    }
+
+    // Setup initial remove buttons
+    document.querySelectorAll('.item-row').forEach(setupRemoveButton);
+
+    // Toggle CNIC field visibility
+    purchaseType.addEventListener('change', function() {
+        if (this.value === 'second_hand') {
+            sellerCnicGroup.classList.remove('hidden');
+            document.getElementById('seller_cnic').required = true;
+        } else {
+            sellerCnicGroup.classList.add('hidden');
+            document.getElementById('seller_cnic').required = false;
+        }
+    });
+
+    // Add initial item if none exists
+    if (itemsContainer.children.length === 0) {
+        addItemBtn.click();
+    }
+});
+</script>
+{% endblock %}

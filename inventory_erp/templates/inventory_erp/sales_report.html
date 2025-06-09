@@ -1,0 +1,133 @@
+{% extends 'inventory_erp/base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-8">
+    <div class="mb-8">
+        <h1 class="text-2xl font-bold mb-4">Sales Report</h1>
+
+        <!-- Date Range Filter -->
+        <form method="get" class="flex space-x-4">
+            <div>
+                <label for="start_date" class="block text-sm font-medium mb-2">Start Date</label>
+                <input type="date" name="start_date" id="start_date" value="{{ start_date|date:'Y-m-d' }}"
+                       class="bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent">
+            </div>
+            <div>
+                <label for="end_date" class="block text-sm font-medium mb-2">End Date</label>
+                <input type="date" name="end_date" id="end_date" value="{{ end_date|date:'Y-m-d' }}"
+                       class="bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent">
+            </div>
+            <div class="flex items-end">
+                <button type="submit" class="bg-mc-accent hover:bg-mc-accent/80 text-mc-white px-4 py-2 rounded-lg transition-colors duration-300">
+                    Apply Filter
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <!-- Total Sales Card -->
+        <div class="bg-mc-grey/10 rounded-lg p-6">
+            <div class="text-mc-white/70 text-sm mb-2">Total Sales</div>
+            <div class="text-2xl font-bold">{{ summary.total_sales }}</div>
+        </div>
+
+        <!-- Total Amount Card -->
+        <div class="bg-mc-grey/10 rounded-lg p-6">
+            <div class="text-mc-white/70 text-sm mb-2">Total Amount</div>
+            <div class="text-2xl font-bold">Rs. {{ summary.total_amount|floatformat:2 }}</div>
+        </div>
+
+        <!-- Received Amount Card -->
+        <div class="bg-mc-grey/10 rounded-lg p-6">
+            <div class="text-mc-white/70 text-sm mb-2">Received Amount</div>
+            <div class="text-2xl font-bold text-green-400">Rs. {{ summary.received_amount|floatformat:2 }}</div>
+        </div>
+
+        <!-- Pending Amount Card -->
+        <div class="bg-mc-grey/10 rounded-lg p-6">
+            <div class="text-mc-white/70 text-sm mb-2">Pending Amount</div>
+            <div class="text-2xl font-bold text-yellow-400">Rs. {{ summary.pending_amount|floatformat:2 }}</div>
+        </div>
+    </div>
+
+    <!-- Sales Chart -->
+    <div class="bg-mc-grey/10 rounded-lg p-6 mb-8">
+        <h2 class="text-lg font-semibold mb-4">Daily Sales Trend</h2>
+        <canvas id="salesChart" class="w-full h-64"></canvas>
+    </div>
+
+    <!-- Print Button -->
+    <div class="flex justify-end mb-8">
+        <button onclick="window.print()" class="bg-mc-accent hover:bg-mc-accent/80 text-mc-white px-4 py-2 rounded-lg transition-colors duration-300">
+            <i class="fas fa-print mr-2"></i>Print Report
+        </button>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const salesData = {{ daily_sales|safe }};
+    const dates = salesData.map(item => item.sale_date);
+    const amounts = salesData.map(item => item.amount);
+    const counts = salesData.map(item => item.count);
+
+    const ctx = document.getElementById('salesChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: dates,
+            datasets: [
+                {
+                    label: 'Sales Amount',
+                    data: amounts,
+                    borderColor: '#10B981',
+                    tension: 0.4,
+                    yAxisID: 'y',
+                },
+                {
+                    label: 'Number of Sales',
+                    data: counts,
+                    borderColor: '#60A5FA',
+                    tension: 0.4,
+                    yAxisID: 'y1',
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            scales: {
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: 'Amount (Rs.)'
+                    }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: 'Number of Sales'
+                    },
+                    grid: {
+                        drawOnChartArea: false,
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

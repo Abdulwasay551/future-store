@@ -1,0 +1,78 @@
+{% extends "shared/skeleton.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Category Navigation -->
+    <div class="mb-8">
+        <div class="flex items-center mb-4">
+            <h2 class="text-2xl font-bold text-mc-white">Browse Categories</h2>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {% for category in categories %}
+            <a href="{% url 'product_list' %}?category={{ category.slug }}" 
+               hx-get="{% url 'product_list' %}?category={{ category.slug }}"
+               hx-target="#content-comp"
+               hx-push-url="true"
+               class="group bg-mc-dark rounded-xl p-4 border border-mc-grey/30 hover:border-mc-accent transition-all duration-300">
+                <div class="aspect-square mb-3 overflow-hidden rounded-lg bg-mc-black">
+                    {% if category.image %}
+                    <img src="{{ category.image.url }}" alt="{{ category.name }}" 
+                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                    {% else %}
+                    <div class="w-full h-full flex items-center justify-center text-mc-grey">
+                        <i class="fas fa-folder text-4xl"></i>
+                    </div>
+                    {% endif %}
+                </div>
+                <h3 class="text-mc-white text-center font-medium group-hover:text-mc-accent transition-colors">
+                    {{ category.name }}
+                </h3>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Active Category Companies -->
+    {% if selected_category %}
+    <div class="mb-8">
+        <div class="flex items-center mb-4">
+            <h2 class="text-2xl font-bold text-mc-white">{{ selected_category.name }} Brands</h2>
+        </div>
+        <div class="flex overflow-x-auto space-x-4 pb-4 scrollbar-hide">
+            <a href="{% url 'product_list' %}?category={{ selected_category.slug }}"
+               hx-get="{% url 'product_list' %}?category={{ selected_category.slug }}"
+               hx-target="#content-comp"
+               hx-push-url="true" 
+               class="flex-shrink-0 px-6 py-2 rounded-full {% if not selected_company %}bg-mc-accent text-mc-black{% else %}bg-mc-dark text-mc-white hover:bg-mc-grey/30{% endif %} transition-colors">
+                All Brands
+            </a>
+            {% for company in selected_category.companies.all %}
+            <a href="{% url 'product_list' %}?category={{ selected_category.slug }}&company={{ company.slug }}"
+               hx-get="{% url 'product_list' %}?category={{ selected_category.slug }}&company={{ company.slug }}"
+               hx-target="#content-comp"
+               hx-push-url="true"
+               class="flex-shrink-0 px-6 py-2 rounded-full {% if selected_company.id == company.id %}bg-mc-accent text-mc-black{% else %}bg-mc-dark text-mc-white hover:bg-mc-grey/30{% endif %} transition-colors">
+                {{ company.name }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Products Section -->
+    <div id="products-section">
+        {% include "store/products_section.html" %}
+    </div>
+</div>
+
+<style>
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+</style>
+{% endblock %}

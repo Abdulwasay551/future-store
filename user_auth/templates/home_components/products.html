@@ -1,0 +1,83 @@
+<!-- Featured Products -->
+<section class="py-20 px-6 bg-mc-dark">
+    <div class="container mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl md:text-5xl font-bold mb-4 text-gradient">
+                FEATURED PRODUCTS
+            </h2>
+            <p class="text-mc-light-grey text-lg">Discover our premium collection of mobile devices</p>
+            <a href="{% url 'product_list' %}" 
+               hx-get="{% url 'product_list' %}"
+               hx-target="#content-comp"
+               hx-push-url="true"
+               class="inline-block mt-4 px-6 py-2 bg-mc-white text-mc-black rounded-lg hover:bg-mc-accent transition-colors duration-300">
+                View All Products
+            </a>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for product in featured_products %}
+            <div class="bg-mc-black rounded-xl p-6 card-hover animate-slide-up border border-mc-grey/30" 
+                 style="animation-delay: {{ forloop.counter0 }}00ms;">
+                <div class="relative mb-6 overflow-hidden rounded-lg">
+                    <div class="h-48 bg-gradient-to-br from-mc-grey to-mc-dark">
+                        {% if product.primary_image %}
+                        <img src="{{ product.primary_image }}" 
+                             alt="{{ product.name }}"
+                             class="w-full h-full object-cover">
+                        {% else %}
+                        <div class="w-full h-full flex items-center justify-center text-mc-grey">
+                            <i class="fas fa-image text-4xl"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% if product.is_featured %}
+                    <div class="absolute top-4 right-4 bg-mc-white text-mc-black text-xs px-3 py-1 rounded-full font-semibold">
+                        FEATURED
+                    </div>
+                    {% endif %}
+                </div>
+                <h3 class="text-xl text-mc-white font-bold mb-2 hover:text-mc-accent transition-colors">
+                    {{ product.name }}
+                </h3>
+                <p class="text-mc-light-grey mb-4">{{ product.description|truncatechars:60 }}</p>
+                <div class="flex items-center justify-between">
+                    <div class="flex flex-col">
+                        <span class="text-2xl font-bold text-mc-white">{{ product.price }} ₨</span>
+                        <div class="flex items-center mt-1">
+                            <span class="text-yellow-400">★</span>
+                            <span class="ml-1 text-mc-light-grey text-sm">{{ product.average_rating|floatformat:1 }}</span>
+                        </div>
+                    </div>
+                    {% if user.is_authenticated %}
+                    <form hx-post="{% url 'add_to_cart' product.id %}" 
+                          hx-target="#cart-count"
+                          hx-swap="innerHTML">
+                        {% csrf_token %}
+                        <button type="submit" 
+                                onclick="showToast('{{ product.name }} added to cart')"
+                                class="bg-mc-white text-mc-black px-4 py-2 rounded-lg transition-colors font-semibold hover:bg-mc-accent">
+                            Add to Cart
+                        </button>
+                    </form>
+                    {% else %}
+                    <a href="{% url 'login' %}"
+                       hx-get="{% url 'login' %}"
+                       hx-target="#content-comp"
+                       hx-push-url="true"
+                       class="bg-mc-white text-mc-black px-4 py-2 rounded-lg transition-colors font-semibold hover:bg-mc-accent">
+                        Add to Cart
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-12">
+                <div class="text-5xl mb-4">📱</div>
+                <h3 class="text-xl font-semibold mb-2 text-mc-white">No featured products yet</h3>
+                <p class="text-mc-light-grey">Check back soon for our featured products!</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>

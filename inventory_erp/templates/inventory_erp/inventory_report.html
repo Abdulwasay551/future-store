@@ -1,0 +1,144 @@
+{% extends 'inventory_erp/base.html' %}
+{% load inventory_tags %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-8">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-2xl font-bold">Inventory Report</h1>
+        <div class="space-x-4">
+            <button onclick="window.print()" class="px-6 py-2 rounded-lg bg-mc-accent hover:bg-mc-accent/80 transition-colors duration-300">
+                <i class="fas fa-print mr-2"></i>Print Report
+            </button>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-mc-grey/10 rounded-lg p-6">
+            <h3 class="text-sm font-medium text-mc-white/70 mb-2">Total Devices</h3>
+            <p class="text-2xl font-bold">{{ summary.total_devices }}</p>
+        </div>
+        
+        <div class="bg-mc-grey/10 rounded-lg p-6">
+            <h3 class="text-sm font-medium text-mc-white/70 mb-2">Low Stock Items</h3>
+            <p class="text-2xl font-bold text-yellow-500">{{ summary.low_stock }}</p>
+        </div>
+        
+        <div class="bg-mc-grey/10 rounded-lg p-6">
+            <h3 class="text-sm font-medium text-mc-white/70 mb-2">Out of Stock</h3>
+            <p class="text-2xl font-bold text-red-500">{{ summary.out_of_stock }}</p>
+        </div>
+        
+        <div class="bg-mc-grey/10 rounded-lg p-6">
+            <h3 class="text-sm font-medium text-mc-white/70 mb-2">Total Stock Value</h3>
+            <p class="text-2xl font-bold text-green-500">{{ summary.total_stock_value }}</p>
+        </div>
+    </div>
+
+    <!-- Category Summary -->
+    <div class="bg-mc-grey/10 rounded-lg p-6 mb-8">
+        <h2 class="text-lg font-semibold mb-4">Category Summary</h2>
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="text-left border-b border-mc-grey/20">
+                        <th class="pb-3">Category</th>
+                        <th class="pb-3 text-right">Devices</th>
+                        <th class="pb-3 text-right">Total Stock</th>
+                        <th class="pb-3 text-right">Stock Value</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-mc-grey/20">
+                    {% for category in category_summary %}
+                    <tr class="hover:bg-mc-grey/5">
+                        <td class="py-4">{{ category.category__name|default:'Uncategorized' }}</td>
+                        <td class="py-4 text-right">{{ category.count }}</td>
+                        <td class="py-4 text-right">{{ category.total_stock }}</td>
+                        <td class="py-4 text-right">{{ category.stock_value }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Stock Details -->
+    <div class="bg-mc-grey/10 rounded-lg p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-semibold">Stock Details</h2>
+            <input type="text" id="stockSearch" 
+                   placeholder="Search devices..." 
+                   class="bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent">
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="text-left border-b border-mc-grey/20">
+                        <th class="pb-3">Device</th>
+                        <th class="pb-3">Category</th>
+                        <th class="pb-3">Company</th>
+                        <th class="pb-3 text-right">Stock</th>
+                        <th class="pb-3 text-right">Price</th>
+                        <th class="pb-3 text-right">Value</th>
+                        <th class="pb-3">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-mc-grey/20">
+                    {% for device in devices %}
+                    <tr class="hover:bg-mc-grey/5">
+                        <td class="py-4">{{ device.name }}</td>
+                        <td class="py-4">{{ device.category.name|default:'-' }}</td>
+                        <td class="py-4">{{ device.company.name }}</td>
+                        <td class="py-4 text-right">{{ device.stock }}</td>
+                        <td class="py-4 text-right">{{ device.price }}</td>
+                        <td class="py-4 text-right">{{ device.stock|multiply:device.price }}</td>
+                        <td class="py-4">
+                            <span class="px-2 py-1 rounded-full text-xs 
+                                {% if device.stock == 0 %}bg-red-500/20 text-red-500
+                                {% elif device.stock <= 10 %}bg-yellow-500/20 text-yellow-500
+                                {% else %}bg-green-500/20 text-green-500{% endif %}">
+                                {% if device.stock == 0 %}
+                                    Out of Stock
+                                {% elif device.stock <= 10 %}
+                                    Low Stock
+                                {% else %}
+                                    In Stock
+                                {% endif %}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('stockSearch');
+    const tableRows = document.querySelectorAll('tbody tr');
+
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        
+        tableRows.forEach(row => {
+            const deviceName = row.cells[0].textContent.toLowerCase();
+            const category = row.cells[1].textContent.toLowerCase();
+            const company = row.cells[2].textContent.toLowerCase();
+            
+            if (deviceName.includes(searchTerm) || 
+                category.includes(searchTerm) || 
+                company.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

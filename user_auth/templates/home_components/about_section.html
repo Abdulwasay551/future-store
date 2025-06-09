@@ -1,0 +1,201 @@
+<!-- About Section -->
+{% load static %}
+    <section class="py-20 px-6 bg-mc-dark">
+        <div class="container mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-4xl md:text-5xl font-bold mb-6 text-gradient">
+                        ABOUT MOBILE CORNER
+                    </h2>
+                    <p class="text-mc-light-grey text-lg mb-6 leading-relaxed">
+                        Located in the heart of Peer G, Mobile Corner has been serving the community with premium mobile technology for years. We pride ourselves on offering the latest devices, accessories, and exceptional customer service.
+                    </p>
+                    <p class="text-mc-light-grey text-lg mb-8 leading-relaxed">
+                        Our commitment to quality and authenticity has made us the trusted choice for mobile enthusiasts across the region.
+                    </p>
+                    <button class="bg-mc-white text-mc-black px-8 py-3 rounded-lg font-semibold hover:bg-mc-accent transition-colors">
+                        Learn More
+                    </button>
+                </div>
+                <!-- 3D Card Flip Container -->
+                    <div class="card-container">
+                    <div class="card">
+                        <!-- Front of the card -->
+                        <div class="card-face card-front">
+                            <div class="image-wrapper">
+                                <img src="{% static 'card.jpg' %}" 
+                                     class="card-image rounded-3xl" 
+                                     alt="Mobile Corner Store">
+                            </div>
+                        </div>
+                        <!-- Back of the card -->
+                        <div class="card-face card-back">
+                            <div class="image-wrapper">
+                                <img src="{% static 'card-back.jpg' %}" 
+                                     class="card-image rounded-3xl" 
+                                     alt="Mobile Corner Store">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<style>    /* Card flip container styles */
+    .card-container {
+        position: relative;
+        width: min(90vw, 874px); /* Half of original image width */
+        height: min(60vh, 620px); /* Half of original image height - maintains aspect ratio */
+        margin: 0 auto;
+        perspective: 1000px;
+    }
+
+    @media (min-width: 1024px) {
+        .card-container {
+            width: min(100%, 874px);
+            height: min(70vh, 620px);
+        }
+    }
+
+    .card {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+        transform-style: preserve-3d;
+        transition: transform 2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .card:hover {
+        transform: rotateY(180deg);
+    }
+
+    /* Card faces */
+    .card-face {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+        overflow: hidden;
+        border-radius: 1rem;
+    }
+
+    .image-wrapper {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .card-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        transition: transform 0.3s ease;
+    }
+
+     .card-image {
+        transform: scale(1.05);
+    }
+
+    .card-front {
+        z-index: 2;
+        transform: rotateY(0deg);
+    }
+
+    .card-back {
+        transform: rotateY(180deg);
+    }
+
+
+    /* Glow effect on hover */
+    .card-container::before {
+        content: '';
+        position: absolute;
+        top: -5px;
+        left: -5px;
+        right: -5px;
+        bottom: -5px;
+        background: linear-gradient(45deg, var(--mc-accent), var(--mc-white));
+        border-radius: 25px;
+        z-index: -1;
+        filter: blur(20px);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .card-container:hover::before {
+        opacity: 0.15;
+        animation: glow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+        from {
+            filter: blur(20px);
+            opacity: 0.15;
+        }
+        to {
+            filter: blur(25px);
+            opacity: 0.2;
+        }
+    }
+
+    /* Add floating animation */
+    .card-container {
+        animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(0px);
+        }
+        50% {
+            transform: translateY(-10px);
+        }
+    }    /* Responsive breakpoints */
+    @media (max-width: 768px) {
+        .card-container {
+            width: min(85vw, 583px); /* One-third of original width */
+            height: min(50vh, 413px); /* One-third of original height - maintains aspect ratio */
+        }
+        
+        .card-face {
+            border-radius: 0.75rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .card-container {
+            width: min(90vw, 437px); /* One-fourth of original width */
+            height: min(45vh, 310px); /* One-fourth of original height - maintains aspect ratio */
+        }
+    }
+
+    /* Preserve image quality */
+    .card-image {
+        max-width: 874px; /* Half of original image width */
+        max-height: 620px; /* Half of original image height */
+        object-fit: contain;
+    }
+</style>
+
+<script>
+    // Add click functionality for mobile devices
+    document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('click', function() {
+            this.style.transform = 
+                this.style.transform === 'rotateY(180deg)' 
+                    ? 'rotateY(0deg)' 
+                    : 'rotateY(180deg)';
+        });
+
+        // Prevent image drag
+        card.querySelectorAll('img').forEach(img => {
+            img.addEventListener('dragstart', e => e.preventDefault());
+        });
+    });
+</script>

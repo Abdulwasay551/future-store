@@ -1,0 +1,142 @@
+{% extends "shared/skeleton.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Profile Header -->
+        <div class="bg-mc-dark rounded-2xl p-8 mb-8 card-hover border border-mc-grey/30">
+            <div class="flex items-center space-x-6">
+                <div class="w-24 h-24 bg-mc-white rounded-full flex items-center justify-center">
+                    <span class="text-3xl font-bold text-mc-black">{{ user.email.0|upper }}</span>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-mc-white mb-2">{{ user.email }}</h1>
+                    <p class="text-mc-light-grey">Member since {{ user.date_joined|date:"F j, Y" }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Addresses Section -->
+        <div class="bg-mc-dark rounded-2xl p-8 mb-8 card-hover border border-mc-grey/30">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-mc-white">Your Addresses</h2>
+                <button onclick="document.getElementById('add-address-form').classList.toggle('hidden')"
+                        class="px-4 py-2 bg-mc-white text-mc-black rounded-lg hover:bg-mc-accent transition-colors duration-300">
+                    Add New Address
+                </button>
+            </div>
+
+            <!-- Add Address Form -->
+            <form id="add-address-form" action="{% url 'add_address' %}" method="POST" 
+                  class="hidden mb-8 bg-mc-black/50 rounded-xl p-6 border border-mc-grey/30">
+                {% csrf_token %}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="col-span-2">
+                        <label class="block text-mc-white mb-2">Address Type</label>
+                        <select name="address_type" required 
+                                class="w-full p-2 bg-mc-black border border-mc-grey rounded-lg text-mc-white">
+                            <option value="home">Home</option>
+                            <option value="office">Office</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-mc-white mb-2">Street Address</label>
+                        <textarea name="street_address" required rows="2"
+                                  class="w-full p-2 bg-mc-black border border-mc-grey rounded-lg text-mc-white"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-mc-white mb-2">City</label>
+                        <input type="text" name="city" required 
+                               class="w-full p-2 bg-mc-black border border-mc-grey rounded-lg text-mc-white">
+                    </div>
+                    <div>
+                        <label class="block text-mc-white mb-2">State</label>
+                        <input type="text" name="state" required 
+                               class="w-full p-2 bg-mc-black border border-mc-grey rounded-lg text-mc-white">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-mc-white mb-2">Postal Code</label>
+                        <input type="text" name="postal_code" required 
+                               class="w-full p-2 bg-mc-black border border-mc-grey rounded-lg text-mc-white">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="flex items-center text-mc-white">
+                            <input type="checkbox" name="is_default" class="mr-2">
+                            Set as default address
+                        </label>
+                    </div>
+                </div>
+                <button type="submit" 
+                        class="mt-4 px-6 py-2 bg-mc-white text-mc-black rounded-lg hover:bg-mc-accent transition-colors duration-300">
+                    Save Address
+                </button>
+            </form>
+
+            <!-- Addresses List -->
+            <div class="space-y-4">
+                {% for address in addresses %}
+                <div class="bg-mc-black/50 rounded-xl p-6 border border-mc-grey/30">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="text-mc-white font-semibold">{{ address.get_address_type_display }}</span>
+                                {% if address.is_default %}
+                                <span class="px-2 py-1 bg-mc-accent text-mc-black text-xs rounded-full">Default</span>
+                                {% endif %}
+                            </div>
+                            <p class="text-mc-light-grey">{{ address.street_address }}</p>
+                            <p class="text-mc-light-grey">{{ address.city }}, {{ address.state }} {{ address.postal_code }}</p>
+                        </div>
+                        <button class="text-mc-accent hover:text-mc-white">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-mc-light-grey text-center py-4">No addresses added yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Recent Orders -->
+        <div class="bg-mc-dark rounded-2xl p-8 card-hover border border-mc-grey/30">
+            <h2 class="text-xl font-bold text-mc-white mb-6">Recent Orders</h2>
+            <div class="space-y-4">
+                {% for order in recent_orders %}
+                <div class="bg-mc-black/50 rounded-xl p-6 border border-mc-grey/30">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-mc-white font-semibold">Order #{{ order.id }}</p>
+                            <p class="text-mc-light-grey">{{ order.created_at|date:"M d, Y" }}</p>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-sm
+                            {% if order.status == 'delivered' %}bg-green-500/20 text-green-300 border border-green-500
+                            {% elif order.status == 'cancelled' %}bg-red-500/20 text-red-300 border border-red-500
+                            {% else %}bg-blue-500/20 text-blue-300 border border-blue-500{% endif %}">
+                            {{ order.get_status_display }}
+                        </span>
+                    </div>
+                    <div class="text-mc-white font-semibold mb-2">Total: ${{ order.total_amount }}</div>
+                    <a hx-get="{% url 'order_detail' order.id %}" hx-target="#content-comp" hx-push-url="true"
+                       class="text-mc-accent hover:text-mc-white transition-colors duration-300">
+                        View Details →
+                    </a>
+                </div>
+                {% empty %}
+                <p class="text-mc-light-grey text-center py-4">No orders yet.</p>
+                {% endfor %}
+            </div>
+            {% if recent_orders %}
+            <div class="mt-6 text-center">
+                <a hx-get="{% url 'orders' %}" hx-target="#content-comp" hx-push-url="true"
+                   class="text-mc-accent hover:text-mc-white transition-colors duration-300">
+                    View All Orders →
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

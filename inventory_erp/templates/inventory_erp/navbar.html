@@ -1,0 +1,293 @@
+{% load static %}
+<nav class="relative top-0 w-full z-10 bg-mc-black/95 backdrop-blur-md border-b border-mc-grey/30">
+    <div class="container mx-auto px-6 py-4">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <a href="{% url 'inventory_erp:dashboard' %}" class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-mc-white rounded-full flex items-center justify-center overflow-hidden">
+                        <img src="{% static 'logo-light.JPG' %}" class="w-full h-full object-cover block">
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-mc-white">Mobile Corner ERP</h1>
+                        <p class="text-xs text-mc-light-grey">Inventory Management</p>
+                    </div>
+                </a>
+            </div>
+            
+            <!-- Mobile Menu Button -->
+            <button id="mobileMenuButton" class="md:hidden text-mc-white focus:outline-none">
+                <i class="fas fa-bars text-2xl"></i>
+            </button>
+
+            <!-- Desktop Navigation -->
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="{% url 'inventory_erp:dashboard' %}" class="text-mc-white hover:text-mc-accent transition-colors duration-300">
+                    <i class="fas fa-chart-line mr-2"></i>Dashboard
+                </a>
+                
+                <!-- Companies Dropdown -->
+                <div class="relative group">
+                    <button class="text-mc-white hover:text-mc-accent transition-colors duration-300 flex items-center">
+                        <i class="fas fa-building mr-2"></i>Companies <i class="fas fa-chevron-down ml-1"></i>
+                    </button>
+                    <div class="absolute left-0 w-56 bg-mc-dark rounded-xl shadow-xl hidden group-hover:block z-20 border border-mc-grey/30">
+                        <a href="{% url 'inventory_erp:company_list' %}" class="block px-4 py-2 text-mc-white hover:bg-mc-grey/30 first:rounded-t-xl">
+                            View All Companies
+                        </a>
+                        <a href="{% url 'inventory_erp:company_create' %}" class="block px-4 py-2 text-mc-white hover:bg-mc-grey/30">
+                            Add New Company
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Dealers Dropdown -->
+                <div class="relative group">
+                    <button class="text-mc-white hover:text-mc-accent transition-colors duration-300 flex items-center">
+                        <i class="fas fa-user-tie mr-2"></i>Dealers <i class="fas fa-chevron-down ml-1"></i>
+                    </button>
+                    <div class="absolute left-0 w-56 bg-mc-dark rounded-xl shadow-xl hidden group-hover:block z-20 border border-mc-grey/30">
+                        <a href="{% url 'inventory_erp:dealer_list' %}" class="block px-4 py-2 text-mc-white hover:bg-mc-grey/30 first:rounded-t-xl">
+                            View All Dealers
+                        </a>
+                        <a href="{% url 'inventory_erp:dealer_create' %}" class="block px-4 py-2 text-mc-white hover:bg-mc-grey/30">
+                            Add New Dealer
+                        </a>
+                        <a href="{% url 'inventory_erp:dealer_ledger' %}" class="block px-4 py-2 text-mc-white hover:bg-mc-grey/30">
+                            Dealer Ledger
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Devices Dropdown -->
+                <div class="relative group">
+                    <button class="text-mc-white hover:text-mc-accent transition-colors duration-300 flex items-center">
+                        <i class="fas fa-mobile-alt mr-2"></i>Devices <i class="fas fa-chevron-down ml-1"></i>
+                    </button>
+                    <div class="absolute left-0 w-56 bg-mc-dark rounded-xl shadow-xl hidden group-hover:block z-20 border border-mc-grey/30">
+                        <a href="{% url 'inventory_erp:device_list' %}" class="block px-4 py-2 text-mc-white hover:bg-mc-grey/30 first:rounded-t-xl">
+                            View All Devices
+                        </a>
+                        <a href="{% url 'inventory_erp:add_device' %}" class="block px-4 py-2 text-mc-white hover:bg-mc-grey/30">
+                            Add New Device
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Device Categories Dropdown -->
+                <div class="relative group">
+                    <button class="text-mc-white hover:text-mc-accent transition-colors duration-300 flex items-center">
+                        <i class="fas fa-list-ul mr-2"></i>Device Categories <i class="fas fa-chevron-down ml-1"></i>
+                    </button>
+                    <div class="absolute left-0 w-56 bg-mc-dark rounded-xl shadow-xl hidden group-hover:block z-20 border border-mc-grey/30">
+                        {% comment %} <a href="{% url 'inventory_erp:device_category_list' %}" class="block px-4 py-2 text-mc-white hover:bg-mc-grey/30 first:rounded-t-xl"> {% endcomment %}
+                            View All Categories
+                        </a>
+                        {% comment %} <a href="{% url 'inventory_erp:device_category_create' %}" class="block px-4 py-2 text-mc-white hover:bg-mc-grey/30"> {% endcomment %}
+                            Add New Category
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Purchases Dropdown -->
+                <div class="relative group">
+                    <button class="text-mc-white hover:text-mc-accent transition-colors duration-300 flex items-center">
+                        <i class="fas fa-shopping-cart mr-2"></i>Purchases <i class="fas fa-chevron-down ml-1"></i>
+                    </button>
+                    <div class="absolute left-0 w-56 bg-mc-dark rounded-xl shadow-xl hidden group-hover:block z-20 border border-mc-grey/30">
+                        <a href="{% url 'inventory_erp:purchase_entry' %}" class="block px-4 py-2 text-mc-white hover:bg-mc-grey/30 first:rounded-t-xl">
+                            New Purchase
+                        </a>
+                        <a href="{% url 'inventory_erp:purchase_list' %}" class="block px-4 py-2 text-mc-white hover:bg-mc-grey/30">
+                            View Purchases
+                        </a>
+                        <a href="{% url 'inventory_erp:purchase_return_list' %}" class="block px-4 py-2 text-mc-white hover:bg-mc-grey/30">
+                            Purchase Returns
+                        </a>
+                        <a href="{% url 'inventory_erp:purchase_payments' %}" class="block px-4 py-2 text-mc-white hover:bg-mc-grey/30">
+                            Payments
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Sales Dropdown -->
+                <div class="relative group">
+                    <button class="text-mc-white hover:text-mc-accent transition-colors duration-300 flex items-center">
+                        <i class="fas fa-cash-register mr-2"></i>Sales <i class="fas fa-chevron-down ml-1"></i>
+                    </button>
+                    <div class="absolute left-0 w-56 bg-mc-dark rounded-xl shadow-xl hidden group-hover:block z-20 border border-mc-grey/30">
+                        <a href="{% url 'inventory_erp:sale_entry' %}" class="block px-4 py-2 text-mc-white hover:bg-mc-grey/30 first:rounded-t-xl">
+                            New Sale
+                        </a>
+                        <a href="{% url 'inventory_erp:sale_list' %}" class="block px-4 py-2 text-mc-white hover:bg-mc-grey/30">
+                            View Sales
+                        </a>
+                        <a href="{% url 'inventory_erp:sale_return_list' %}" class="block px-4 py-2 text-mc-white hover:bg-mc-grey/30">
+                            Sale Returns
+                        </a>
+                        <a href="{% url 'inventory_erp:sale_payments' %}" class="block px-4 py-2 text-mc-white hover:bg-mc-grey/30">
+                            Payments
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Reports Dropdown -->
+                <div class="relative group">
+                    <button class="text-mc-white hover:text-mc-accent transition-colors duration-300 flex items-center">
+                        <i class="fas fa-chart-pie mr-2"></i>Reports <i class="fas fa-chevron-down ml-1"></i>
+                    </button>
+                    <div class="absolute left-0 w-56 bg-mc-dark rounded-xl shadow-xl hidden group-hover:block z-20 border border-mc-grey/30">
+                        <a href="{% url 'inventory_erp:sales_report' %}" class="block px-4 py-2 text-mc-white hover:bg-mc-grey/30 first:rounded-t-xl">
+                            Sales Report
+                        </a>
+                        <a href="{% url 'inventory_erp:purchase_report' %}" class="block px-4 py-2 text-mc-white hover:bg-mc-grey/30">
+                            Purchase Report
+                        </a>
+                        <a href="{% url 'inventory_erp:inventory_report' %}" class="block px-4 py-2 text-mc-white hover:bg-mc-grey/30">
+                            Inventory Report
+                        </a>
+                        <a href="{% url 'inventory_erp:dealer_report' %}" class="block px-4 py-2 text-mc-white hover:bg-mc-grey/30">
+                            Dealer Report
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side Controls -->
+            <div class="flex items-center space-x-4">
+                <!-- Theme Toggle -->
+                <button id="themeToggle" class="p-2 text-mc-text hover:bg-mc-grey/20 rounded-lg transition-colors relative group">
+                    <i class="fas fa-moon dark:hidden"></i>
+                    <i class="fas fa-sun hidden dark:block"></i>
+                </button>
+
+                <!-- User Menu -->
+                <div class="relative group">
+                    <button class="flex items-center space-x-2 px-4 py-2 text-mc-white hover:bg-mc-grey/20 rounded-lg transition-colors">
+                        <span>{{ user.email }}</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="absolute right-0 w-48 py-2 bg-mc-dark rounded-lg shadow-xl hidden group-hover:block z-20">
+                        <a href="{% url 'admin:index' %}" class="block px-4 py-2 text-mc-white hover:bg-mc-grey/20">
+                            <i class="fas fa-toolbox mr-2"></i>Admin Panel
+                        </a>
+                        <a href="/" class="block px-4 py-2 text-mc-white hover:bg-mc-grey/20">
+                            <i class="fas fa-store mr-2"></i>Store Front
+                        </a>
+                        <hr class="my-2 border-mc-grey">
+                        <form action="{% url 'logout' %}" method="POST" class="block">
+                            {% csrf_token %}
+                            <button type="submit" class="w-full text-left px-4 py-2 text-mc-white hover:bg-mc-grey/20">
+                                <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Navigation -->
+    <div id="mobileMenu" class="fixed inset-0 bg-mc-black/95 z-50 md:hidden hidden">
+        <div class="container mx-auto px-6 py-8">
+            <div class="flex justify-end mb-8">
+                <button id="closeMobileMenu" class="text-mc-white focus:outline-none">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            <div class="flex flex-col space-y-6">
+                <a href="{% url 'inventory_erp:dashboard' %}" class="text-mc-white hover:text-mc-accent transition-colors duration-300">
+                    <i class="fas fa-chart-line mr-2"></i>Dashboard
+                </a>
+                
+                <!-- Mobile Companies Menu -->
+                <div x-data="{ open: false }" class="relative">
+                    <button @click="open = !open" class="w-full text-left text-mc-white hover:text-mc-accent transition-colors duration-300 flex items-center justify-between">
+                        <span><i class="fas fa-building mr-2"></i>Companies</span>
+                        <i class="fas fa-chevron-down" :class="{ 'transform rotate-180': open }"></i>
+                    </button>
+                    <div x-show="open" class="mt-2 space-y-2 pl-6">
+                        <a href="{% url 'inventory_erp:company_list' %}" class="block text-mc-white hover:text-mc-accent">View All Companies</a>
+                        <a href="{% url 'inventory_erp:company_create' %}" class="block text-mc-white hover:text-mc-accent">Add New Company</a>
+                    </div>
+                </div>
+
+                <!-- Mobile Dealers Menu -->
+                <div x-data="{ open: false }" class="relative">
+                    <button @click="open = !open" class="w-full text-left text-mc-white hover:text-mc-accent transition-colors duration-300 flex items-center justify-between">
+                        <span><i class="fas fa-user-tie mr-2"></i>Dealers</span>
+                        <i class="fas fa-chevron-down" :class="{ 'transform rotate-180': open }"></i>
+                    </button>
+                    <div x-show="open" class="mt-2 space-y-2 pl-6">
+                        <a href="{% url 'inventory_erp:dealer_list' %}" class="block text-mc-white hover:text-mc-accent">View All Dealers</a>
+                        <a href="{% url 'inventory_erp:dealer_create' %}" class="block text-mc-white hover:text-mc-accent">Add New Dealer</a>
+                        <a href="{% url 'inventory_erp:dealer_ledger' %}" class="block text-mc-white hover:text-mc-accent">Dealer Ledger</a>
+                    </div>
+                </div>
+
+                <!-- Mobile Devices Menu -->
+                <div x-data="{ open: false }" class="relative">
+                    <button @click="open = !open" class="w-full text-left text-mc-white hover:text-mc-accent transition-colors duration-300 flex items-center justify-between">
+                        <span><i class="fas fa-mobile-alt mr-2"></i>Devices</span>
+                        <i class="fas fa-chevron-down" :class="{ 'transform rotate-180': open }"></i>
+                    </button>
+                    <div x-show="open" class="mt-2 space-y-2 pl-6">
+                        <a href="{% url 'inventory_erp:device_list' %}" class="block text-mc-white hover:text-mc-accent">View All Devices</a>
+                        <a href="{% url 'inventory_erp:add_device' %}" class="block text-mc-white hover:text-mc-accent">Add New Device</a>
+                    </div>
+                </div>
+
+                <!-- Mobile Device Categories Menu -->
+                <div x-data="{ open: false }" class="relative">
+                    <button @click="open = !open" class="w-full text-left text-mc-white hover:text-mc-accent transition-colors duration-300 flex items-center justify-between">
+                        <span><i class="fas fa-list-ul mr-2"></i>Device Categories</span>
+                        <i class="fas fa-chevron-down" :class="{ 'transform rotate-180': open }"></i>
+                    </button>
+                    <div x-show="open" class="mt-2 space-y-2 pl-6">
+                        {% comment %} <a href="{% url 'inventory_erp:device_category_list' %}" class="block text-mc-white hover:text-mc-accent">View All Categories</a> {% endcomment %}
+                        {% comment %} <a href="{% url 'inventory_erp:device_category_create' %}" class="block text-mc-white hover:text-mc-accent">Add New Category</a> {% endcomment %}
+                    </div>
+                </div>
+
+                <!-- Mobile Purchases Menu -->
+                <div x-data="{ open: false }" class="relative">
+                    <button @click="open = !open" class="w-full text-left text-mc-white hover:text-mc-accent transition-colors duration-300 flex items-center justify-between">
+                        <span><i class="fas fa-shopping-cart mr-2"></i>Purchases</span>
+                        <i class="fas fa-chevron-down" :class="{ 'transform rotate-180': open }"></i>
+                    </button>
+                    <div x-show="open" class="mt-2 space-y-2 pl-6">
+                        <a href="{% url 'inventory_erp:purchase_entry' %}" class="block text-mc-white hover:text-mc-accent">New Purchase</a>
+                        <a href="{% url 'inventory_erp:purchase_list' %}" class="block text-mc-white hover:text-mc-accent">View Purchases</a>
+                        <a href="{% url 'inventory_erp:purchase_return_list' %}" class="block text-mc-white hover:text-mc-accent">Purchase Returns</a>
+                    </div>
+                </div>
+
+                <!-- Mobile Sales Menu -->
+                <div x-data="{ open: false }" class="relative">
+                    <button @click="open = !open" class="w-full text-left text-mc-white hover:text-mc-accent transition-colors duration-300 flex items-center justify-between">
+                        <span><i class="fas fa-cash-register mr-2"></i>Sales</span>
+                        <i class="fas fa-chevron-down" :class="{ 'transform rotate-180': open }"></i>
+                    </button>
+                    <div x-show="open" class="mt-2 space-y-2 pl-6">
+                        <a href="{% url 'inventory_erp:sale_entry' %}" class="block text-mc-white hover:text-mc-accent">New Sale</a>
+                        <a href="{% url 'inventory_erp:sale_list' %}" class="block text-mc-white hover:text-mc-accent">View Sales</a>
+                        <a href="{% url 'inventory_erp:sale_return_list' %}" class="block text-mc-white hover:text-mc-accent">Sale Returns</a>
+                    </div>
+                </div>
+
+                <!-- Mobile Reports Menu -->
+                <div x-data="{ open: false }" class="relative">
+                    <button @click="open = !open" class="w-full text-left text-mc-white hover:text-mc-accent transition-colors duration-300 flex items-center justify-between">
+                        <span><i class="fas fa-chart-pie mr-2"></i>Reports</span>
+                        <i class="fas fa-chevron-down" :class="{ 'transform rotate-180': open }"></i>
+                    </button>
+                    <div x-show="open" class="mt-2 space-y-2 pl-6">
+                        <a href="{% url 'inventory_erp:sales_report' %}" class="block text-mc-white hover:text-mc-accent">Sales Report</a>
+                        <a href="{% url 'inventory_erp:purchase_report' %}" class="block text-mc-white hover:text-mc-accent">Purchase Report</a>
+                        <a href="{% url 'inventory_erp:inventory_report' %}" class="block text-mc-white hover:text-mc-accent">Inventory Report</a>
+                        <a href="{% url 'inventory_erp:dealer_report' %}" class="block text-mc-white hover:text-mc-accent">Dealer Report</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>

@@ -1,0 +1,93 @@
+<!-- Hero Section -->
+ {% load static %}
+<section class="relative min-h-screen" style="z-index: 1;">
+    <!-- Background Elements -->
+    <div class="absolute inset-0 bg-gradient-to-br from-mc-black to-mc-dark overflow-hidden">
+        <!-- Animated background patterns -->
+        <div class="absolute inset-0 opacity-5">
+            <div class="absolute inset-0 bg-repeat pattern-grid dark:opacity-20 light:opacity-10"></div>
+        </div>
+        <!-- Gradient Overlay -->
+        <div class="absolute inset-0 bg-gradient-to-t from-mc-black/80 to-transparent opacity-80"></div>
+        <!-- Animated Circles -->
+        <div class="absolute top-20 left-10 w-64 h-64 bg-mc-accent/10 rounded-full filter blur-3xl animate-float"></div>
+        <div class="absolute bottom-20 right-10 w-96 h-96 bg-mc-accent/10 rounded-full filter blur-3xl animate-float" style="animation-delay: 1s"></div>
+    </div>
+
+    <!-- Content -->
+    <div class="relative z-10 pt-32 pb-20 px-6 flex items-center min-h-screen">
+        <div class="container mx-auto text-center">
+            <div class="animate-fade-in">
+                <!-- Logo Circle -->
+                <div class="mb-8 relative">
+                    <div class="w-32 h-32 bg-mc-white rounded-full mx-auto mb-6 flex items-center justify-center animate-float relative overflow-hidden group">
+                        <!-- Gradient border effect -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-mc-accent to-mc-white opacity-0 group-hover:opacity-20 transition-opacity duration-500"></div>                        <!-- Logo images for different themes -->
+                        <img src="{% static 'logo-light.JPG' %}" class="text-4xl font-bold relative z-10 block  w-full h-full object-cover">
+                    </div>
+                </div>
+
+                <!-- Title with enhanced gradient -->
+                <h1 class="relative text-5xl md:text-7xl font-black mb-8">
+                    <span class="relative inline-block">
+                        <span class="relative z-10 bg-gradient-to-r from-mc-white via-mc-accent to-mc-white bg-clip-text text-transparent dark:from-mc-white dark:via-mc-accent dark:to-mc-white">
+                            MOBILE CORNER
+                        </span>
+                    </span>
+                </h1>
+
+                <!-- Subtitle with better contrast -->
+                <p class="text-xl md:text-2xl mb-12 max-w-3xl mx-auto">
+                    <span class="text-mc-light-grey font-light">Your Premium Destination for Mobile Technology</span>
+                    <br>
+                    <span class="text-mc-accent font-medium mt-2 inline-block">Experience Excellence in Every Device</span>
+                </p>
+
+                <!-- Enhanced buttons -->
+                <div class="flex flex-col md:flex-row gap-6 justify-center items-center">
+                    <button class="group relative px-8 py-4 rounded-lg font-semibold text-lg animate-slide-up overflow-hidden">
+                        <!-- Button background -->
+                        <div class="absolute inset-0 bg-mc-white transition-transform duration-300 group-hover:scale-105"></div>
+                        <!-- Button text -->
+                        <span class="relative z-10 text-mc-black">SHOP NOW</span>
+                        <!-- Hover effect -->
+                        <div class="absolute inset-0 bg-gradient-to-r from-mc-accent to-mc-white opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+                    </button>
+                    <button class="group relative px-8 py-4 rounded-lg font-semibold text-lg overflow-hidden">
+                        <!-- Button border -->
+                        <div class="absolute inset-0 border-2 border-mc-white rounded-lg transition-transform duration-300 group-hover:scale-105"></div>
+                        <!-- Button text -->
+                        <span class="relative z-10 text-mc-white group-hover:text-mc-black transition-colors duration-300">VIEW CATALOG</span>
+                        <!-- Hover background -->
+                        <div class="absolute inset-0 bg-mc-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-1"></div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Decorative elements -->
+    <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-mc-accent/20 to-transparent"></div>
+</section>
+
+<style>
+    .pattern-grid {
+        background-image: 
+            linear-gradient(var(--mc-accent) 1px, transparent 1px),
+            linear-gradient(90deg, var(--mc-accent) 1px, transparent 1px);
+        background-size: 20px 20px;
+    }
+
+    .-z-1 {
+        z-index: -1;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+    }
+
+    .animate-float {
+        animation: float 6s ease-in-out infinite;
+    }
+</style>

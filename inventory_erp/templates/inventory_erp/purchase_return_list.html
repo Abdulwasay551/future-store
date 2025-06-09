@@ -1,0 +1,115 @@
+{% extends 'inventory_erp/base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-8">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-2xl font-bold">Purchase Returns</h1>
+        <div class="space-x-4">
+            <button class="px-6 py-2 rounded-lg bg-mc-accent hover:bg-mc-accent/80 transition-colors duration-300">
+                <i class="fas fa-plus mr-2"></i>New Return
+            </button>
+        </div>
+    </div>
+
+    <div class="bg-mc-grey/10 rounded-lg p-6 mb-8">
+        <h2 class="text-lg font-semibold mb-4">Filter Returns</h2>
+        <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+                <label for="dealer" class="block text-sm font-medium mb-2">Dealer</label>
+                <select name="dealer" id="dealer" class="w-full bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent">
+                    <option value="">All Dealers</option>
+                    {% for dealer in dealers %}
+                    <option value="{{ dealer.id }}" {% if request.GET.dealer == dealer.id|stringformat:"i" %}selected{% endif %}>
+                        {{ dealer.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label for="start_date" class="block text-sm font-medium mb-2">Start Date</label>
+                <input type="date" name="start_date" id="start_date" 
+                       value="{{ request.GET.start_date|default:'' }}"
+                       class="w-full bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent">
+            </div>
+
+            <div>
+                <label for="end_date" class="block text-sm font-medium mb-2">End Date</label>
+                <input type="date" name="end_date" id="end_date" 
+                       value="{{ request.GET.end_date|default:'' }}"
+                       class="w-full bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent">
+            </div>
+
+            <div>
+                <label for="status" class="block text-sm font-medium mb-2">Status</label>
+                <select name="status" id="status" class="w-full bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent">
+                    <option value="">All Status</option>
+                    {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </form>
+    </div>
+
+    <div class="bg-mc-grey/10 rounded-lg overflow-hidden">
+        <div class="p-6">
+            <h2 class="text-lg font-semibold mb-4">Return List</h2>
+            {% if purchase_returns %}
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="text-left border-b border-mc-grey/20">
+                            <th class="pb-3">Return Date</th>
+                            <th class="pb-3">Dealer</th>
+                            <th class="pb-3">Return No.</th>
+                            <th class="pb-3">Items</th>
+                            <th class="pb-3">Total Amount</th>
+                            <th class="pb-3">Status</th>
+                            <th class="pb-3">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-mc-grey/20">
+                        {% for return in purchase_returns %}
+                        <tr class="hover:bg-mc-grey/5">
+                            <td class="py-4">{{ return.return_date|date:"M d, Y" }}</td>
+                            <td class="py-4">{{ return.purchase.dealer.name }}</td>
+                            <td class="py-4">RTN-{{ return.id }}</td>
+                            <td class="py-4">{{ return.items.count }}</td>
+                            <td class="py-4">{{ return.total_amount }}</td>
+                            <td class="py-4">
+                                <span class="px-2 py-1 rounded-full text-xs
+                                    {% if return.status == 'pending' %}bg-yellow-500/20 text-yellow-500
+                                    {% elif return.status == 'approved' %}bg-green-500/20 text-green-500
+                                    {% else %}bg-red-500/20 text-red-500{% endif %}">
+                                    {{ return.get_status_display }}
+                                </span>
+                            </td>
+                            <td class="py-4">
+                                <div class="flex space-x-2">
+                                    <a href="#" class="text-mc-white/70 hover:text-mc-white transition-colors duration-300">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="#" class="text-mc-white/70 hover:text-mc-white transition-colors duration-300">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-8 text-mc-white/50">
+                {% if request.GET %}
+                No returns found matching your filters.
+                {% else %}
+                No purchase returns have been recorded yet.
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

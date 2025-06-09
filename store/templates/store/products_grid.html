@@ -1,0 +1,104 @@
+<!-- Products Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+    {% for product in products %}
+    <div class="bg-mc-dark rounded-xl overflow-hidden card-hover border border-mc-grey/30">
+        <div class="relative aspect-[4/3] bg-mc-dark">
+            {% if product.primary_image %}
+            <img src="{{ product.primary_image }}" 
+                 alt="{{ product.name }}" 
+                 class="product-image">
+            {% else %}
+            <div class="w-full h-full flex items-center justify-center text-mc-grey">
+                <i class="fas fa-image text-4xl"></i>
+            </div>
+            {% endif %}
+            {% if product.is_featured %}
+            <div class="absolute top-4 right-4">
+                <div class="bg-mc-accent text-mc-black px-3 py-1 rounded-full text-sm font-semibold">
+                    FEATURED
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        <div class="p-4 sm:p-6">
+            <div class="text-sm text-mc-light-grey mb-2">{{ product.company.name }}</div>
+            <h3 class="text-lg sm:text-xl font-bold text-mc-white mb-2">{{ product.name }}</h3>
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
+                <span class="text-xl font-bold text-mc-white">{{ product.price }} Rs</span>
+                <div class="flex items-center bg-mc-black/50 px-2 py-1 rounded-full self-start sm:self-auto">
+                    <span class="text-yellow-400">★</span>
+                    <span class="ml-1 text-mc-white text-sm">{{ product.average_rating|floatformat:1 }}</span>
+                </div>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-2">
+                <a hx-get="{% url 'product_detail' product.slug %}" 
+                   hx-target="#content-comp" 
+                   hx-push-url="true"
+                   class="flex-1 text-center px-4 py-2 bg-mc-black text-mc-white hover:bg-mc-grey/50 rounded-lg transition-colors duration-300">
+                    View Details
+                </a>                    
+                {% if user.is_authenticated %}
+                <form hx-post="{% url 'add_to_cart' product.id %}" 
+                      hx-target="#cart-count"
+                      hx-swap="innerHTML"
+                      hx-trigger="submit"
+                      class="flex-1">
+                    {% csrf_token %}
+                    <button type="submit" 
+                            class="w-full px-4 py-2 bg-mc-white text-mc-black hover:bg-mc-accent rounded-lg transition-colors duration-300"
+                            onclick="showToast('{{ product.name }} added to cart')"
+                            {% if not product.stock %}disabled{% endif %}>
+                        {% if product.stock %}Add to Cart{% else %}Out of Stock{% endif %}
+                    </button>
+                </form>
+                {% else %}
+                <a href="{% url 'login' %}"
+                   hx-get="{% url 'login' %}"
+                   hx-target="#content-comp"
+                   hx-push-url="true"
+                   class="flex-1 text-center px-4 py-2 bg-mc-white text-mc-black hover:bg-mc-accent rounded-lg transition-colors duration-300"
+                   onclick="showToast('Please log in to add items to cart')">
+                    Add to Cart
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-span-full text-center py-12">
+        <div class="text-5xl mb-4">🔍</div>
+        <h3 class="text-xl font-semibold mb-2 text-mc-white">No products found</h3>
+        <p class="text-mc-light-grey">Try adjusting your filters</p>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if products.has_other_pages %}
+<div class="flex justify-center space-x-2 mt-8">
+    {% if products.has_previous %}
+    <a href="?page={{ products.previous_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.company %}&company={{ request.GET.company }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}{% if request.GET.rating %}&rating={{ request.GET.rating }}{% endif %}{% if request.GET.availability %}&availability={{ request.GET.availability }}{% endif %}"
+       class="px-4 py-2 bg-mc-dark text-mc-white hover:bg-mc-grey/30 transition-colors duration-300 rounded-lg border border-mc-grey/30">
+        Previous
+    </a>
+    {% endif %}
+
+    {% for num in products.paginator.page_range %}
+    {% if products.number == num %}
+    <span class="px-4 py-2 bg-mc-accent text-mc-black rounded-lg">{{ num }}</span>
+    {% else %}
+    <a href="?page={{ num }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.company %}&company={{ request.GET.company }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}{% if request.GET.rating %}&rating={{ request.GET.rating }}{% endif %}{% if request.GET.availability %}&availability={{ request.GET.availability }}{% endif %}"
+       class="px-4 py-2 bg-mc-dark text-mc-white hover:bg-mc-grey/30 transition-colors duration-300 rounded-lg border border-mc-grey/30">
+        {{ num }}
+    </a>
+    {% endif %}
+    {% endfor %}
+
+    {% if products.has_next %}
+    <a href="?page={{ products.next_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.company %}&company={{ request.GET.company }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}{% if request.GET.rating %}&rating={{ request.GET.rating }}{% endif %}{% if request.GET.availability %}&availability={{ request.GET.availability }}{% endif %}"
+       class="px-4 py-2 bg-mc-dark text-mc-white hover:bg-mc-grey/30 transition-colors duration-300 rounded-lg border border-mc-grey/30">
+        Next
+    </a>
+    {% endif %}
+</div>
+{% endif %}

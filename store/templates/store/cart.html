@@ -1,0 +1,112 @@
+{% extends "shared/skeleton.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold text-mc-white mb-8">Your Shopping Cart</h1>
+
+    {% if cart.items.all %}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Cart Items -->
+        <div class="lg:col-span-2">
+            <div class="space-y-4">
+                {% for item in cart.items.all %}
+                <div class="bg-mc-dark rounded-xl p-4 sm:p-6 border border-mc-grey/30 card-hover">                <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                        {% if item.product.primary_image %}
+                        <img src="{{ item.product.primary_image }}" 
+                             alt="{{ item.product.name }}" 
+                             class="w-full sm:w-24 h-32 sm:h-24 object-cover rounded-lg">
+                        {% else %}
+                        <div class="w-full sm:w-24 h-32 sm:h-24 flex items-center justify-center bg-mc-dark rounded-lg text-mc-grey">
+                            <i class="fas fa-image text-2xl"></i>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="flex-1">
+                            <h3 class="text-lg sm:text-xl font-bold text-mc-white">{{ item.product.name }}</h3>
+                            <p class="text-mc-light-grey">{{ item.product.price }} Rs</p>
+                        </div>
+                        
+                        <div class="flex items-center justify-between sm:justify-end gap-4 sm:gap-6">
+                            <div class="flex items-center gap-2">
+                                <form hx-post="{% url 'update_cart' item.id %}" 
+                                      hx-target="#content-comp" 
+                                      class="inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="decrease">
+                                    <button type="submit" 
+                                            class="w-10 h-10 bg-mc-black text-mc-white hover:bg-mc-grey/50 rounded-lg transition-colors duration-300">
+                                        -
+                                    </button>
+                                </form>
+                                
+                                <span class="w-8 text-center text-mc-white">{{ item.quantity }}</span>
+                                
+                                <form hx-post="{% url 'update_cart' item.id %}" 
+                                      hx-target="#content-comp" 
+                                      class="inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="increase">
+                                    <button type="submit" 
+                                            class="w-10 h-10 bg-mc-black text-mc-white hover:bg-mc-grey/50 rounded-lg transition-colors duration-300">
+                                        +
+                                    </button>
+                                </form>
+                            </div>
+
+                            <div class="text-right">
+                                <p class="text-xl font-bold text-mc-white">${{ item.subtotal }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="lg:col-span-1">
+            <div class="bg-mc-dark rounded-xl p-6 sticky top-4 border border-mc-grey/30">
+                <h2 class="text-xl font-semibold mb-6 text-mc-white">Order Summary</h2>
+                
+                <div class="space-y-4 mb-6">
+                    <div class="flex justify-between text-mc-light-grey">
+                        <span>Subtotal</span>
+                        <span>${{ cart.total }}</span>
+                    </div>
+                    <div class="flex justify-between text-mc-light-grey">
+                        <span>Shipping</span>
+                        <span>Free</span>
+                    </div>
+                    <div class="border-t border-mc-grey/30 pt-4">
+                        <div class="flex justify-between text-xl font-bold text-mc-white">
+                            <span>Total</span>
+                            <span>${{ cart.total }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <a hx-get="{% url 'checkout' %}" 
+                   hx-target="#content-comp"
+                   hx-push-url="true" 
+                   class="block w-full py-3 bg-mc-white text-mc-black hover:bg-mc-accent transition-colors duration-300 rounded-lg text-center font-semibold">
+                    Proceed to Checkout
+                </a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-12">
+        <div class="text-5xl mb-4">🛒</div>
+        <h3 class="text-xl font-semibold mb-2 text-mc-white">Your cart is empty</h3>
+        <p class="text-mc-light-grey mb-6">Add some products to your cart and they will show up here</p>
+        <a hx-get="{% url 'product_list' %}" 
+           hx-target="#content-comp"
+           hx-push-url="true" 
+           class="inline-block px-6 py-3 bg-mc-white text-mc-black hover:bg-mc-accent transition-colors duration-300 rounded-lg font-semibold">
+            Browse Products
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

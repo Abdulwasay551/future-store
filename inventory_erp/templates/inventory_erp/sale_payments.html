@@ -1,0 +1,95 @@
+{% extends 'inventory_erp/base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-8">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-2xl font-bold">Sale Payments</h1>
+    </div>
+
+    <div class="bg-mc-grey/10 rounded-lg p-6 mb-8">
+        <h2 class="text-lg font-semibold mb-4">Filter Payments</h2>
+        <form method="GET" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label for="start_date" class="block text-sm font-medium mb-2">Start Date</label>
+                <input type="date" name="start_date" id="start_date" 
+                       value="{{ request.GET.start_date|default:'' }}"
+                       class="w-full bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent">
+            </div>
+
+            <div>
+                <label for="end_date" class="block text-sm font-medium mb-2">End Date</label>
+                <input type="date" name="end_date" id="end_date" 
+                       value="{{ request.GET.end_date|default:'' }}"
+                       class="w-full bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent">
+            </div>
+        </form>
+    </div>
+
+    <div class="bg-mc-grey/10 rounded-lg overflow-hidden">
+        <div class="p-6">
+            <h2 class="text-lg font-semibold mb-4">Payment List</h2>
+            {% if payments %}
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="text-left border-b border-mc-grey/20">
+                            <th class="pb-3">Payment Date</th>
+                            <th class="pb-3">Customer</th>
+                            <th class="pb-3">Invoice</th>
+                            <th class="pb-3">Amount</th>
+                            <th class="pb-3">Method</th>
+                            <th class="pb-3">Reference</th>
+                            <th class="pb-3">Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-mc-grey/20">
+                        {% for payment in payments %}
+                        <tr class="hover:bg-mc-grey/5">
+                            <td class="py-4">{{ payment.payment_date|date:"M d, Y" }}</td>
+                            <td class="py-4">{{ payment.sale.customer_name }}</td>
+                            <td class="py-4">INV-{{ payment.sale.invoice_number }}</td>
+                            <td class="py-4">{{ payment.amount }}</td>
+                            <td class="py-4">
+                                <span class="px-2 py-1 rounded-full text-xs
+                                    {% if payment.payment_method == 'cash' %}bg-green-500/20 text-green-500
+                                    {% elif payment.payment_method == 'bank' %}bg-blue-500/20 text-blue-500
+                                    {% elif payment.payment_method == 'card' %}bg-purple-500/20 text-purple-500
+                                    {% else %}bg-yellow-500/20 text-yellow-500{% endif %}">
+                                    {{ payment.get_payment_method_display }}
+                                </span>
+                            </td>
+                            <td class="py-4">{{ payment.reference_number|default:'-' }}</td>
+                            <td class="py-4">{{ payment.notes|default:'-' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if payments.has_other_pages %}
+            <div class="mt-6 flex justify-center">
+                <nav class="flex space-x-2" aria-label="Pagination">
+                    {% if payments.has_previous %}
+                    <a href="?page={{ payments.previous_page_number }}" class="px-3 py-1 rounded-lg bg-mc-grey/20 hover:bg-mc-grey/30">Previous</a>
+                    {% endif %}
+
+                    {% if payments.has_next %}
+                    <a href="?page={{ payments.next_page_number }}" class="px-3 py-1 rounded-lg bg-mc-grey/20 hover:bg-mc-grey/30">Next</a>
+                    {% endif %}
+                </nav>
+            </div>
+            {% endif %}
+
+            {% else %}
+            <div class="text-center py-8 text-mc-white/50">
+                {% if request.GET %}
+                No payments found matching your filters.
+                {% else %}
+                No sale payments have been recorded yet.
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

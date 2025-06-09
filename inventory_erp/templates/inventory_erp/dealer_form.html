@@ -1,0 +1,153 @@
+{% extends 'inventory_erp/base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-8">
+    <div class="max-w-3xl mx-auto">
+        <div class="flex items-center justify-between mb-8">
+            <h1 class="text-2xl font-bold">{{ form_title }}</h1>
+            <a href="{% url 'inventory_erp:dealer_list' %}" class="text-mc-white/70 hover:text-mc-white transition-colors duration-300">
+                <i class="fas fa-arrow-left mr-2"></i>Back to List
+            </a>
+        </div>
+
+        <div class="bg-mc-grey/10 rounded-lg p-6">
+            <form method="POST" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- Basic Information -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="name" class="block text-sm font-medium mb-2">Dealer Name*</label>
+                        <input type="text" name="name" id="name" required
+                            value="{{ dealer.name|default:'' }}"
+                            class="w-full bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent">
+                    </div>
+                    
+                    <div>
+                        <label for="dealer_type" class="block text-sm font-medium mb-2">Dealer Type*</label>
+                        <select name="dealer_type" id="dealer_type" required
+                            class="w-full bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent"
+                            onchange="toggleRequiredFields()">
+                            <option value="">Select Type</option>
+                            {% for type_code, type_name in dealer_types %}
+                                <option value="{{ type_code }}" {% if dealer.dealer_type == type_code %}selected{% endif %}>
+                                    {{ type_name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Contact Information -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="contact_person" class="block text-sm font-medium mb-2">Contact Person*</label>
+                        <input type="text" name="contact_person" id="contact_person" required
+                            value="{{ dealer.contact_person|default:'' }}"
+                            class="w-full bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent">
+                    </div>
+                    
+                    <div>
+                        <label for="phone" class="block text-sm font-medium mb-2">Phone Number*</label>
+                        <input type="tel" name="phone" id="phone" required
+                            value="{{ dealer.phone|default:'' }}"
+                            class="w-full bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="email" class="block text-sm font-medium mb-2">Email</label>
+                        <input type="email" name="email" id="email"
+                            value="{{ dealer.email|default:'' }}"
+                            class="w-full bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent">
+                    </div>
+                    
+                    <div id="cnicField" class="hidden">
+                        <label for="cnic" class="block text-sm font-medium mb-2">CNIC*</label>
+                        <input type="text" name="cnic" id="cnic"
+                            value="{{ dealer.cnic|default:'' }}"
+                            class="w-full bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent">
+                        <p class="text-sm text-mc-white/70 mt-1">Required for second-hand dealers</p>
+                    </div>
+                </div>
+
+                <!-- Business Terms -->
+                <div id="businessTerms" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="credit_limit" class="block text-sm font-medium mb-2">Credit Limit*</label>
+                        <input type="number" name="credit_limit" id="credit_limit" step="0.01"
+                            value="{{ dealer.credit_limit|default:'' }}"
+                            class="w-full bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent">
+                        <p class="text-sm text-mc-white/70 mt-1">Required for main/sub dealers</p>
+                    </div>
+                    
+                    <div>
+                        <label for="payment_terms_days" class="block text-sm font-medium mb-2">Payment Terms (Days)</label>
+                        <input type="number" name="payment_terms_days" id="payment_terms_days"
+                            value="{{ dealer.payment_terms_days|default:'30' }}"
+                            class="w-full bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent">
+                    </div>
+                </div>
+
+                <!-- Address -->
+                <div>
+                    <label for="address" class="block text-sm font-medium mb-2">Address*</label>
+                    <textarea name="address" id="address" rows="3" required
+                        class="w-full bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent">{{ dealer.address|default:'' }}</textarea>
+                </div>
+
+                <!-- Notes -->
+                <div>
+                    <label for="notes" class="block text-sm font-medium mb-2">Notes</label>
+                    <textarea name="notes" id="notes" rows="3"
+                        class="w-full bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent">{{ dealer.notes|default:'' }}</textarea>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="flex justify-end space-x-4">
+                    <a href="{% url 'inventory_erp:dealer_list' %}" class="px-6 py-2 rounded-lg bg-mc-grey/20 hover:bg-mc-grey/30 transition-colors duration-300">
+                        Cancel
+                    </a>
+                    <button type="submit" class="px-6 py-2 rounded-lg bg-mc-accent hover:bg-mc-accent/80 transition-colors duration-300">
+                        {{ submit_text }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    function toggleRequiredFields() {
+        const dealerType = document.getElementById('dealer_type').value;
+        const cnicField = document.getElementById('cnicField');
+        const businessTerms = document.getElementById('businessTerms');
+        const cnicInput = document.getElementById('cnic');
+        const creditLimitInput = document.getElementById('credit_limit');
+        
+        if (dealerType === 'second_hand') {
+            cnicField.classList.remove('hidden');
+            businessTerms.classList.add('hidden');
+            cnicInput.required = true;
+            creditLimitInput.required = false;
+        } else if (dealerType === 'main' || dealerType === 'sub') {
+            cnicField.classList.add('hidden');
+            businessTerms.classList.remove('hidden');
+            cnicInput.required = false;
+            creditLimitInput.required = true;
+        } else {
+            cnicField.classList.add('hidden');
+            businessTerms.classList.add('hidden');
+            cnicInput.required = false;
+            creditLimitInput.required = false;
+        }
+    }
+
+    // Call on page load to set initial state
+    document.addEventListener('DOMContentLoaded', toggleRequiredFields);
+</script>
+{% endblock %}
+
+{% endblock %}

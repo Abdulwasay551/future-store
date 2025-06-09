@@ -1,0 +1,161 @@
+{% load static %}
+
+<div id="chat-widget" class="fixed bottom-4 right-4 z-50">
+    <!-- Chat Button -->
+    <button id="chat-toggle" class="bg-mc-white text-mc-black p-4 rounded-full shadow-lg hover:bg-mc-accent transition-all duration-300">
+        <span id="chat-icon" class="text-2xl">💬</span>
+    </button>
+
+    <!-- Chat Window -->
+    <div id="chat-window" class="hidden fixed bottom-20 right-4 w-96 bg-mc-dark rounded-xl shadow-2xl border border-mc-grey/30">
+        <div class="p-4 border-b border-mc-grey/30">
+            <h3 class="text-mc-white font-bold text-lg">Phone Advisor</h3>
+            <p class="text-mc-light-grey text-sm">Let me help you find the perfect phone!</p>
+        </div>
+
+        <!-- Chat Messages -->
+        <div id="chat-messages" class="h-96 overflow-y-auto p-4 space-y-4">
+            <!-- Messages will be added here dynamically -->
+        </div>
+
+        <!-- Chat Input -->
+        <form id="chat-form" class="p-4 border-t border-mc-grey/30">
+            <div class="flex gap-2">
+                <input type="text" id="chat-input" placeholder="Type your message..." 
+                       class="flex-1 px-4 py-2 rounded-lg bg-mc-black border border-mc-grey/30 text-mc-white placeholder-mc-light-grey">
+                <button type="submit" class="px-4 py-2 bg-mc-white text-mc-black rounded-lg hover:bg-mc-accent transition-colors duration-300">
+                    Send
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chatWidget = {
+        toggleBtn: document.getElementById('chat-toggle'),
+        window: document.getElementById('chat-window'),
+        messages: document.getElementById('chat-messages'),
+        form: document.getElementById('chat-form'),
+        input: document.getElementById('chat-input'),
+        
+        init() {
+            this.toggleBtn.addEventListener('click', () => this.toggleChat());
+            this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+            
+            // Show initial bot message
+            this.addMessage(`Hello! 👋 I'm your phone advisor, and I'm here to help you find the perfect mobile phone. 
+            
+Would you like me to ask you a few questions about:
+1. Your budget range
+2. Camera importance
+3. Performance needs
+4. Gaming preferences
+
+Just let me know what matters most to you!`, 'bot');
+        },
+        
+        toggleChat() {
+            this.window.classList.toggle('hidden');
+        },
+        
+        async handleSubmit(e) {
+            e.preventDefault();
+            const message = this.input.value.trim();
+            if (!message) return;
+            
+            // Add user message
+            this.addMessage(message, 'user');
+            this.input.value = '';
+            
+            // Send to server and get response
+            try {
+                const response = await fetch('/chatbot/message/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': this.getCSRFToken(),
+                    },
+                    body: JSON.stringify({ message }),
+                });
+                
+                const data = await response.json();
+                
+                // Add bot response
+                this.addMessage(data.response, 'bot');
+                
+                // If there are product recommendations, show them
+                if (data.products && data.products.length > 0) {
+                    this.addProductRecommendations(data.products);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                this.addMessage('Sorry, I encountered an error. Please try again.', 'bot');
+            }
+        },
+        
+        addMessage(text, sender) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'}`;
+            
+            const msgContent = document.createElement('div');
+            msgContent.className = `max-w-[75%] p-3 rounded-lg ${
+                sender === 'user' 
+                ? 'bg-mc-white text-mc-black' 
+                : 'bg-mc-grey/30 text-mc-white'
+            }`;
+            msgContent.textContent = text;
+            
+            msgDiv.appendChild(msgContent);
+            this.messages.appendChild(msgDiv);
+            this.messages.scrollTop = this.messages.scrollHeight;
+        },
+        
+        addProductRecommendations(products) {
+            const recsDiv = document.createElement('div');
+            recsDiv.className = 'flex flex-col space-y-2 my-4';
+            
+            products.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'bg-mc-black rounded-lg p-3 flex gap-3 hover:bg-mc-grey/30 transition-colors duration-300 cursor-pointer';
+                productCard.innerHTML = `
+                    ${product.image ? `
+                        <div class="w-16 h-16 flex-shrink-0">
+                            <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover rounded">
+                        </div>
+                    ` : ''}
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-mc-white">${product.name}</h4>
+                        <p class="text-mc-light-grey text-sm">${product.price}</p>
+                    </div>
+                `;
+                
+                productCard.addEventListener('click', () => {
+                    window.location.href = product.url;
+                });
+                
+                recsDiv.appendChild(productCard);
+            });
+            
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'flex justify-start';
+            msgDiv.appendChild(recsDiv);
+            
+            this.messages.appendChild(msgDiv);
+            this.messages.scrollTop = this.messages.scrollHeight;
+        },
+        
+        getCSRFToken() {
+            const cookies = document.cookie.split(';');
+            for (const cookie of cookies) {
+                const [name, value] = cookie.trim().split('=');
+                if (name === 'csrftoken') return value;
+            }
+            return '';
+        }
+    };
+    
+    chatWidget.init();
+});
+</script>

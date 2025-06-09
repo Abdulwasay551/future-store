@@ -1,0 +1,128 @@
+{% extends 'inventory_erp/base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-8">
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-2xl font-bold">Dealer Ledger</h1>
+            {% if dealer %}
+            <p class="text-mc-white/70">{{ dealer.name }} - {{ dealer.get_dealer_type_display }}</p>
+            {% endif %}
+        </div>
+        <div class="flex space-x-4">
+            <button onclick="window.print()" class="bg-mc-accent hover:bg-mc-accent/80 text-mc-white px-4 py-2 rounded-lg transition-colors duration-300">
+                <i class="fas fa-print mr-2"></i>Print Ledger
+            </button>
+        </div>
+    </div>
+
+    <!-- Dealer Selection -->
+    {% if not dealer %}
+    <div class="bg-mc-grey/10 rounded-lg p-4 mb-8">
+        <form method="get" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="md:col-span-3">
+                <label for="dealer" class="block text-sm font-medium mb-2">Select Dealer</label>
+                <select name="dealer" id="dealer" class="w-full bg-mc-black border border-mc-grey/30 rounded-lg px-3 py-2 focus:outline-none focus:border-mc-accent" required>
+                    <option value="">Choose a dealer...</option>
+                    {% for d in dealers %}
+                    <option value="{{ d.id }}">{{ d.name }} ({{ d.get_dealer_type_display }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="flex items-end">
+                <button type="submit" class="bg-mc-accent hover:bg-mc-accent/80 text-mc-white px-4 py-2 rounded-lg transition-colors duration-300 w-full">
+                    View Ledger
+                </button>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+
+    {% if dealer %}
+    <!-- Dealer Summary -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-mc-grey/10 rounded-lg p-6">
+            <div class="text-mc-white/70 text-sm mb-2">Total Purchases</div>
+            <div class="text-2xl font-bold">{{ summary.total_purchases }}</div>
+        </div>
+        <div class="bg-mc-grey/10 rounded-lg p-6">
+            <div class="text-mc-white/70 text-sm mb-2">Total Amount</div>
+            <div class="text-2xl font-bold">Rs. {{ summary.total_amount|floatformat:2 }}</div>
+        </div>
+        <div class="bg-mc-grey/10 rounded-lg p-6">
+            <div class="text-mc-white/70 text-sm mb-2">Paid Amount</div>
+            <div class="text-2xl font-bold text-green-400">Rs. {{ summary.paid_amount|floatformat:2 }}</div>
+        </div>
+        <div class="bg-mc-grey/10 rounded-lg p-6">
+            <div class="text-mc-white/70 text-sm mb-2">Balance Due</div>
+            <div class="text-2xl font-bold text-yellow-400">Rs. {{ summary.balance_due|floatformat:2 }}</div>
+        </div>
+    </div>
+
+    <!-- Ledger Entries -->
+    <div class="bg-mc-grey/10 rounded-lg overflow-hidden mb-8">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-mc-grey/30">
+                <thead>
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-mc-white/70 uppercase tracking-wider">Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-mc-white/70 uppercase tracking-wider">Reference</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-mc-white/70 uppercase tracking-wider">Type</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-mc-white/70 uppercase tracking-wider">Description</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-mc-white/70 uppercase tracking-wider">Amount</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-mc-white/70 uppercase tracking-wider">Balance</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-mc-grey/30">
+                    {% for entry in ledger_entries %}
+                    <tr class="hover:bg-mc-grey/5">
+                        <td class="px-6 py-4 whitespace-nowrap">{{ entry.transaction_date }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% if entry.purchase %}PO-{{ entry.purchase.id }}{% else %}-{% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ entry.get_payment_type_display }}</td>
+                        <td class="px-6 py-4">{{ entry.notes }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right">Rs. {{ entry.amount|floatformat:2 }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right">Rs. {{ entry.running_balance|floatformat:2 }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="px-6 py-4 text-center text-mc-white/70">
+                            No ledger entries found
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if ledger_entries.has_other_pages %}
+    <div class="flex justify-center mt-6 space-x-2">
+        {% if ledger_entries.has_previous %}
+        <a href="?page={{ ledger_entries.previous_page_number }}&dealer={{ dealer.id }}" class="px-3 py-1 rounded-lg bg-mc-grey/10 hover:bg-mc-grey/20 transition-colors duration-300">
+            <i class="fas fa-chevron-left"></i>
+        </a>
+        {% endif %}
+        
+        {% for num in ledger_entries.paginator.page_range %}
+            {% if ledger_entries.number == num %}
+            <span class="px-3 py-1 rounded-lg bg-mc-accent text-mc-white">{{ num }}</span>
+            {% else %}
+            <a href="?page={{ num }}&dealer={{ dealer.id }}" class="px-3 py-1 rounded-lg bg-mc-grey/10 hover:bg-mc-grey/20 transition-colors duration-300">
+                {{ num }}
+            </a>
+            {% endif %}
+        {% endfor %}
+        
+        {% if ledger_entries.has_next %}
+        <a href="?page={{ ledger_entries.next_page_number }}&dealer={{ dealer.id }}" class="px-3 py-1 rounded-lg bg-mc-grey/10 hover:bg-mc-grey/20 transition-colors duration-300">
+            <i class="fas fa-chevron-right"></i>
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+    {% endif %}
+</div>
+{% endblock %}
