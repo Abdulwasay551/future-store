@@ -9,7 +9,7 @@ from .models import *
 import json
 from datetime import datetime
 from decimal import Decimal
-import weasyprint  # For PDF generation
+# import weasyprint  # For PDF generation - temporarily disabled
 from django.views.generic import ListView, CreateView, UpdateView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
@@ -256,7 +256,7 @@ def print_purchase(request, pk):
     html = render_to_string('inventory_erp/print/purchase.html', {'purchase': purchase})
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = f'filename=purchase_{purchase.id}.pdf'
-    weasyprint.HTML(string=html).write_pdf(response)
+    # weasyprint.HTML(string=html).write_pdf(response)
     return response
 
 @staff_member_required
@@ -769,3 +769,18 @@ def inventory_report(request):
         'devices': devices,
     }
     return render(request, 'inventory_erp/inventory_report.html', context)
+
+def generate_pdf_report(request):
+    # Temporary response while PDF generation is disabled
+    return HttpResponse("PDF generation is temporarily disabled. Please check back later.", content_type="text/plain")
+    
+    # Original PDF generation code - temporarily commented out
+    # context = {
+    #     'products': Product.objects.all(),
+    #     'date': timezone.now()
+    # }
+    # html = render_to_string('inventory_erp/pdf_report.html', context)
+    # response = HttpResponse(content_type='application/pdf')
+    # response['Content-Disposition'] = 'attachment; filename="inventory_report.pdf"'
+    # weasyprint.HTML(string=html).write_pdf(response)
+    # return response

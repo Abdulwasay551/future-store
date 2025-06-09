@@ -34,7 +34,7 @@ SECRET_KEY = env('DJANGO_SECRET_KEY', default='mobilecorner1212')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['.vercel.app', '.now.sh', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
