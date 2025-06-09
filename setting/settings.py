@@ -16,6 +16,7 @@ from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 import os
 import environ
+import sys
 
 # Initialize environ
 env = environ.Env()
@@ -23,6 +24,7 @@ environ.Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+sys.path.append(str(BASE_DIR))
 
 
 # Quick-start development settings - unsuitable for production
@@ -53,12 +55,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'user_auth',  # 
-    'store',
-    'chatbot',  # Chatbot for phone recommendations
-    'inventory_erp',  # ERP system for inventory management
     'social_django',  # Add social auth app
     'whitenoise.runserver_nostatic',
+    'user_auth',  # 
+    'store.apps.StoreConfig',
+    'chatbot.apps.ChatbotConfig',
+    'inventory_erp.apps.InventoryErpConfig',
 ]
 
 MIDDLEWARE = [

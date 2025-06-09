@@ -8,10 +8,18 @@ echo "Creating directories..."
 mkdir -p staticfiles
 
 echo "Running migrations..."
-# Ensure the database is ready
-sleep 5
-python3 manage.py makemigrations --noinput
+# Remove existing migrations and create fresh ones
+find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
+find . -path "*/migrations/*.pyc" -delete
 sleep 2
+
+# Make fresh migrations
+python3 manage.py makemigrations store --noinput
+python3 manage.py makemigrations user_auth --noinput
+python3 manage.py makemigrations inventory_erp --noinput
+sleep 2
+
+# Apply migrations
 python3 manage.py migrate --noinput
 
 echo "Collecting static files..."
