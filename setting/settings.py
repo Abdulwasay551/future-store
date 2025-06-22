@@ -162,10 +162,10 @@ STATICFILES_DIRS = [
 ]
 
 # Create static directories if they don't exist (only in development)
-if DEVELOPMENT :
+if DEVELOPMENT:
     try:
-        STATIC_ROOT, exist_ok=True
-        os.path.join(BASE_DIR, 'static'), exist_ok=True
+        os.makedirs(STATIC_ROOT)
+        os.makedirs(os.path.join(BASE_DIR, 'static'))
     except OSError:
         # Directory creation failed (e.g., read-only filesystem in production)
         pass
