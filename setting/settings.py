@@ -351,35 +351,35 @@ PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
 ]
 
-# Security settings based on environment
-if DEVELOPMENT:
-    SECURE_SSL_REDIRECT = False
-    SESSION_COOKIE_SECURE = False
-    CSRF_COOKIE_SECURE = False
-    SECURE_PROXY_SSL_HEADER = None
-    SECURE_SSL_REDIRECT = False
-    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+# # Security settings based on environment
+# if DEVELOPMENT:
+#     SECURE_SSL_REDIRECT = False
+#     SESSION_COOKIE_SECURE = False
+#     CSRF_COOKIE_SECURE = False
+#     SECURE_PROXY_SSL_HEADER = None
+#     SECURE_SSL_REDIRECT = False
+#     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     
-    # Disable HTTPS requirements
-    SECURE_HSTS_SECONDS = 0
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = False
-    SECURE_HSTS_PRELOAD = False
-else:
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SECURE_HSTS_SECONDS = 31536000
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
+#     # Disable HTTPS requirements
+#     SECURE_HSTS_SECONDS = 0
+#     SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+#     SECURE_HSTS_PRELOAD = False
+# else:
+#     SECURE_SSL_REDIRECT = True
+#     SESSION_COOKIE_SECURE = True
+#     CSRF_COOKIE_SECURE = True
+#     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+#     SECURE_HSTS_SECONDS = 31536000
+#     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+#     SECURE_HSTS_PRELOAD = True
 
-# CSRF settings including development URLs
-CSRF_TRUSTED_ORIGINS = [
-    'https://*.vercel.app',
-    'https://*.now.sh',
-    'https://localhost:*',
-    'https://127.0.0.1:*',
-]
+# # CSRF settings including development URLs
+# CSRF_TRUSTED_ORIGINS = [
+#     'https://*.vercel.app',
+#     'https://*.now.sh',
+#     'https://localhost:*',
+#     'https://127.0.0.1:*',
+# ]
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'  # For Gmail
 EMAIL_PORT = 587
