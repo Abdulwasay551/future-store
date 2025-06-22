@@ -9,6 +9,10 @@ from .models import *
 import json
 from datetime import datetime
 from decimal import Decimal
+from docx import Document
+from docx.shared import Inches, Pt, RGBColor
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+from io import BytesIO
 # import weasyprint  # For PDF generation - temporarily disabled
 from django.views.generic import ListView, CreateView, UpdateView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -253,10 +257,13 @@ def validate_identifier(request):
 @staff_member_required
 def print_purchase(request, pk):
     purchase = get_object_or_404(Purchase, pk=pk)
-    html = render_to_string('inventory_erp/print/purchase.html', {'purchase': purchase})
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'filename=purchase_{purchase.id}.pdf'
-    # weasyprint.HTML(string=html).write_pdf(response)
+    docx_file = generate_purchase_docx(purchase)
+    
+    response = HttpResponse(
+        docx_file.getvalue(),
+        content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    )
+    response['Content-Disposition'] = f'attachment; filename=purchase_{purchase.id}.docx'
     return response
 
 @staff_member_required
@@ -784,3 +791,158 @@ def generate_pdf_report(request):
     # response['Content-Disposition'] = 'attachment; filename="inventory_report.pdf"'
     # weasyprint.HTML(string=html).write_pdf(response)
     # return response
+
+def generate_purchase_docx(purchase):
+    doc = Document()
+    
+    # Add title
+    title = doc.add_heading('Purchase Invoice', 0)
+    title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    
+    # Add purchase details
+    doc.add_paragraph(f'Invoice Number: {purchase.dealer_invoice_number}')
+    doc.add_paragraph(f'Date: {purchase.purchase_date}')
+    doc.add_paragraph(f'Dealer: {purchase.dealer.name}')
+    doc.add_paragraph(f'Type: {purchase.get_purchase_type_display()}')
+    
+    # Add items table
+    table = doc.add_table(rows=1, cols=5)
+    table.style = 'Table Grid'
+    
+    # Add headers
+    header_cells = table.rows[0].cells
+    headers = ['Device', 'Quantity', 'Unit Price', 'Total']
+    for i, header in enumerate(headers):
+        header_cells[i].text = header
+    
+    # Add items
+    for item in purchase.items.all():
+        row_cells = table.add_row().cells
+        row_cells[0].text = item.device.name
+        row_cells[1].text = str(item.quantity)
+        row_cells[2].text = str(item.unit_price)
+        row_cells[3].text = str(item.quantity * item.unit_price)
+    
+    # Add totals
+    doc.add_paragraph(f'Total Amount: Rs. {purchase.total_amount}')
+    doc.add_paragraph(f'Paid Amount: Rs. {purchase.paid_amount}')
+    doc.add_paragraph(f'Balance Due: Rs. {purchase.balance_due}')
+    
+    # Save to BytesIO
+    docx_file = BytesIO()
+    doc.save(docx_file)
+    docx_file.seek(0)
+    return docx_file
+
+def generate_sale_docx(sale):
+    doc = Document()
+    
+    # Add title
+    title = doc.add_heading('Sale Invoice', 0)
+    title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    
+    # Add sale details
+    doc.add_paragraph(f'Invoice Number: {sale.invoice_number}')
+    doc.add_paragraph(f'Date: {sale.sale_date}')
+    doc.add_paragraph(f'Customer: {sale.customer_name}')
+    doc.add_paragraph(f'Phone: {sale.customer_phone}')
+    
+    # Add items table
+    table = doc.add_table(rows=1, cols=5)
+    table.style = 'Table Grid'
+    
+    # Add headers
+    header_cells = table.rows[0].cells
+    headers = ['Device', 'Quantity', 'Unit Price', 'Total']
+    for i, header in enumerate(headers):
+        header_cells[i].text = header
+    
+    # Add items
+    for item in sale.items.all():
+        row_cells = table.add_row().cells
+        row_cells[0].text = item.device.name
+        row_cells[1].text = str(item.quantity)
+        row_cells[2].text = str(item.unit_price)
+        row_cells[3].text = str(item.quantity * item.unit_price)
+    
+    # Add totals
+    doc.add_paragraph(f'Total Amount: Rs. {sale.final_amount}')
+    doc.add_paragraph(f'Received Amount: Rs. {sale.received_amount}')
+    doc.add_paragraph(f'Balance Due: Rs. {sale.balance_due}')
+    
+    # Save to BytesIO
+    docx_file = BytesIO()
+    doc.save(docx_file)
+    docx_file.seek(0)
+    return docx_file
+
+def generate_ledger_docx(dealer, ledger_entries):
+    doc = Document()
+    
+    # Add title
+    title = doc.add_heading('Dealer Ledger', 0)
+    title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    
+    # Add dealer details
+    doc.add_paragraph(f'Dealer: {dealer.name}')
+    doc.add_paragraph(f'Type: {dealer.get_dealer_type_display()}')
+    
+    # Add ledger table
+    table = doc.add_table(rows=1, cols=5)
+    table.style = 'Table Grid'
+    
+    # Add headers
+    header_cells = table.rows[0].cells
+    headers = ['Date', 'Transaction', 'Debit', 'Credit', 'Balance']
+    for i, header in enumerate(headers):
+        header_cells[i].text = header
+    
+    # Add entries
+    balance = 0
+    for entry in ledger_entries:
+        row_cells = table.add_row().cells
+        row_cells[0].text = str(entry.transaction_date)
+        row_cells[1].text = entry.get_payment_type_display()
+        
+        if entry.payment_type == 'credit':
+            row_cells[2].text = str(entry.amount)
+            balance += entry.amount
+        else:
+            row_cells[3].text = str(entry.amount)
+            balance -= entry.amount
+            
+        row_cells[4].text = str(balance)
+    
+    # Add summary
+    doc.add_paragraph(f'Current Balance: Rs. {balance}')
+    
+    # Save to BytesIO
+    docx_file = BytesIO()
+    doc.save(docx_file)
+    docx_file.seek(0)
+    return docx_file
+
+@staff_member_required
+def print_sale(request, pk):
+    sale = get_object_or_404(Sale, pk=pk)
+    docx_file = generate_sale_docx(sale)
+    
+    response = HttpResponse(
+        docx_file.getvalue(),
+        content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    )
+    response['Content-Disposition'] = f'attachment; filename=sale_{sale.id}.docx'
+    return response
+
+@staff_member_required
+def print_ledger(request, dealer_id):
+    dealer = get_object_or_404(Dealer, pk=dealer_id)
+    ledger_entries = dealer.ledger_entries.all().order_by('transaction_date')
+    docx_file = generate_ledger_docx(dealer, ledger_entries)
+    
+    response = HttpResponse(
+        docx_file.getvalue(),
+        content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    )
+    response['Content-Disposition'] = f'attachment; filename=ledger_{dealer.id}.docx'
+    return response

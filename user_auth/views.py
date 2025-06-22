@@ -4,11 +4,12 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
-from .models import User
+from django.core.paginator import Paginator
 from django.http import HttpResponse
 from social_django.utils import load_strategy
 from social_core.exceptions import AuthAlreadyAssociated
-from store.models import Contact
+from .models import User
+from store.models import Contact, Order
 
 def home(request):
     # Get featured products (newest and highest rated)
@@ -69,7 +70,7 @@ def logout_view(request):
 @login_required
 def profile_view(request):
     addresses = request.user.addresses.all().order_by('-is_default')
-    recent_orders = request.user.orders.all().order_by('-created_at')[:3]
+    recent_orders = Order.objects.filter(user=request.user).order_by('-created_at')[:3]
     
     return render(request, 'auth/profile.html', {
         'addresses': addresses,
@@ -78,9 +79,16 @@ def profile_view(request):
 
 @login_required
 def orders_view(request):
-    orders = request.user.orders.all().order_by('-created_at')
+    orders = Order.objects.filter(user=request.user).order_by('-created_at')
+    
+    # Pagination
+    paginator = Paginator(orders, 5)  # Show 5 orders per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
     return render(request, 'auth/orders.html', {
-        'orders': orders
+        'orders': page_obj,
+        'page_obj': page_obj
     })
 
 def about_view(request):

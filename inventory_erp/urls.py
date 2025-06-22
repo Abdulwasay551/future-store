@@ -29,13 +29,16 @@ urlpatterns = [
     path('dealers/report/', views.dealer_report, name='dealer_report'),
 
     # Purchase Management
-    path('purchase/list/', views.purchase_list, name='purchase_list'),
-    path('purchase/returns/', views.purchase_return_list, name='purchase_return_list'),
+    path('purchases/', views.purchase_list, name='purchase_list'),
+    path('purchases/new/', views.purchase_entry, name='purchase_entry'),
+    path('purchases/<int:pk>/print/', views.print_purchase, name='print_purchase'),
+    path('purchases/returns/', views.purchase_return_list, name='purchase_return_list'),
     path('purchase/payments/', views.purchase_payments, name='purchase_payments'),
 
     # Sales Management
     path('sales/', views.sale_list, name='sale_list'),
     path('sales/new/', views.sale_entry, name='sale_entry'),
+    path('sales/<int:pk>/print/', views.print_sale, name='print_sale'),
     path('sales/returns/', views.sale_return_list, name='sale_return_list'),
     path('sales/payments/', views.sale_payments, name='sale_payments'),
 
@@ -43,4 +46,7 @@ urlpatterns = [
     path('reports/sales/', views.sales_report, name='sales_report'),
     path('reports/purchases/', views.purchase_report, name='purchase_report'),
     path('reports/inventory/', views.inventory_report, name='inventory_report'),
+
+    # Dealer Management
+    path('dealers/<int:dealer_id>/ledger/print/', views.print_ledger, name='print_ledger'),
 ]

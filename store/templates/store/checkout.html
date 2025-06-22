@@ -3,122 +3,322 @@
 
 {% block content %}
 <div class="container mx-auto px-4 py-8 text-mc-white">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Shipping Address Selection -->
-        <div class="lg:col-span-2">
-            <h2 class="text-2xl font-bold mb-6 text-mc-white">Shipping Address</h2>
-            
-            <!-- Address List -->
-            <div id="address-list" class="space-y-4 mb-8">
-                {% for address in addresses %}
-                <div class="bg-mc-dark rounded-xl p-4 border border-mc-grey/30">
-                    <label class="flex items-start space-x-4">
-                        <input type="radio" name="selected_address" value="{{ address.id }}"
-                               {% if address.is_default %}checked{% endif %}
-                               class="mt-1 bg-mc-black border-mc-grey text-mc-white">
-                        <div class="flex-1">
-                            <div class="flex justify-between">
-                                <span class="font-semibold text-mc-white">{{ address.get_address_type_display }}</span>
-                                {% if address.is_default %}
-                                <span class="text-sm text-mc-accent">Default</span>
-                                {% endif %}
-                            </div>
-                            <p class="text-mc-light-grey">{{ address.street_address }}</p>
-                            <p class="text-mc-light-grey">{{ address.city }}, {{ address.state }} {{ address.postal_code }}</p>
-                        </div>
-                    </label>
-                </div>
-                {% endfor %}
-            </div>
-
-            <!-- Add New Address -->
-            <div class="mb-8">
-                <button type="button" 
-                        onclick="document.getElementById('add-address-form').classList.toggle('hidden')"
-                        class="px-4 py-2 bg-mc-white text-mc-black hover:bg-mc-accent transition-colors duration-300 rounded-lg">
-                    Add New Address
-                </button>
+    <form action="{% url 'place_order' %}" method="POST">
+        {% csrf_token %}
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Shipping Address Selection -->
+            <div class="lg:col-span-2">
+                <h2 class="text-2xl font-bold mb-6 text-mc-white">Shipping Address</h2>
                 
-                <form id="add-address-form" 
-                      hx-post="{% url 'add_address' %}" 
-                      hx-target="#address-list"
-                      hx-swap="beforeend"
-                      class="hidden mt-4 bg-mc-dark rounded-xl p-6 border border-mc-grey/30">
-                    {% csrf_token %}
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="col-span-2">
-                            <label class="block text-mc-white mb-2">Address Type</label>
-                            <select name="address_type" required 
-                                    class="w-full p-2 rounded-lg bg-mc-black border border-mc-grey text-mc-white">
-                                <option value="home">Home</option>
-                                <option value="office">Office</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                        <div class="col-span-2">
-                            <label class="block text-mc-white mb-2">Street Address</label>
-                            <textarea name="street_address" required 
-                                      class="w-full p-2 rounded-lg bg-mc-black border border-mc-grey text-mc-white" 
-                                      rows="2"></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-mc-white mb-2">City</label>
-                            <input type="text" name="city" required 
-                                   class="w-full p-2 rounded-lg bg-mc-black border border-mc-grey text-mc-white">
-                        </div>
-                        <div>
-                            <label class="block text-mc-white mb-2">State</label>
-                            <input type="text" name="state" required 
-                                   class="w-full p-2 rounded-lg bg-mc-black border border-mc-grey text-mc-white">
-                        </div>
-                        <div class="col-span-2">
-                            <label class="block text-mc-white mb-2">Postal Code</label>
-                            <input type="text" name="postal_code" required 
-                                   class="w-full p-2 rounded-lg bg-mc-black border border-mc-grey text-mc-white">
-                        </div>
-                        <div class="col-span-2">
-                            <label class="flex items-center text-mc-white">
-                                <input type="checkbox" name="is_default" 
-                                       class="mr-2 bg-mc-black border-mc-grey text-mc-white">
-                                Set as default address
+                <!-- Address List -->
+                <div id="address-list" class="space-y-4 mb-8">
+                    {% if addresses %}
+                        {% for address in addresses %}
+                        <div class="bg-mc-dark rounded-xl p-4 border border-mc-grey/30 hover:border-mc-accent/50 transition-colors duration-300">
+                            <label class="flex items-start space-x-4 cursor-pointer">
+                                <input type="radio" name="selected_address" value="{{ address.id }}"
+                                       {% if address.is_default %}checked{% endif %}
+                                       class="mt-1 bg-mc-black border-mc-grey text-mc-accent focus:ring-mc-accent focus:ring-2">
+                                <div class="flex-1">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <span class="font-semibold text-mc-white capitalize">{{ address.get_address_type_display }}</span>
+                                        {% if address.is_default %}
+                                        <span class="text-sm bg-mc-accent text-mc-black px-2 py-1 rounded-full font-medium">Default</span>
+                                        {% endif %}
+                                    </div>
+                                    <p class="text-mc-light-grey mb-1">{{ address.street_address }}</p>
+                                    <p class="text-mc-light-grey">{{ address.city }}, {{ address.state }} {{ address.postal_code }}</p>
+                                </div>
                             </label>
                         </div>
-                    </div>
-                    <button type="submit" 
-                            class="mt-4 px-4 py-2 bg-mc-white text-mc-black hover:bg-mc-accent transition-colors duration-300 rounded-lg">
-                        Save Address
-                    </button>
-                </form>
-            </div>
-        </div>
-
-        <!-- Order Summary -->
-        <div class="lg:col-span-1">
-            <div class="bg-mc-dark rounded-xl p-6 border border-mc-grey/30 sticky top-4">
-                <h2 class="text-xl font-semibold mb-4 text-mc-white">Order Summary</h2>
-                <div class="space-y-2 mb-4">
-                    {% for item in cart.items.all %}
-                    <div class="flex justify-between text-mc-light-grey">
-                        <span>{{ item.product.name }} (x{{ item.quantity }})</span>
-                        <span>${{ item.subtotal }}</span>
-                    </div>
-                    {% endfor %}
+                        {% endfor %}
+                    {% else %}
+                        <div class="bg-mc-dark rounded-xl p-6 border border-mc-grey/30 text-center">
+                            <i class="fas fa-map-marker-alt text-3xl text-mc-grey mb-3"></i>
+                            <p class="text-mc-light-grey mb-4">No addresses found. Please add a delivery address.</p>
+                            <button type="button" 
+                                    onclick="toggleAddressForm()"
+                                    class="px-4 py-2 bg-mc-accent text-mc-black hover:bg-mc-accent/90 transition-colors duration-300 rounded-lg font-semibold">
+                                <i class="fas fa-plus mr-2"></i>
+                                Add Your First Address
+                            </button>
+                        </div>
+                    {% endif %}
                 </div>
-                <div class="border-t border-mc-grey/30 pt-4">
-                    <div class="flex justify-between text-mc-white font-semibold">
-                        <span>Total</span>
-                        <span>${{ cart.total }}</span>
+
+                <!-- Add New Address -->
+                <div class="mb-8">
+                    <button type="button" 
+                            onclick="toggleAddressForm()"
+                            class="px-4 py-2 bg-mc-accent text-mc-black hover:bg-mc-accent/90 transition-colors duration-300 rounded-lg font-semibold">
+                        <i class="fas fa-plus mr-2"></i>
+                        Add New Address
+                    </button>
+                    
+                    <div id="add-address-form" 
+                         class="hidden mt-4 bg-mc-dark rounded-xl p-6 border border-mc-grey/30">
+                        <h3 class="text-lg font-semibold mb-4 text-mc-white">Add New Address</h3>
+                        <form hx-post="{% url 'add_address' %}" 
+                              hx-target="#address-list"
+                              hx-swap="beforeend"
+                              hx-on::after-request="if(event.detail.successful) { document.getElementById('add-address-form').classList.add('hidden'); }">
+                            {% csrf_token %}
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="col-span-2">
+                                    <label class="block text-mc-white mb-2">Address Type</label>
+                                    <select name="address_type" 
+                                            class="w-full p-3 rounded-lg bg-mc-black border border-mc-grey text-mc-white focus:border-mc-accent focus:outline-none"
+                                            onchange="toggleRequiredFields()">
+                                        <option value="">Select Address Type</option>
+                                        <option value="home">Home</option>
+                                        <option value="office">Office</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="col-span-2">
+                                    <label class="block text-mc-white mb-2">Street Address</label>
+                                    <textarea name="street_address" 
+                                              class="w-full p-3 rounded-lg bg-mc-black border border-mc-grey text-mc-white focus:border-mc-accent focus:outline-none" 
+                                              rows="3"
+                                              placeholder="Enter your street address"></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-mc-white mb-2">City</label>
+                                    <input type="text" name="city" 
+                                           class="w-full p-3 rounded-lg bg-mc-black border border-mc-grey text-mc-white focus:border-mc-accent focus:outline-none"
+                                           placeholder="Enter city">
+                                </div>
+                                <div>
+                                    <label class="block text-mc-white mb-2">State</label>
+                                    <input type="text" name="state" 
+                                           class="w-full p-3 rounded-lg bg-mc-black border border-mc-grey text-mc-white focus:border-mc-accent focus:outline-none"
+                                           placeholder="Enter state">
+                                </div>
+                                <div class="col-span-2">
+                                    <label class="block text-mc-white mb-2">Postal Code</label>
+                                    <input type="text" name="postal_code" 
+                                           class="w-full p-3 rounded-lg bg-mc-black border border-mc-grey text-mc-white focus:border-mc-accent focus:outline-none"
+                                           placeholder="Enter postal code">
+                                </div>
+                                <div class="col-span-2">
+                                    <label class="flex items-center text-mc-white">
+                                        <input type="checkbox" name="is_default" 
+                                               class="mr-3 w-4 h-4 bg-mc-black border-mc-grey text-mc-accent focus:ring-mc-accent focus:ring-2">
+                                        Set as default address
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="flex gap-3 mt-6">
+                                <button type="submit" 
+                                        class="px-6 py-3 bg-mc-accent text-mc-black hover:bg-mc-accent/90 transition-colors duration-300 rounded-lg font-semibold">
+                                    <i class="fas fa-save mr-2"></i>
+                                    Save Address
+                                </button>
+                                <button type="button" 
+                                        onclick="toggleAddressForm()"
+                                        class="px-6 py-3 bg-mc-grey/30 text-mc-white hover:bg-mc-grey/50 transition-colors duration-300 rounded-lg font-semibold">
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
                     </div>
-                    <form action="{% url 'place_order' %}" method="POST" class="mt-6">
-                        {% csrf_token %}
+                </div>
+
+                <!-- Payment Method -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold mb-4 text-mc-white">Contact Information</h3>
+                    <div class="bg-mc-dark rounded-xl p-4 border border-mc-grey/30 mb-6">
+                        <div class="mb-4">
+                            <label class="block text-mc-white mb-2">Phone Number <span class="text-red-400">*</span></label>
+                            <input type="tel" name="phone_number" 
+                                   value="{{ user.phone_number|default:'' }}"
+                                   class="w-full p-3 rounded-lg bg-mc-black border border-mc-grey text-mc-white focus:border-mc-accent focus:outline-none"
+                                   placeholder="Enter your phone number (e.g., +1234567890)"
+                                   pattern="^\+?1?\d{9,15}$"
+                                   required>
+                            <p class="text-sm text-mc-light-grey mt-1">Required for delivery coordination</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Order Processing Information -->
+                    <div class="bg-mc-dark rounded-xl p-6 border border-mc-grey/30">
+                        <div class="flex items-start space-x-4">
+                            <div class="flex-shrink-0">
+                                <div class="w-12 h-12 bg-mc-accent/20 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-info-circle text-mc-accent text-xl"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="text-lg font-semibold text-mc-white mb-2">Order Processing</h4>
+                                <p class="text-mc-light-grey mb-3">
+                                    After placing your order, you will receive a confirmation message. Our representative will contact you shortly to discuss payment options and delivery details.
+                                </p>
+                                <div class="bg-mc-black/50 rounded-lg p-4 border border-mc-grey/30">
+                                    <p class="text-mc-accent font-medium">
+                                        <i class="fas fa-phone mr-2"></i>
+                                        You will soon get a message from our representative
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Notes -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold mb-4 text-mc-white">Order Notes (Optional)</h3>
+                    <textarea name="notes" 
+                              class="w-full p-3 rounded-lg bg-mc-dark border border-mc-grey text-mc-white" 
+                              rows="3"
+                              placeholder="Any special instructions for delivery..."></textarea>
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="lg:col-span-1">
+                <div class="bg-mc-dark rounded-xl p-6 border border-mc-grey/30 sticky top-4">
+                    <h2 class="text-xl font-semibold mb-4 text-mc-white">Order Summary</h2>
+                    <div class="space-y-2 mb-4">
+                        {% for item in cart.items.all %}
+                        <div class="flex justify-between text-mc-light-grey">
+                            <span>{{ item.product.name }}{% if item.color %} ({{ item.color.name }}){% endif %} (x{{ item.quantity }})</span>
+                            <span>{{ item.subtotal }} Rs</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="border-t border-mc-grey/30 pt-4">
+                        <div class="flex justify-between text-mc-white font-semibold">
+                            <span>Total</span>
+                            <span>{{ cart.total }} Rs</span>
+                        </div>
                         <button type="submit" 
-                                class="w-full py-3 bg-mc-white text-mc-black hover:bg-mc-accent transition-colors duration-300 rounded-lg font-semibold">
+                                class="w-full py-3 bg-mc-accent text-mc-black hover:bg-mc-accent/90 transition-colors duration-300 rounded-lg font-semibold mt-6">
                             Place Order
                         </button>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </form>
 </div>
+
+<script>
+function toggleAddressForm() {
+    const form = document.getElementById('add-address-form');
+    if (form.classList.contains('hidden')) {
+        form.classList.remove('hidden');
+        // Focus on the first input field
+        const firstInput = form.querySelector('input, select, textarea');
+        if (firstInput) {
+            firstInput.focus();
+        }
+    } else {
+        form.classList.add('hidden');
+        // Clear form fields when hiding
+        const formElement = form.querySelector('form');
+        if (formElement) {
+            formElement.reset();
+            // Remove required attributes when hiding
+            const requiredFields = formElement.querySelectorAll('input, select, textarea');
+            requiredFields.forEach(field => {
+                field.removeAttribute('required');
+            });
+        }
+    }
+}
+
+function toggleRequiredFields() {
+    const form = document.getElementById('add-address-form');
+    const formElement = form.querySelector('form');
+    const addressType = formElement.querySelector('select[name="address_type"]');
+    const requiredFields = formElement.querySelectorAll('input[name="street_address"], input[name="city"], input[name="state"], input[name="postal_code"]');
+    
+    if (addressType.value) {
+        // If address type is selected, make other fields required
+        requiredFields.forEach(field => {
+            field.setAttribute('required', 'required');
+        });
+    } else {
+        // If no address type selected, remove required attributes
+        requiredFields.forEach(field => {
+            field.removeAttribute('required');
+        });
+    }
+}
+
+// Ensure at least one address is selected when form is submitted
+document.addEventListener('DOMContentLoaded', function() {
+    const orderForm = document.querySelector('form[action*="place_order"]');
+    if (orderForm) {
+        orderForm.addEventListener('submit', function(e) {
+            const selectedAddress = document.querySelector('input[name="selected_address"]:checked');
+            if (!selectedAddress) {
+                e.preventDefault();
+                alert('Please select a delivery address.');
+                return false;
+            }
+        });
+    }
+    
+    // Auto-select default address if no address is selected
+    const selectedAddress = document.querySelector('input[name="selected_address"]:checked');
+    if (!selectedAddress) {
+        const defaultAddress = document.querySelector('input[name="selected_address"]');
+        if (defaultAddress) {
+            defaultAddress.checked = true;
+        }
+    }
+});
+
+// Phone number validation
+function validatePhoneNumber(phoneNumber) {
+    const phonePattern = /^\+?1?\d{9,15}$/;
+    return phonePattern.test(phoneNumber);
+}
+
+// Form validation before submission
+document.querySelector('form[action*="place_order"]').addEventListener('submit', function(e) {
+    const phoneNumber = document.querySelector('input[name="phone_number"]').value.trim();
+    const selectedAddress = document.querySelector('input[name="selected_address"]:checked');
+    
+    // Check if phone number is provided
+    if (!phoneNumber) {
+        e.preventDefault();
+        alert('Please enter your phone number. It is required for order placement.');
+        document.querySelector('input[name="phone_number"]').focus();
+        return false;
+    }
+    
+    // Check if phone number format is valid
+    if (!validatePhoneNumber(phoneNumber)) {
+        e.preventDefault();
+        alert('Please enter a valid phone number (e.g., +1234567890).');
+        document.querySelector('input[name="phone_number"]').focus();
+        return false;
+    }
+    
+    // Check if address is selected
+    if (!selectedAddress) {
+        e.preventDefault();
+        alert('Please select a delivery address.');
+        return false;
+    }
+    
+    return true;
+});
+
+// Real-time phone number validation
+document.querySelector('input[name="phone_number"]').addEventListener('input', function(e) {
+    const phoneNumber = e.target.value.trim();
+    const isValid = validatePhoneNumber(phoneNumber);
+    
+    if (phoneNumber && !isValid) {
+        e.target.classList.add('border-red-500');
+        e.target.classList.remove('border-mc-grey', 'focus:border-mc-accent');
+    } else {
+        e.target.classList.remove('border-red-500');
+        e.target.classList.add('border-mc-grey', 'focus:border-mc-accent');
+    }
+});
+</script>
 {% endblock %}

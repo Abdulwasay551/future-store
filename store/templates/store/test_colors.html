@@ -1,0 +1,171 @@
+{% extends "shared/skeleton.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 text-mc-white">
+    <h1 class="text-3xl font-bold mb-8">Color Functionality Test</h1>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Test Product -->
+        <div class="bg-mc-dark rounded-xl p-6 border border-mc-grey/30">
+            <h2 class="text-xl font-semibold mb-4">Test Product</h2>
+            
+            {% if test_product %}
+            <div class="space-y-4">
+                <h3 class="text-lg font-medium">{{ test_product.name }}</h3>
+                <p class="text-mc-light-grey">{{ test_product.description }}</p>
+                
+                <!-- Colors -->
+                {% if test_product.colors.all %}
+                <div>
+                    <h4 class="font-medium mb-2">Available Colors:</h4>
+                    <div class="flex flex-wrap gap-2">
+                        {% for color in test_product.colors.all %}
+                        <div class="flex items-center gap-2 p-2 rounded border border-mc-grey/30">
+                            {% if color.hex_code %}
+                            <div class="w-6 h-6 rounded-full border border-mc-grey/50" 
+                                 style="background-color: {{ color.hex_code }};"></div>
+                            {% endif %}
+                            <span class="text-sm">{{ color.name }} ({{ color.stock }})</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- Images -->
+                {% if test_product.images.all %}
+                <div>
+                    <h4 class="font-medium mb-2">Product Images:</h4>
+                    <div class="grid grid-cols-3 gap-2">
+                        {% for image in test_product.images.all %}
+                        <div class="aspect-square bg-mc-black rounded overflow-hidden">
+                            {% if image.get_image_url %}
+                            <img src="{{ image.get_image_url }}" 
+                                 alt="{{ image.alt_text|default:test_product.name }}"
+                                 class="w-full h-full object-cover">
+                            {% else %}
+                            <div class="w-full h-full flex items-center justify-center text-mc-grey">
+                                <i class="fas fa-image"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                {% else %}
+                <p class="text-mc-light-grey">No colors found for this product.</p>
+                {% endif %}
+            </div>
+            {% else %}
+            <p class="text-mc-light-grey">No test product available.</p>
+            {% endif %}
+        </div>
+        
+        <!-- Test Results -->
+        <div class="bg-mc-dark rounded-xl p-6 border border-mc-grey/30">
+            <h2 class="text-xl font-semibold mb-4">Test Results</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <h4 class="font-medium mb-2">Color Selection Test:</h4>
+                    <button onclick="testColorSelection()" 
+                            class="px-4 py-2 bg-mc-accent text-mc-black rounded-lg hover:bg-mc-accent/90 transition-colors">
+                        Test Color Selection
+                    </button>
+                    <div id="colorTestResult" class="mt-2 text-sm"></div>
+                </div>
+                
+                <div>
+                    <h4 class="font-medium mb-2">Image Loading Test:</h4>
+                    <button onclick="testImageLoading()" 
+                            class="px-4 py-2 bg-mc-accent text-mc-black rounded-lg hover:bg-mc-accent/90 transition-colors">
+                        Test Image Loading
+                    </button>
+                    <div id="imageTestResult" class="mt-2 text-sm"></div>
+                </div>
+                
+                <div>
+                    <h4 class="font-medium mb-2">AJAX Endpoints Test:</h4>
+                    <button onclick="testAjaxEndpoints()" 
+                            class="px-4 py-2 bg-mc-accent text-mc-black rounded-lg hover:bg-mc-accent/90 transition-colors">
+                        Test AJAX Endpoints
+                    </button>
+                    <div id="ajaxTestResult" class="mt-2 text-sm"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function testColorSelection() {
+    const result = document.getElementById('colorTestResult');
+    result.innerHTML = '<span class="text-yellow-400">Testing color selection...</span>';
+    
+    // Test if color selection elements exist
+    const colorOptions = document.querySelectorAll('.color-option');
+    if (colorOptions.length > 0) {
+        result.innerHTML = `<span class="text-green-400">✓ Found ${colorOptions.length} color options</span>`;
+    } else {
+        result.innerHTML = '<span class="text-red-400">✗ No color options found</span>';
+    }
+}
+
+function testImageLoading() {
+    const result = document.getElementById('imageTestResult');
+    result.innerHTML = '<span class="text-yellow-400">Testing image loading...</span>';
+    
+    // Test if images load properly
+    const images = document.querySelectorAll('img');
+    let loadedImages = 0;
+    let totalImages = images.length;
+    
+    if (totalImages === 0) {
+        result.innerHTML = '<span class="text-red-400">✗ No images found</span>';
+        return;
+    }
+    
+    images.forEach(img => {
+        if (img.complete && img.naturalHeight !== 0) {
+            loadedImages++;
+        } else {
+            img.onload = () => {
+                loadedImages++;
+                if (loadedImages === totalImages) {
+                    result.innerHTML = `<span class="text-green-400">✓ All ${totalImages} images loaded successfully</span>`;
+                }
+            };
+            img.onerror = () => {
+                result.innerHTML = `<span class="text-red-400">✗ Failed to load some images (${loadedImages}/${totalImages})</span>`;
+            };
+        }
+    });
+    
+    if (loadedImages === totalImages) {
+        result.innerHTML = `<span class="text-green-400">✓ All ${totalImages} images loaded successfully</span>`;
+    }
+}
+
+function testAjaxEndpoints() {
+    const result = document.getElementById('ajaxTestResult');
+    result.innerHTML = '<span class="text-yellow-400">Testing AJAX endpoints...</span>';
+    
+    // Test color images endpoint
+    fetch('/store/product/1/color/1/images/')
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error('Color images endpoint failed');
+            }
+        })
+        .then(data => {
+            result.innerHTML = '<span class="text-green-400">✓ Color images endpoint working</span>';
+        })
+        .catch(error => {
+            result.innerHTML = '<span class="text-red-400">✗ Color images endpoint failed</span>';
+        });
+}
+</script>
+{% endblock %} 

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ notification.title }}</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 300;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .notification-type {
+            display: inline-block;
+            background-color: #667eea;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+        }
+        .message {
+            background-color: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .order-details {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .order-details h3 {
+            margin-top: 0;
+            color: #667eea;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        .detail-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        .detail-value {
+            color: #6c757d;
+        }
+        .tracking-info {
+            background-color: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .tracking-info h3 {
+            margin-top: 0;
+            color: #1976d2;
+        }
+        .tracking-button {
+            display: inline-block;
+            background-color: #2196f3;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        .tracking-button:hover {
+            background-color: #1976d2;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .status-pending { background-color: #fff3cd; color: #856404; }
+        .status-confirmed { background-color: #d1ecf1; color: #0c5460; }
+        .status-processing { background-color: #d4edda; color: #155724; }
+        .status-shipped { background-color: #cce5ff; color: #004085; }
+        .status-delivered { background-color: #d4edda; color: #155724; }
+        .status-cancelled { background-color: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Future Store</h1>
+            <p>Your order update is here!</p>
+        </div>
+        
+        <div class="content">
+            <div class="notification-type">{{ notification.get_notification_type_display }}</div>
+            
+            <h2>{{ notification.title }}</h2>
+            
+            <div class="message">
+                <p>{{ notification.message|linebreaks }}</p>
+            </div>
+            
+            {% if order %}
+            <div class="order-details">
+                <h3>📦 Order Details</h3>
+                <div class="detail-row">
+                    <span class="detail-label">Order ID:</span>
+                    <span class="detail-value">#{{ order.id }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Order Date:</span>
+                    <span class="detail-value">{{ order.created_at|date:"F d, Y" }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Total Amount:</span>
+                    <span class="detail-value">Rs {{ order.total_amount }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Status:</span>
+                    <span class="detail-value">
+                        <span class="status-badge status-{{ order.status }}">
+                            {{ order.get_status_display }}
+                        </span>
+                    </span>
+                </div>
+                {% if order.payment_method %}
+                <div class="detail-row">
+                    <span class="detail-label">Payment Method:</span>
+                    <span class="detail-value">{{ order.get_payment_method_display|default:order.payment_method|title }}</span>
+                </div>
+                {% endif %}
+            </div>
+            
+            {% if order.tracking_id and order.tracking_url %}
+            <div class="tracking-info">
+                <h3>🚚 Track Your Order</h3>
+                <p><strong>Tracking ID:</strong> {{ order.tracking_id }}</p>
+                {% if order.delivery_service %}
+                <p><strong>Delivery Service:</strong> {{ order.delivery_service.name }}</p>
+                {% endif %}
+                {% if order.estimated_delivery_date %}
+                <p><strong>Estimated Delivery:</strong> {{ order.estimated_delivery_date|date:"F d, Y" }}</p>
+                {% endif %}
+                <a href="{{ order.tracking_url }}" class="tracking-button" target="_blank">
+                    Track Package
+                </a>
+            </div>
+            {% endif %}
+            
+            {% if order.address %}
+            <div class="order-details">
+                <h3>📍 Delivery Address</h3>
+                <p>
+                    {{ order.address.street_address }}<br>
+                    {{ order.address.city }}, {{ order.address.state }} {{ order.address.postal_code }}
+                </p>
+            </div>
+            {% endif %}
+            {% endif %}
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="{{ request.scheme }}://{{ request.get_host }}{% url 'order_detail' order.id %}" 
+                   style="background-color: #667eea; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 600;">
+                    View Order Details
+                </a>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Thank you for shopping with Future Store!</p>
+            <p>If you have any questions, please contact our support team.</p>
+            <p>&copy; 2024 Future Store. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html> 

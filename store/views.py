@@ -1,15 +1,16 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.core.paginator import Paginator
 from django.template.loader import render_to_string
 from django.db import models
-from .models import Category, Company, Product, Cart, CartItem, Review, Address, Order, OrderItem
+from .models import Category, Company, Product, Cart, CartItem, Review, Address, Order, OrderItem, ProductColor, Notification
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Sum, F, Count, Q, ExpressionWrapper, DecimalField
 from django.utils import timezone
 from datetime import timedelta
+import re
 
 def product_list(request):
     # Get all categories
@@ -96,20 +97,96 @@ def product_detail(request, slug):
     product = get_object_or_404(Product, slug=slug, is_available=True)
     reviews = product.reviews.all().order_by('-created_at')
     
+    # Get selected color from query params
+    selected_color_id = request.GET.get('color')
+    selected_color = None
+    if selected_color_id:
+        selected_color = product.colors.filter(id=selected_color_id).first()
+    
+    # If no color selected, use primary color
+    if not selected_color:
+        selected_color = product.primary_color
+    
+    # Get images for selected color
+    color_images = []
+    if selected_color:
+        color_images = selected_color.images.all()
+    
+    # If no color-specific images, fall back to product images
+    if not color_images:
+        color_images = product.images.all()
+    
     return render(request, 'store/product_detail.html', {
         'product': product,
-        'reviews': reviews
+        'reviews': reviews,
+        'selected_color': selected_color,
+        'color_images': color_images,
+    })
+
+def get_color_images(request, product_id, color_id):
+    """AJAX view to get images for a specific color"""
+    product = get_object_or_404(Product, id=product_id)
+    color = get_object_or_404(ProductColor, id=color_id, product=product)
+    
+    images = []
+    for img in color.images.all():
+        images.append({
+            'id': img.id,
+            'url': img.get_image_url,
+            'alt_text': img.alt_text,
+            'is_primary': img.is_primary
+        })
+    
+    return JsonResponse({'images': images})
+
+def get_product_colors(request, product_id):
+    """AJAX view to get colors for a specific product"""
+    product = get_object_or_404(Product, id=product_id)
+    
+    colors = []
+    for color in product.colors.all():
+        colors.append({
+            'id': color.id,
+            'name': color.name,
+            'hex_code': color.hex_code,
+            'stock': color.stock,
+            'is_primary': color.is_primary
+        })
+    
+    return JsonResponse({'colors': colors})
+
+def test_colors(request):
+    """Test view for debugging color functionality"""
+    # Get the first product with colors for testing
+    test_product = Product.objects.filter(colors__isnull=False).first()
+    
+    return render(request, 'store/test_colors.html', {
+        'test_product': test_product,
     })
 
 @login_required(login_url='login')
 def add_to_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     cart, created = Cart.objects.get_or_create(user=request.user)
-    cart_item, item_created = CartItem.objects.get_or_create(cart=cart, product=product)
     
-    if not item_created:
+    # Get color from form data
+    color_id = request.POST.get('color_id')
+    color = None
+    if color_id:
+        color = product.colors.filter(id=color_id).first()
+    
+    # Try to get existing cart item with same product and color
+    cart_item = None
+    if color:
+        cart_item = CartItem.objects.filter(cart=cart, product=product, color=color).first()
+    else:
+        cart_item = CartItem.objects.filter(cart=cart, product=product, color__isnull=True).first()
+    
+    if cart_item:
         cart_item.quantity += 1
         cart_item.save()
+    else:
+        CartItem.objects.create(cart=cart, product=product, color=color, quantity=1)
     
     # Return only the cart count for HTMX request
     return render(request, 'store/cart_count.html', {'cart': cart})
@@ -182,13 +259,24 @@ def checkout(request):
 @login_required
 def add_address(request):
     if request.method == 'POST':
+        # Validate required fields
+        address_type = request.POST.get('address_type')
+        street_address = request.POST.get('street_address')
+        city = request.POST.get('city')
+        state = request.POST.get('state')
+        postal_code = request.POST.get('postal_code')
+        
+        if not all([address_type, street_address, city, state, postal_code]):
+            messages.error(request, 'Please fill in all required fields.')
+            return redirect('checkout')
+        
         address = Address(
             user=request.user,
-            address_type=request.POST.get('address_type'),
-            street_address=request.POST.get('street_address'),
-            city=request.POST.get('city'),
-            state=request.POST.get('state'),
-            postal_code=request.POST.get('postal_code'),
+            address_type=address_type,
+            street_address=street_address,
+            city=city,
+            state=state,
+            postal_code=postal_code,
             is_default=request.POST.get('is_default') == 'on'
         )
         address.save()
@@ -200,58 +288,127 @@ def add_address(request):
 @login_required
 def place_order(request):
     if request.method == 'POST':
+        print(f"Order placement attempt - User: {request.user.email}")
+        
         cart = Cart.objects.get(user=request.user)
         if not cart.items.exists():
             messages.error(request, 'Your cart is empty.')
             return redirect('cart_detail')
         
+        # Validate phone number
+        phone_number = request.POST.get('phone_number', '').strip()
+        if not phone_number:
+            messages.error(request, 'Phone number is required for order placement.')
+            return redirect('checkout')
+        
+        # Validate phone number format using regex
+        phone_pattern = re.compile(r'^\+?1?\d{9,15}$')
+        if not phone_pattern.match(phone_number):
+            messages.error(request, 'Please enter a valid phone number (e.g., +1234567890).')
+            return redirect('checkout')
+        
         address_id = request.POST.get('selected_address')
+        print(f"Selected address ID: {address_id}")
+        
         if not address_id:
             messages.error(request, 'Please select a delivery address.')
             return redirect('checkout')
         
-        address = get_object_or_404(Address, id=address_id, user=request.user)
+        try:
+            address = get_object_or_404(Address, id=address_id, user=request.user)
+            print(f"Address found: {address.street_address}")
+        except Exception as e:
+            print(f"Address error: {e}")
+            messages.error(request, 'Invalid address selected.')
+            return redirect('checkout')
         
         # Start transaction to ensure data consistency
         from django.db import transaction
         try:
             with transaction.atomic():
+                print("Starting transaction...")
+                
+                # Update user's phone number if it's different
+                if request.user.phone_number != phone_number:
+                    request.user.phone_number = phone_number
+                    request.user.save()
+                    print(f"Updated user phone number to: {phone_number}")
+                
                 # Check stock availability and update stock
                 for cart_item in cart.items.all():
-                    if cart_item.product.stock < cart_item.quantity:
-                        messages.error(
-                            request,
-                            f'Sorry, {cart_item.product.name} only has {cart_item.product.stock} items in stock.'
-                        )
-                        return redirect('cart_detail')
+                    print(f"Processing cart item: {cart_item.product.name} x {cart_item.quantity}")
+                    
+                    if cart_item.color:
+                        # Check color-specific stock
+                        if cart_item.color.stock < cart_item.quantity:
+                            messages.error(
+                                request,
+                                f'Sorry, {cart_item.product.name} ({cart_item.color.name}) only has {cart_item.color.stock} items in stock.'
+                            )
+                            return redirect('cart_detail')
+                    else:
+                        # Check product total stock
+                        if cart_item.product.total_stock < cart_item.quantity:
+                            messages.error(
+                                request,
+                                f'Sorry, {cart_item.product.name} only has {cart_item.product.total_stock} items in stock.'
+                            )
+                            return redirect('cart_detail')
                     
                     # Reduce stock
-                    cart_item.product.stock -= cart_item.quantity
-                    cart_item.product.save()
+                    if cart_item.color:
+                        cart_item.color.stock -= cart_item.quantity
+                        cart_item.color.save()
+                        print(f"Reduced stock for {cart_item.color.name} to {cart_item.color.stock}")
+                    else:
+                        # Reduce from primary color if no specific color selected
+                        primary_color = cart_item.product.primary_color
+                        if primary_color and primary_color.stock >= cart_item.quantity:
+                            primary_color.stock -= cart_item.quantity
+                            primary_color.save()
+                            print(f"Reduced stock for primary color to {primary_color.stock}")
                 
                 # Create order
                 order = Order.objects.create(
                     user=request.user,
                     address=address,
-                    total_amount=cart.total
+                    total_amount=cart.total,
+                    notes=request.POST.get('notes', ''),
+                    payment_method='pending'  # Set to pending since payment will be discussed with representative
                 )
+                print(f"Order created with ID: {order.id}")
                 
                 # Create order items
                 for cart_item in cart.items.all():
                     OrderItem.objects.create(
                         order=order,
                         product=cart_item.product,
+                        color=cart_item.color,
                         quantity=cart_item.quantity,
-                        price=cart_item.product.price
+                        price=cart_item.product.discounted_price
                     )
+                    print(f"Order item created: {cart_item.product.name}")
                 
                 # Clear the cart
                 cart.items.all().delete()
+                print("Cart cleared")
                 
-                messages.success(request, 'Order placed successfully!')
+                # Create order notification
+                try:
+                    order.create_order_notification()
+                    print("Order notification created")
+                except Exception as e:
+                    print(f"Notification error: {e}")
+                    # Continue even if notification fails
+                
+                messages.success(request, 'Order placed successfully! Our representative will contact you shortly to discuss payment and delivery details.')
+                print("Order placement successful!")
                 return redirect('order_detail', order_id=order.id)
                 
         except Exception as e:
+            print(f"Order creation error: {e}")
+            import traceback
+            traceback.print_exc()
             messages.error(request, 'An error occurred while processing your order. Please try again.')
             return redirect('checkout')
     
@@ -260,6 +417,10 @@ def place_order(request):
 @login_required
 def order_detail(request, order_id):
     order = get_object_or_404(Order, id=order_id, user=request.user)
+    
+    # Mark order notifications as read
+    order.notifications.filter(is_read=False).update(is_read=True)
+    
     return render(request, 'store/order_detail.html', {'order': order})
 
 @login_required
@@ -290,3 +451,33 @@ def load_more_reviews(request, product_id):
     
     html = render_to_string('store/review_list.html', context)
     return HttpResponse(html)
+
+@login_required
+def notifications_list(request):
+    """View user notifications"""
+    notifications = request.user.notifications.all()[:50]  # Last 50 notifications
+    unread_count = request.user.notifications.filter(is_read=False).count()
+    
+    return render(request, 'store/notifications.html', {
+        'notifications': notifications,
+        'unread_count': unread_count
+    })
+
+@login_required
+def mark_notification_read(request, notification_id):
+    """Mark a notification as read via AJAX"""
+    from django.http import JsonResponse
+    try:
+        notification = request.user.notifications.get(id=notification_id)
+        notification.is_read = True
+        notification.save()
+        return JsonResponse({'success': True})
+    except Notification.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Notification not found'})
+
+@login_required
+def mark_all_notifications_read(request):
+    """Mark all notifications as read"""
+    from django.http import JsonResponse
+    request.user.notifications.filter(is_read=False).update(is_read=True)
+    return JsonResponse({'success': True})

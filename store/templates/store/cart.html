@@ -11,7 +11,8 @@
         <div class="lg:col-span-2">
             <div class="space-y-4">
                 {% for item in cart.items.all %}
-                <div class="bg-mc-dark rounded-xl p-4 sm:p-6 border border-mc-grey/30 card-hover">                <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                <div class="bg-mc-dark rounded-xl p-4 sm:p-6 border border-mc-grey/30 card-hover">
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-4">
                         {% if item.product.primary_image %}
                         <img src="{{ item.product.primary_image }}" 
                              alt="{{ item.product.name }}" 
@@ -24,7 +25,17 @@
                         
                         <div class="flex-1">
                             <h3 class="text-lg sm:text-xl font-bold text-mc-white">{{ item.product.name }}</h3>
-                            <p class="text-mc-light-grey">{{ item.product.price }} Rs</p>
+                            <p class="text-mc-light-grey">{{ item.product.discounted_price }} Rs</p>
+                            {% if item.color %}
+                            <div class="flex items-center gap-2 mt-2">
+                                <span class="text-mc-light-grey text-sm">Color:</span>
+                                {% if item.color.hex_code %}
+                                <div class="w-4 h-4 rounded-full border border-mc-grey/50" 
+                                     style="background-color: {{ item.color.hex_code }};"></div>
+                                {% endif %}
+                                <span class="text-mc-white text-sm font-medium">{{ item.color.name }}</span>
+                            </div>
+                            {% endif %}
                         </div>
                         
                         <div class="flex items-center justify-between sm:justify-end gap-4 sm:gap-6">
@@ -55,7 +66,7 @@
                             </div>
 
                             <div class="text-right">
-                                <p class="text-xl font-bold text-mc-white">${{ item.subtotal }}</p>
+                                <p class="text-xl font-bold text-mc-white">Rs {{ item.subtotal }}</p>
                             </div>
                         </div>
                     </div>
@@ -72,7 +83,7 @@
                 <div class="space-y-4 mb-6">
                     <div class="flex justify-between text-mc-light-grey">
                         <span>Subtotal</span>
-                        <span>${{ cart.total }}</span>
+                        <span>Rs {{ cart.total }}</span>
                     </div>
                     <div class="flex justify-between text-mc-light-grey">
                         <span>Shipping</span>
@@ -81,7 +92,7 @@
                     <div class="border-t border-mc-grey/30 pt-4">
                         <div class="flex justify-between text-xl font-bold text-mc-white">
                             <span>Total</span>
-                            <span>${{ cart.total }}</span>
+                            <span>Rs {{ cart.total }}</span>
                         </div>
                     </div>
                 </div>

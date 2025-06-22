@@ -34,9 +34,13 @@ sys.path.append(str(BASE_DIR))
 SECRET_KEY = env('DJANGO_SECRET_KEY', default='mobilecorner1212')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = False  # Change this line
 
-ALLOWED_HOSTS = ['*']
+# Development/Production environment settings
+DEVELOPMENT = env.bool('DEVELOPMENT', default=True)
+
+# Update ALLOWED_HOSTS based on environment
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1']) if DEBUG else ['*']
 
 
 # Application definition
@@ -88,6 +92,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'store.context_processors.categories_processor',
             ],
         },
     },
@@ -156,6 +161,10 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
+# Create static directories if they don't exist
+os.makedirs(STATIC_ROOT, exist_ok=True)
+os.makedirs(os.path.join(BASE_DIR, 'static'), exist_ok=True)
+
 # Enable WhiteNoise for static files
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
@@ -180,6 +189,13 @@ UNFOLD = {
     #     "light": lambda request: static("icon-light.svg"),  # light mode
     #     "dark": lambda request: static("icon-dark.svg"),  # dark mode
     # },
+    "SITE_DROPDOWN": [
+        {
+            "icon": "diamond",
+            "title": _("Mobile Corner"),
+            "link": reverse_lazy("admin:index"),
+        },
+    ],
     "SITE_LOGO": {
         "light": lambda request: static("logo-light.JPG"),  # light mode
         "dark": lambda request: static("logo-dark.JPG"),  # dark mode
@@ -198,7 +214,7 @@ UNFOLD = {
     "SHOW_BACK_BUTTON": True, # show/hide "Back" button on changeform in header, default: False
     "LOGIN": {
         "image": lambda request: static("bg.jpg"),
-        "title": "Welcome to Bit and Bytes System",
+        "title": "Welcome to Mobile Corner Admin",
         "description": "Please login to access the system",
         
         # "redirect_after": lambda request: reverse_lazy("admin:APP_MODEL_changelist"),
@@ -253,9 +269,54 @@ UNFOLD = {
             },
         },
     },
-    "SIDEBAR": {
-        "show_search": True,  # Search in applications and models names
-        "show_all_applications": True,  # Dropdown with all applications and models
+   "SIDEBAR": {
+        "show_search": False,  # Search in applications and models names
+        "show_all_applications": False,  # Dropdown with all applications and models
+        "navigation": [
+            {
+                "title": _("Mobile Corner"),
+                "collapsible": False,  # Collapsible group of links
+                "items": [
+                    {
+                        "title": _("Dashboard"),
+                        "icon": "dashboard",  # Supported icon set: https://fonts.google.com/icons
+                        "link": reverse_lazy("admin:index"),
+                        "permission": lambda request: request.user.is_superuser,
+                    },
+                    {
+                        "title": _("Users"),
+                        "icon": "people",
+                        "badge": "Careful",
+                        "link": reverse_lazy("admin:user_auth_user_changelist"),
+                    },
+                    {
+                        "title": _("Products"),
+                        "icon": "phone",
+                        "link": reverse_lazy("admin:store_product_changelist"),
+                    },
+                    {
+                        "title": _("Orders"),   
+                        "icon": "book",
+                        "link": reverse_lazy("admin:store_order_changelist"),
+                    },
+                    {
+                        "title": _("Reviews"),
+                        "icon": "reviews",
+                        "link": reverse_lazy("admin:store_review_changelist"),
+                    },
+                    {
+                        "title": _("Contacts"),
+                        "icon": "chat",
+                        "link": reverse_lazy("admin:store_contact_changelist"),
+                    },
+                    {
+                        "title": _("Delivery Services"),
+                        "icon": "delivery_dining",
+                        "link": reverse_lazy("admin:store_deliveryservice_changelist"),
+                    }
+                ],
+            },
+        ],
     },
 
 }
@@ -290,16 +351,39 @@ PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
 ]
 
-# Security settings
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-SECURE_BROWSER_XSS_FILTER = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
-X_FRAME_OPTIONS = 'DENY'
+# Security settings based on environment
+if DEVELOPMENT:
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+    SECURE_PROXY_SSL_HEADER = None
+    SECURE_SSL_REDIRECT = False
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+    
+    # Disable HTTPS requirements
+    SECURE_HSTS_SECONDS = 0
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+    SECURE_HSTS_PRELOAD = False
+else:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
 
-# CSRF settings for Vercel
+# CSRF settings including development URLs
 CSRF_TRUSTED_ORIGINS = [
     'https://*.vercel.app',
     'https://*.now.sh',
+    'https://localhost:*',
+    'https://127.0.0.1:*',
 ]
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # For Gmail
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER') 
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD') 
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

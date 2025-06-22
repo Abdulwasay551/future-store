@@ -2,6 +2,7 @@
  {% load static %}
 <section class="relative min-h-screen" style="z-index: 1;">
     <!-- Background Elements -->
+
     <div class="absolute inset-0 bg-gradient-to-br from-mc-black to-mc-dark overflow-hidden">
         <!-- Animated background patterns -->
         <div class="absolute inset-0 opacity-5">
@@ -16,14 +17,17 @@
 
     <!-- Content -->
     <div class="relative z-10 pt-32 pb-20 px-6 flex items-center min-h-screen">
+
         <div class="container mx-auto text-center">
             <div class="animate-fade-in">
                 <!-- Logo Circle -->
                 <div class="mb-8 relative">
-                    <div class="w-32 h-32 bg-mc-white rounded-full mx-auto mb-6 flex items-center justify-center animate-float relative overflow-hidden group">
+
+                    <div class="w-32 h-32 bg-mc-white rounded-full mx-auto mb-6 border-2 border-mc-accent flex items-center justify-center animate-float relative overflow-hidden group">
                         <!-- Gradient border effect -->
-                        <div class="absolute inset-0 bg-gradient-to-br from-mc-accent to-mc-white opacity-0 group-hover:opacity-20 transition-opacity duration-500"></div>                        <!-- Logo images for different themes -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-mc-accent to-mc-white opacity-100 group-hover:opacity-20 transition-opacity duration-500"></div>                        <!-- Logo images for different themes -->
                         <img src="{% static 'logo-light.JPG' %}" class="text-4xl font-bold relative z-10 block  w-full h-full object-cover">
+
                     </div>
                 </div>
 

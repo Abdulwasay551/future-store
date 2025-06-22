@@ -1,5 +1,8 @@
 {% load static %}
 
+<!-- CSRF Token for AJAX requests -->
+{% csrf_token %}
+
 <!-- Filters and Sort -->
 <div class="mb-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
     <!-- Price Range Filter -->
@@ -95,10 +98,48 @@
                 </div>
             </div>
             {% endif %}
+            
+            <!-- Color Swatches -->
+            {% if product.colors.count > 1 %}
+            <div class="absolute bottom-4 left-4 flex gap-1">
+                {% for color in product.colors.all|slice:":4" %}
+                {% if color.hex_code %}
+                <div class="w-4 h-4 rounded-full border border-white shadow-md" 
+                     style="background-color: {{ color.hex_code }};" 
+                     title="{{ color.name }}"></div>
+                {% endif %}
+                {% endfor %}
+                {% if product.colors.count > 4 %}
+                <div class="w-4 h-4 rounded-full border border-white shadow-md bg-mc-grey flex items-center justify-center">
+                    <span class="text-xs text-mc-white">+{{ product.colors.count|add:"-4" }}</span>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
         </div>
         <div class="p-4 sm:p-6">
             <div class="text-sm text-mc-light-grey mb-2">{{ product.company.name }}</div>
             <h3 class="text-lg sm:text-xl font-bold text-mc-white mb-2">{{ product.name }}</h3>
+            
+            <!-- Available Colors -->
+            {% if product.colors.count > 1 %}
+            <div class="mb-3">
+                <div class="text-xs text-mc-light-grey mb-1">Available Colors:</div>
+                <div class="flex flex-wrap gap-1">
+                    {% for color in product.colors.all|slice:":3" %}
+                    <span class="text-xs px-2 py-1 rounded-full {% if color.stock > 0 %}bg-green-500/20 text-green-400{% else %}bg-red-500/20 text-red-400{% endif %}">
+                        {{ color.name }}
+                    </span>
+                    {% endfor %}
+                    {% if product.colors.count > 3 %}
+                    <span class="text-xs px-2 py-1 rounded-full bg-mc-grey/20 text-mc-light-grey">
+                        +{{ product.colors.count|add:"-3" }} more
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            
             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
                 <div class="flex items-center gap-2">
                     {% if product.has_discount %}
@@ -124,19 +165,27 @@
                     View Details
                 </a>                    
                 {% if user.is_authenticated %}
-                <form hx-post="{% url 'add_to_cart' product.id %}" 
-                      hx-target="#cart-count"
-                      hx-swap="innerHTML"
-                      hx-trigger="submit"
-                      class="flex-1">
-                    {% csrf_token %}
-                    <button type="submit" 
-                            class="w-full px-4 py-2 bg-mc-white text-mc-black hover:bg-mc-accent rounded-lg transition-colors duration-300"
-                            onclick="showToast('{{ product.name }} added to cart')"
-                            {% if not product.stock %}disabled{% endif %}>
-                        {% if product.stock %}Add to Cart{% else %}Out of Stock{% endif %}
+                    {% if product.colors.count > 1 %}
+                    <button onclick="openColorModal({{ product.id }}, '{{ product.name }}', {{ product.discounted_price }})" 
+                            class="flex-1 px-4 py-2 bg-mc-white text-mc-black hover:bg-mc-accent rounded-lg transition-colors duration-300"
+                            {% if not product.is_in_stock %}disabled{% endif %}>
+                        {% if product.is_in_stock %}Add to Cart{% else %}Out of Stock{% endif %}
                     </button>
-                </form>
+                    {% else %}
+                    <form hx-post="{% url 'add_to_cart' product.id %}" 
+                          hx-target="#cart-count"
+                          hx-swap="innerHTML"
+                          hx-trigger="submit"
+                          class="flex-1">
+                        {% csrf_token %}
+                        <button type="submit" 
+                                class="w-full px-4 py-2 bg-mc-white text-mc-black hover:bg-mc-accent rounded-lg transition-colors duration-300"
+                                onclick="showToast('{{ product.name }} added to cart')"
+                                {% if not product.is_in_stock %}disabled{% endif %}>
+                            {% if product.is_in_stock %}Add to Cart{% else %}Out of Stock{% endif %}
+                        </button>
+                    </form>
+                    {% endif %}
                 {% else %}
                 <a href="{% url 'login' %}"
                    hx-get="{% url 'login' %}"
@@ -157,6 +206,33 @@
         <p class="text-mc-light-grey">Try adjusting your filters</p>
     </div>
     {% endfor %}
+</div>
+
+<!-- Color Selection Modal -->
+<div id="colorModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-mc-dark rounded-xl p-6 max-w-md w-full border border-mc-grey/30">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-semibold text-mc-white" id="modalProductName">Select Color</h3>
+            <button onclick="closeColorModal()" class="text-mc-light-grey hover:text-mc-white">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        
+        <div id="modalColorOptions" class="space-y-3 mb-6">
+            <!-- Color options will be loaded here -->
+        </div>
+        
+        <div class="flex gap-3">
+            <button onclick="closeColorModal()" 
+                    class="flex-1 px-4 py-2 bg-mc-grey/30 text-mc-white hover:bg-mc-grey/50 rounded-lg transition-colors duration-300">
+                Cancel
+            </button>
+            <button onclick="addToCartWithColor()" 
+                    class="flex-1 px-4 py-2 bg-mc-accent text-mc-black hover:bg-mc-accent/90 rounded-lg transition-colors duration-300 font-semibold">
+                Add to Cart
+            </button>
+        </div>
+    </div>
 </div>
 
 <!-- Pagination -->
@@ -194,3 +270,135 @@
     {% endif %}
 </div>
 {% endif %}
+
+<script>
+let selectedProductId = null;
+let selectedColorId = null;
+let selectedProductName = '';
+let selectedProductPrice = 0;
+
+function openColorModal(productId, productName, productPrice) {
+    selectedProductId = productId;
+    selectedProductName = productName;
+    selectedProductPrice = productPrice;
+    selectedColorId = null;
+    
+    // Update modal title
+    document.getElementById('modalProductName').textContent = `Select Color - ${productName}`;
+    
+    // Fetch color options
+    fetch(`/store/api/product/${productId}/colors/`)
+        .then(response => response.json())
+        .then(data => {
+            const colorOptionsContainer = document.getElementById('modalColorOptions');
+            colorOptionsContainer.innerHTML = '';
+            
+            data.colors.forEach(color => {
+                const colorOption = document.createElement('div');
+                colorOption.className = `flex items-center justify-between p-3 rounded-lg border-2 border-mc-grey/30 hover:border-mc-accent/50 transition-all duration-200 cursor-pointer ${color.stock > 0 ? 'hover:bg-mc-grey/10' : 'opacity-50 cursor-not-allowed'}`;
+                colorOption.onclick = () => {
+                    if (color.stock > 0) {
+                        selectModalColor(color.id, colorOption);
+                    }
+                };
+                
+                const leftSection = document.createElement('div');
+                leftSection.className = 'flex items-center gap-3';
+                
+                if (color.hex_code) {
+                    const colorSwatch = document.createElement('div');
+                    colorSwatch.className = 'w-6 h-6 rounded-full border border-mc-grey/50';
+                    colorSwatch.style.backgroundColor = color.hex_code;
+                    leftSection.appendChild(colorSwatch);
+                }
+                
+                const colorInfo = document.createElement('div');
+                colorInfo.innerHTML = `
+                    <div class="text-mc-white font-medium">${color.name}</div>
+                    <div class="text-sm ${color.stock > 0 ? 'text-green-400' : 'text-red-400'}">
+                        ${color.stock > 0 ? `${color.stock} in stock` : 'Out of stock'}
+                    </div>
+                `;
+                leftSection.appendChild(colorInfo);
+                
+                colorOption.appendChild(leftSection);
+                colorOptionsContainer.appendChild(colorOption);
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching colors:', error);
+            document.getElementById('modalColorOptions').innerHTML = '<p class="text-mc-light-grey">Error loading colors</p>';
+        });
+    
+    // Show modal
+    document.getElementById('colorModal').classList.remove('hidden');
+}
+
+function closeColorModal() {
+    document.getElementById('colorModal').classList.add('hidden');
+    selectedProductId = null;
+    selectedColorId = null;
+    selectedProductName = '';
+    selectedProductPrice = 0;
+}
+
+function selectModalColor(colorId, colorElement) {
+    // Remove previous selection
+    document.querySelectorAll('#modalColorOptions > div').forEach(div => {
+        div.classList.remove('border-mc-accent', 'bg-mc-accent/10');
+        div.classList.add('border-mc-grey/30');
+    });
+    
+    // Add selection to clicked element
+    colorElement.classList.remove('border-mc-grey/30');
+    colorElement.classList.add('border-mc-accent', 'bg-mc-accent/10');
+    
+    selectedColorId = colorId;
+}
+
+function addToCartWithColor() {
+    if (!selectedColorId) {
+        showToast('Please select a color');
+        return;
+    }
+    
+    // Create form data
+    const formData = new FormData();
+    formData.append('color_id', selectedColorId);
+    formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+    
+    // Send request
+    fetch(`/store/add-to-cart/${selectedProductId}/`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.text())
+    .then(html => {
+        // Update cart count
+        document.getElementById('cart-count').innerHTML = html;
+        showToast(`${selectedProductName} added to cart`);
+        closeColorModal();
+    })
+    .catch(error => {
+        console.error('Error adding to cart:', error);
+        showToast('Error adding to cart');
+    });
+}
+
+// Close modal when clicking outside
+document.getElementById('colorModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeColorModal();
+    }
+});
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeColorModal();
+    }
+});
+</script>
