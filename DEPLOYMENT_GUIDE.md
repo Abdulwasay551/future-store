@@ -1,5 +1,23 @@
 # Django Vercel Deployment Guide
 
+## ✅ FIXED: Read-only File System Error
+
+**The main issue has been identified and fixed!**
+
+### **Problem:**
+```
+OSError: [Errno 30] Read-only file system: '/var/task/staticfiles'
+```
+
+### **Root Cause:**
+The Django settings were trying to create directories (`os.makedirs()`) during settings import, but Vercel's serverless environment has a read-only file system.
+
+### **Solution Applied:**
+1. **Removed `os.makedirs()` calls** from settings.py
+2. **Updated static files configuration** to work with Vercel
+3. **Added proper build process** to create directories during build time
+4. **Updated Vercel configuration** with build command
+
 ## Current Issues and Solutions
 
 ### 1. **500 Internal Server Error - FUNCTION_INVOCATION_FAILED**
@@ -44,9 +62,9 @@ EMAIL_HOST_PASSWORD=your-app-password
 ### 2. **Step-by-Step Fix Process**
 
 #### **Step 1: Test Locally**
-Run the debug script to check your configuration:
+Run the test script to verify the fix:
 ```bash
-python debug_deployment.py
+python test_vercel_deployment.py
 ```
 
 #### **Step 2: Set Environment Variables in Vercel**
@@ -66,7 +84,7 @@ python debug_deployment.py
 
 #### **Step 4: Deploy and Test**
 1. Push your changes to GitHub
-2. Vercel will automatically redeploy
+2. Vercel will automatically redeploy using the build command
 3. Test the `/store/test/` endpoint first
 4. Check Vercel logs for any errors
 
@@ -96,7 +114,7 @@ After deployment, test these endpoints in order:
 
 #### **Static File Errors**
 - The updated WhiteNoise configuration should handle this
-- Make sure `STATIC_ROOT` directory exists
+- Static files are now collected during build time
 
 #### **Template Errors**
 - Check that all template files exist
@@ -107,6 +125,7 @@ After deployment, test these endpoints in order:
 The updated `vercel.json` now includes:
 - Proper static file routing
 - Environment variable for production detection
+- Build command to handle static files
 - Simplified build configuration
 
 ### 6. **Debugging Steps**
@@ -154,6 +173,6 @@ Remember to change these back for production!
 
 **Need Help?**
 - Check Vercel logs for specific error messages
-- Run the debug script locally
+- Run the test script locally
 - Test each endpoint individually
 - Verify all environment variables are set 
