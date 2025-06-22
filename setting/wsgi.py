@@ -11,7 +11,6 @@ import os
 import sys
 from pathlib import Path
 from django.core.wsgi import get_wsgi_application
-from django.core.management import execute_from_command_line
 
 # Add the project directory to the Python path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -36,6 +35,11 @@ if os.environ.get('VERCEL_ENV') == 'production':
             from django.core.management import call_command
             call_command('collectstatic', '--noinput', '--clear')
             print("Static files collected successfully!")
+            
+            # Verify files were collected
+            if staticfiles_dir.exists():
+                files = list(staticfiles_dir.rglob('*'))
+                print(f"Collected {len([f for f in files if f.is_file()])} static files")
     except Exception as e:
         print(f"Warning: Could not collect static files: {e}")
 
