@@ -27,6 +27,8 @@
     "env": {
         "PYTHONPATH": "/var/task",
         "DJANGO_SETTINGS_MODULE": "setting.settings",
-        "VERCEL_ENV": "production"
-    }
+        "VERCEL_ENV": "production",
+        "DEVELOPMENT": "False"
+    },
+    "buildCommand": "python manage.py collectstatic --noinput"
 } 
