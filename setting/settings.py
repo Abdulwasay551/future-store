@@ -161,26 +161,9 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
-# Create static directories if they don't exist (only in development)
-if DEVELOPMENT:
-    try:
-        os.makedirs(STATIC_ROOT, exist_ok=True)
-        os.makedirs(os.path.join(BASE_DIR, 'static'), exist_ok=True)
-    except OSError:
-        # Directory creation failed (e.g., read-only filesystem in production)
-        pass
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Enable WhiteNoise for static files
-if not DEVELOPMENT:
-    # In production, use WhiteNoise for static file serving
-    STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'
-    # Add WhiteNoise configuration for better performance
-    WHITENOISE_USE_FINDERS = True
-    WHITENOISE_AUTOREFRESH = True
-    WHITENOISE_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-else:
-    # In development, use default static files storage
-    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+
 
 # Media files
 MEDIA_URL = '/media/'
