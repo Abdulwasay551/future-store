@@ -1,0 +1,21 @@
+{
+    "version": 2,
+    "routes": [
+        {
+            "src": "/static/(.*)",
+            "dest": "/staticfiles/$1"
+        },
+        {
+            "src": "/media/(.*)",
+            "dest": "/media/$1"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "setting/wsgi.py"
+        }
+    ],
+    "env": {
+        "PYTHONPATH": "/var/task",
+        "DJANGO_SETTINGS_MODULE": "setting.settings"
+    }
+} 

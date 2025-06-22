@@ -31,5 +31,6 @@
     "env": {
         "PYTHONPATH": "/var/task",
         "DJANGO_SETTINGS_MODULE": "setting.settings"
-    }
+    },
+    "buildCommand": "bash build_files.sh"
 } 
