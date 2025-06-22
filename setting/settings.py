@@ -34,7 +34,7 @@ sys.path.append(str(BASE_DIR))
 SECRET_KEY = env('DJANGO_SECRET_KEY', default='mobilecorner1212')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False  # Change this line
+DEBUG = env.bool('DEBUG', default=True)  # Change this line
 
 # Development/Production environment settings
 DEVELOPMENT = env.bool('DEVELOPMENT', default=True)
