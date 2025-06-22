@@ -34,7 +34,7 @@ sys.path.append(str(BASE_DIR))
 SECRET_KEY = env('DJANGO_SECRET_KEY', default='mobilecorner1212')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env.bool('DEBUG', default=True)  # Change this line
+DEBUG = env.bool('DEBUG', default=False)  # Change this line
 
 # Development/Production environment settings
 DEVELOPMENT = env.bool('DEVELOPMENT', default=True)
@@ -173,7 +173,7 @@ if DEVELOPMENT:
 # Enable WhiteNoise for static files
 if not DEVELOPMENT:
     # In production, use WhiteNoise for static file serving
-    STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
     # Add WhiteNoise configuration for better performance
     WHITENOISE_USE_FINDERS = True
     WHITENOISE_AUTOREFRESH = True

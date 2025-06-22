@@ -26,4 +26,11 @@ urlpatterns = [
     path('chatbot/', include('chatbot.urls')),  # Include chatbot app URLs
     path('erp/', include('inventory_erp.urls')),  # Include inventory_erp app URLs
     path('social-auth/', include('social_django.urls', namespace='social')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
+
+# Serve static files in development
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+# Serve media files
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -6,6 +6,7 @@ python3 -m pip install -r requirements.txt
 
 echo "Creating directories..."
 mkdir -p staticfiles
+mkdir -p static
 
 echo "Running migrations..."
 # Remove existing migrations and create fresh ones
@@ -23,4 +24,7 @@ sleep 2
 python3 manage.py migrate --noinput
 
 echo "Collecting static files..."
-python3 manage.py collectstatic --noinput --clear
+# Clear existing static files and collect fresh ones
+python3 manage.py collectstatic --noinput --clear --verbosity=2
+
+echo "Build completed successfully!"
