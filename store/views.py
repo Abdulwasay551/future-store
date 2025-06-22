@@ -12,6 +12,10 @@ from django.utils import timezone
 from datetime import timedelta
 import re
 
+def test_view(request):
+    """Simple test view to check if the app is working"""
+    return HttpResponse("Store app is working!")
+
 def product_list(request):
     # Get all categories
     categories = Category.objects.all()
