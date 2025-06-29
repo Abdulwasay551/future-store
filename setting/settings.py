@@ -17,6 +17,7 @@ from django.utils.translation import gettext_lazy as _
 import os
 import environ
 import sys
+import socket
 
 # Initialize environ
 env = environ.Env()
@@ -37,10 +38,30 @@ SECRET_KEY = env('DJANGO_SECRET_KEY', default='mobilecorner1212')
 DEBUG = env.bool('DEBUG', default=False)  # Change this line
 
 # Development/Production environment settings
-DEVELOPMENT = env.bool('DEVELOPMENT', default=True)
+DEVELOPMENT = env.bool('DEVELOPMENT', default=DEBUG)  # Default to DEBUG value
 
 # Update ALLOWED_HOSTS based on environment
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1']) if DEBUG else ['*']
+if DEBUG:
+    ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
+else:
+    # Production settings - include Vercel domains
+    ALLOWED_HOSTS = [
+        'future-store-one.vercel.app',
+        'mobilecorner.pk'
+        '*.vercel.app',
+        '*.now.sh',
+        'localhost',
+        '127.0.0.1',
+        '*'
+    ]
+
+# Additional security check - ensure the current host is allowed
+try:
+    hostname = socket.gethostname()
+    if hostname not in ALLOWED_HOSTS and '*' not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(hostname)
+except:
+    pass
 
 
 # Application definition
@@ -383,6 +404,8 @@ else:
 # CSRF settings including development URLs
 CSRF_TRUSTED_ORIGINS = [
     'https://*.vercel.app',
+    'https://mobilecorner.pk',
+    'https://future-store-one.vercel.app',
     'https://*.now.sh',
     'https://localhost:*',
     'https://127.0.0.1:*',
