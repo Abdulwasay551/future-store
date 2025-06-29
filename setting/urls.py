@@ -18,6 +18,21 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.http import JsonResponse
+
+def debug_settings(request):
+    """Debug view to check current settings"""
+    return JsonResponse({
+        'DEBUG': settings.DEBUG,
+        'DEVELOPMENT': settings.DEVELOPMENT,
+        'ALLOWED_HOSTS': settings.ALLOWED_HOSTS,
+        'SECURE_SSL_REDIRECT': settings.SECURE_SSL_REDIRECT,
+        'SESSION_COOKIE_SECURE': settings.SESSION_COOKIE_SECURE,
+        'CSRF_COOKIE_SECURE': settings.CSRF_COOKIE_SECURE,
+        'HOST': request.get_host(),
+        'HOST_IN_ALLOWED': request.get_host() in settings.ALLOWED_HOSTS,
+        'WILDCARD_IN_ALLOWED': '*' in settings.ALLOWED_HOSTS,
+    })
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,6 +41,7 @@ urlpatterns = [
     path('chatbot/', include('chatbot.urls')),  # Include chatbot app URLs
     path('erp/', include('inventory_erp.urls')),  # Include inventory_erp app URLs
     path('social-auth/', include('social_django.urls', namespace='social')),
+    path('debug/', debug_settings, name='debug_settings'),
 ]
 
 # Serve static files in development

@@ -45,15 +45,20 @@ if DEBUG:
     ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 else:
     # Production settings - include Vercel domains
-    ALLOWED_HOSTS = [
-        'future-store-one.vercel.app',
-        'mobilecorner.pk'
-        '*.vercel.app',
-        '*.now.sh',
-        'localhost',
-        '127.0.0.1',
-        '*'
-    ]
+    # Get from environment or use default production hosts
+    env_allowed_hosts = env.list('ALLOWED_HOSTS', default=[])
+    if env_allowed_hosts:
+        ALLOWED_HOSTS = env_allowed_hosts
+    else:
+        ALLOWED_HOSTS = [
+            'future-store-one.vercel.app',
+            'mobilecorner.pk',
+            '*.vercel.app',
+            '*.now.sh',
+            'localhost',
+            '127.0.0.1',
+            '*'
+        ]
 
 # Additional security check - ensure the current host is allowed
 try:
