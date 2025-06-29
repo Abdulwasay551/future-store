@@ -1,38 +1,37 @@
 from django.contrib import admin
-from unfold.admin import ModelAdmin, TabularInline, StackedInline
 from .models import *
 import json
 
 
-class ProductImageInline(StackedInline):
+class ProductImageInline(admin.StackedInline):
     model = ProductImage
     extra = 0
     tab = True
     fields = ['image', 'image_url', 'is_primary', 'alt_text', 'color']
 
 
-class ProductColorInline(StackedInline):
+class ProductColorInline(admin.StackedInline):
     model = ProductColor
     extra = 0
     tab = True
     fields = ['name', 'hex_code', 'is_primary', 'stock']
 
 
-class OrderItemInline(TabularInline):
+class OrderItemInline(admin.TabularInline):
     model = OrderItem
     extra = 0
     readonly_fields = ('subtotal',)
 
 
 @admin.register(Category)
-class CategoryAdmin(ModelAdmin):
+class CategoryAdmin(admin.ModelAdmin):
     list_display = ('name', 'slug', 'created_at')
     prepopulated_fields = {'slug': ('name',)}
     search_fields = ('name',)
 
 
 @admin.register(Company)
-class CompanyAdmin(ModelAdmin):
+class CompanyAdmin(admin.ModelAdmin):
     list_display = ('name', 'category', 'is_featured', 'created_at')
     list_filter = ('category', 'is_featured')
     prepopulated_fields = {'slug': ('name',)}
@@ -40,7 +39,7 @@ class CompanyAdmin(ModelAdmin):
 
 
 @admin.register(Product)
-class ProductAdmin(ModelAdmin):
+class ProductAdmin(admin.ModelAdmin):
     inlines = [ProductColorInline, ProductImageInline]
     list_display = ('name', 'category', 'company', 'price', 'total_stock', 'is_available', 'is_featured', 'created_at')
     list_filter = ('category', 'company', 'is_available', 'is_featured')
@@ -134,7 +133,7 @@ class ProductAdmin(ModelAdmin):
 
 
 @admin.register(ProductColor)
-class ProductColorAdmin(ModelAdmin):
+class ProductColorAdmin(admin.ModelAdmin):
     list_display = ('product', 'name', 'hex_code', 'is_primary', 'stock', 'created_at')
     list_filter = ('product', 'is_primary')
     search_fields = ('product__name', 'name')
@@ -142,7 +141,7 @@ class ProductColorAdmin(ModelAdmin):
 
 
 @admin.register(DeliveryService)
-class DeliveryServiceAdmin(ModelAdmin):
+class DeliveryServiceAdmin(admin.ModelAdmin):
     list_display = ('name', 'estimated_delivery_days', 'is_active', 'created_at')
     list_filter = ('is_active',)
     search_fields = ('name',)
@@ -150,7 +149,7 @@ class DeliveryServiceAdmin(ModelAdmin):
 
 
 @admin.register(Order)
-class OrderAdmin(ModelAdmin):
+class OrderAdmin(admin.ModelAdmin):
     inlines = [OrderItemInline]
     list_display = ('id', 'user', 'status_display', 'total_amount', 'payment_status', 'delivery_service', 'tracking_id', 'created_at')
     list_filter = ('status', 'payment_status', 'delivery_service', 'created_at')
@@ -206,7 +205,7 @@ class OrderAdmin(ModelAdmin):
 
 
 @admin.register(Notification)
-class NotificationAdmin(ModelAdmin):
+class NotificationAdmin(admin.ModelAdmin):
     list_display = ('user', 'notification_type', 'title', 'is_read', 'is_email_sent', 'created_at')
     list_filter = ('notification_type', 'is_read', 'is_email_sent', 'created_at')
     search_fields = ('user__email', 'title', 'message')
@@ -234,40 +233,40 @@ class NotificationAdmin(ModelAdmin):
 
 
 @admin.register(Cart)
-class CartAdmin(ModelAdmin):
+class CartAdmin(admin.ModelAdmin):
     list_display = ('user', 'created_at', 'updated_at')
     search_fields = ('user__email',)
 
 
 @admin.register(CartItem)
-class CartItemAdmin(ModelAdmin):
+class CartItemAdmin(admin.ModelAdmin):
     list_display = ('cart', 'product', 'color', 'quantity')
     list_filter = ('cart', 'product', 'color')
     search_fields = ('cart__user__email', 'product__name', 'color__name')
 
 
 @admin.register(Review)
-class ReviewAdmin(ModelAdmin):
+class ReviewAdmin(admin.ModelAdmin):
     list_display = ('product', 'user', 'rating', 'created_at')
     list_filter = ('product', 'rating')
     search_fields = ('product__name', 'user__email')
 
 
 @admin.register(OrderItem)
-class OrderItemAdmin(ModelAdmin):
+class OrderItemAdmin(admin.ModelAdmin):
     list_display = ('order', 'product', 'quantity', 'price')
     list_filter = ('order', 'product')
     search_fields = ('order__user__email', 'product__name')
 
 
 @admin.register(Address)
-class AddressAdmin(ModelAdmin):
+class AddressAdmin(admin.ModelAdmin):
     list_display = ('user', 'city', 'state')
     search_fields = ('user__email', 'address_line1', 'city', 'state')
 
 
 @admin.register(ProductImage)
-class ProductImageAdmin(ModelAdmin):
+class ProductImageAdmin(admin.ModelAdmin):
     list_display = ('product', 'color', 'is_primary', 'created_at')
     list_filter = ('product', 'color', 'is_primary')
     search_fields = ('product__name', 'color__name', 'alt_text')
