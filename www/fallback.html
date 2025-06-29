@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Mobile Corner">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#000000">
+    
+    <title>Mobile Corner</title>
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .logo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            animation: pulse 2s infinite;
+            overflow: hidden;
+        }
+        
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #ffffff, #cccccc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #cccccc;
+            margin-bottom: 30px;
+        }
+        
+        .description {
+            font-size: 1rem;
+            color: #999999;
+            margin-bottom: 40px;
+            max-width: 400px;
+            line-height: 1.6;
+        }
+        
+        .button {
+            background: linear-gradient(45deg, #ffffff, #f0f0f0);
+            color: #000000;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px;
+        }
+        
+        .button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+        }
+        
+        .button.secondary {
+            background: transparent;
+            color: #ffffff;
+            border: 2px solid #ffffff;
+        }
+        
+        .button.secondary:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .features {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 30px 0;
+            max-width: 400px;
+        }
+        
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .feature-icon {
+            font-size: 24px;
+            width: 40px;
+            text-align: center;
+        }
+        
+        .feature-text {
+            text-align: left;
+        }
+        
+        .feature-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .feature-description {
+            font-size: 14px;
+            color: #cccccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo">
+        <img src="static/logo-light.JPG" alt="Mobile Corner">
+    </div>
+    
+    <h1>MOBILE CORNER</h1>
+    <div class="subtitle">Your Premium Destination for Mobile Technology</div>
+    
+    <div class="description">
+        Experience excellence in every device. Your trusted partner for premium mobile technology and exceptional service.
+    </div>
+    
+    <div class="features">
+        <div class="feature">
+            <div class="feature-icon">🚚</div>
+            <div class="feature-text">
+                <div class="feature-title">Fast Delivery</div>
+                <div class="feature-description">Quick and secure delivery across Pakistan</div>
+            </div>
+        </div>
+        
+        <div class="feature">
+            <div class="feature-icon">✅</div>
+            <div class="feature-text">
+                <div class="feature-title">Authentic Products</div>
+                <div class="feature-description">100% genuine products with warranty</div>
+            </div>
+        </div>
+        
+        <div class="feature">
+            <div class="feature-icon">🛠️</div>
+            <div class="feature-text">
+                <div class="feature-title">24/7 Support</div>
+                <div class="feature-description">Round-the-clock customer support</div>
+            </div>
+        </div>
+    </div>
+    
+    <div>
+        <a href="https://future-store-one.vercel.app/" class="button" target="_blank">
+            Open Mobile Corner
+        </a>
+        <button class="button secondary" onclick="retryIframe()">
+            Try App Mode
+        </button>
+    </div>
+    
+    <script>
+        function retryIframe() {
+            // Try to go back to the iframe version
+            window.location.href = 'index.html';
+        }
+        
+        // Handle Capacitor events
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add mobile-specific functionality
+            if (window.Capacitor) {
+                // Handle app lifecycle
+                window.Capacitor.Plugins.App.addListener('appStateChange', function(state) {
+                    console.log('App state changed:', state);
+                });
+                
+                // Handle back button
+                document.addEventListener('backbutton', function() {
+                    // Exit app
+                    window.Capacitor.Plugins.App.exitApp();
+                });
+            }
+        });
+        
+        // Add haptic feedback on button clicks
+        function addHapticFeedback() {
+            if (window.Capacitor && window.Capacitor.Plugins.Haptics) {
+                window.Capacitor.Plugins.Haptics.impact({ style: 'light' });
+            }
+        }
+        
+        // Add haptic feedback to all buttons
+        document.querySelectorAll('.button').forEach(button => {
+            button.addEventListener('click', addHapticFeedback);
+        });
+    </script>
+</body>
+</html> 

@@ -66,6 +66,7 @@ staticfiles/
 # Flask stuff:
 instance/
 .webassets-cache
+node_modules/
 
 # Scrapy stuff:
 .scrapy
