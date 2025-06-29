@@ -23,23 +23,17 @@ sleep 2
 # Apply migrations
 python3 manage.py migrate --noinput
 
-echo "Collecting static files manually..."
+echo "Collecting static files..."
 
 # Clear staticfiles directory
 rm -rf staticfiles/*
 mkdir -p staticfiles
 
-# Copy Unfold static files first
-echo "Copying Unfold static files..."
-if [ -d "venv/Lib/site-packages/unfold/static" ]; then
-    cp -r venv/Lib/site-packages/unfold/static/* staticfiles/
-    echo "✓ Unfold static files copied"
-else
-    echo "✗ Unfold static files not found in venv"
-    exit 1
-fi
+# Collect all static files including Django admin
+echo "Collecting Django static files..."
+python3 manage.py collectstatic --noinput --verbosity=2
 
-# Copy your custom static files
+# Copy your custom static files (if they exist)
 echo "Copying custom static files..."
 if [ -d "static" ]; then
     cp -r static/* staticfiles/
@@ -47,9 +41,5 @@ if [ -d "static" ]; then
 else
     echo "⚠ Custom static directory not found"
 fi
-
-# Collect Django admin static files
-echo "Collecting Django admin static files..."
-python3 manage.py collectstatic --noinput --verbosity=2 --ignore=unfold/* --ignore=static/*
 
 echo "Build completed successfully!" 

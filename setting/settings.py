@@ -72,6 +72,13 @@ except:
 # Application definition
 
 INSTALLED_APPS = [
+    'unfold',
+    'unfold.contrib.filters',
+    'unfold.contrib.forms',
+    'unfold.contrib.inlines',
+    'unfold.contrib.import_export',
+    'unfold.contrib.guardian',
+    'unfold.contrib.simple_history',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -196,6 +203,8 @@ if not DEVELOPMENT:
     # Add WhiteNoise configuration for better performance
     WHITENOISE_USE_FINDERS = True
     WHITENOISE_AUTOREFRESH = True
+    WHITENOISE_INDEX_FILE = True
+
     WHITENOISE_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 else:
     # In development, use default static files storage
