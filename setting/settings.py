@@ -262,6 +262,7 @@ UNFOLD = {
         # "redirect_after": lambda request: reverse_lazy("admin:APP_MODEL_changelist"),
     },
     "STYLES": [
+                lambda request: static("css/admin.css"),
     ],
     "SCRIPTS": [
 
