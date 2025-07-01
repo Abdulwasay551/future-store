@@ -17,11 +17,14 @@
             </p>
         </div>
 
-        {% comment %} <!-- Google Sign Up -->
+        <!-- Google Sign Up -->
         <div class="mt-6">
-            <a href="{% url 'social:begin' 'google-oauth2' %}" 
-               class="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-mc-black bg-white hover:bg-gray-100 transition-colors duration-300">
-                <img class="h-5 w-5 mr-2" src="{% static 'images/google-logo.png' %}" alt="Google logo">
+            <a href="{% url 'social:begin' 'google-oauth2' %}"
+               class="w-full flex items-center justify-center px-4 py-2 border border-mc-grey rounded-md shadow-sm text-sm font-medium text-mc-black bg-mc-white hover:bg-mc-accent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-mc-accent transition-colors duration-300">
+                <span class="h-5 w-5 mr-2 inline-block align-middle">
+                    <!-- Google SVG Icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 48 48"><g><path fill="#4285F4" d="M43.611 20.083H42V20H24v8h11.303c-1.623 4.377-5.789 7.5-11.303 7.5-6.627 0-12-5.373-12-12s5.373-12 12-12c2.993 0 5.728 1.07 7.868 2.824l6.571-6.571C34.047 5.099 29.268 3 24 3 12.954 3 4 11.954 4 23s8.954 20 20 20c11.046 0 20-8.954 20-20 0-1.341-.138-2.651-.389-3.917z"/><path fill="#34A853" d="M6.306 14.691l6.571 4.819C14.655 16.108 19.001 13 24 13c2.993 0 5.728 1.07 7.868 2.824l6.571-6.571C34.047 5.099 29.268 3 24 3c-7.732 0-14.313 4.41-17.694 10.691z"/><path fill="#FBBC05" d="M24 43c5.166 0 9.899-1.721 13.566-4.678l-6.285-5.146C29.268 35.931 26.768 37 24 37c-5.497 0-10.162-3.522-11.825-8.293l-6.537 5.045C9.635 39.421 16.322 43 24 43z"/><path fill="#EA4335" d="M43.611 20.083H42V20H24v8h11.303c-1.045 2.819-3.13 5.197-6.017 6.676.001-.001 6.285 5.146 6.285 5.146C39.899 41.279 44 37.5 44 23c0-1.341-.138-2.651-.389-3.917z"/></g></svg>
+                </span>
                 Sign up with Google
             </a>
         </div>
@@ -31,9 +34,9 @@
                 <div class="w-full border-t border-mc-grey"></div>
             </div>
             <div class="relative flex justify-center text-sm">
-                <span class="px-2 bg-mc-dark text-mc-light-grey">Or continue with</span>
+                <span class="px-2 bg-mc-dark text-mc-light-grey dark:bg-mc-dark dark:text-mc-light-grey">Or continue with</span>
             </div>
-        </div> {% endcomment %}
+        </div> 
 
         <form class="mt-8 space-y-6" action="{% url 'signup' %}" method="POST">
             {% csrf_token %}

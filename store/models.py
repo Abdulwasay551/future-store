@@ -11,6 +11,7 @@ class Category(models.Model):
     slug = models.SlugField(unique=True)
     description = models.TextField(blank=True)
     image = models.ImageField(upload_to='categories/', blank=True, null=True)
+    image_url = models.URLField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -20,11 +21,18 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def get_image_url(self):
+        if self.image:
+            return self.image.url
+        return self.image_url
+
 class Company(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='companies')
     name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True)
     logo = models.ImageField(upload_to='companies/', blank=True, null=True)
+    logo_url = models.URLField(blank=True, null=True)
     description = models.TextField(blank=True)
     is_featured = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -35,6 +43,12 @@ class Company(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.category.name}"
+
+    @property
+    def get_logo_url(self):
+        if self.logo:
+            return self.logo.url
+        return self.logo_url
 
 class ProductColor(models.Model):
     product = models.ForeignKey('Product', on_delete=models.CASCADE, related_name='colors')

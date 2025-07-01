@@ -53,7 +53,7 @@
                         <!-- Button background -->
                         <div class="absolute inset-0 bg-mc-white transition-transform duration-300 group-hover:scale-105"></div>
                         <!-- Button text -->
-                        <span class="relative z-10 text-mc-black">SHOP NOW</span>
+                        <a href="{% url 'product_list' %}" class="relative z-10 text-mc-black">SHOP NOW</a>
                         <!-- Hover effect -->
                         <div class="absolute inset-0 bg-gradient-to-r from-mc-accent to-mc-white opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
                     </button>
@@ -61,7 +61,7 @@
                         <!-- Button border -->
                         <div class="absolute inset-0 border-2 border-mc-white rounded-lg transition-transform duration-300 group-hover:scale-105"></div>
                         <!-- Button text -->
-                        <span class="relative z-10 text-mc-white group-hover:text-mc-black transition-colors duration-300">VIEW CATALOG</span>
+                        <a href="{% url 'product_list' %}" class="relative z-10 text-mc-white group-hover:text-mc-black transition-colors duration-300">VIEW CATALOG</a>
                         <!-- Hover background -->
                         <div class="absolute inset-0 bg-mc-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-1"></div>
                     </button>

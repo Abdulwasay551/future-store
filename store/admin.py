@@ -26,17 +26,19 @@ class OrderItemInline(TabularInline):
 
 @admin.register(Category)
 class CategoryAdmin(ModelAdmin):
-    list_display = ('name', 'slug', 'created_at')
+    list_display = ('name', 'slug', 'created_at', 'image_url')
     prepopulated_fields = {'slug': ('name',)}
     search_fields = ('name',)
+    fields = ['name', 'slug', 'description', 'image', 'image_url', 'created_at', 'updated_at']
 
 
 @admin.register(Company)
 class CompanyAdmin(ModelAdmin):
-    list_display = ('name', 'category', 'is_featured', 'created_at')
+    list_display = ('name', 'category', 'is_featured', 'created_at', 'logo_url')
     list_filter = ('category', 'is_featured')
     prepopulated_fields = {'slug': ('name',)}
     search_fields = ('name', 'category__name')
+    fields = ['category', 'name', 'slug', 'logo', 'logo_url', 'description', 'is_featured', 'created_at', 'updated_at']
 
 
 @admin.register(Product)
@@ -268,9 +270,10 @@ class AddressAdmin(ModelAdmin):
 
 @admin.register(ProductImage)
 class ProductImageAdmin(ModelAdmin):
-    list_display = ('product', 'color', 'is_primary', 'created_at')
+    list_display = ('product', 'color', 'is_primary', 'created_at', 'image_url')
     list_filter = ('product', 'color', 'is_primary')
     search_fields = ('product__name', 'color__name', 'alt_text')
+    fields = ['product', 'color', 'image', 'image_url', 'is_primary', 'alt_text', 'created_at', 'updated_at']
 
 
 @admin.register(Contact)

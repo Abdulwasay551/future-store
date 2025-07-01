@@ -17,7 +17,11 @@
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {% for product in featured_products %}
-            <div class="bg-mc-black rounded-xl p-6 card-hover animate-slide-up border border-mc-grey/30" 
+            <a href="{% url 'product_detail' product.slug %}"
+               hx-get="{% url 'product_detail' product.slug %}"
+               hx-target="#content-comp"
+               hx-push-url="true"
+               class="bg-mc-black rounded-xl p-6 card-hover animate-slide-up border border-mc-grey/30" 
                  style="animation-delay: {{ forloop.counter0 }}00ms;">
                 <div class="relative mb-6 overflow-hidden rounded-lg">
                     <div class="h-48 bg-gradient-to-br from-mc-grey to-mc-dark">
@@ -59,28 +63,8 @@
                             <span class="ml-1 text-mc-light-grey text-sm">{{ product.average_rating|floatformat:1 }}</span>
                         </div>
                     </div>
-                    {% if user.is_authenticated %}
-                    <form hx-post="{% url 'add_to_cart' product.id %}" 
-                          hx-target="#cart-count"
-                          hx-swap="innerHTML">
-                        {% csrf_token %}
-                        <button type="submit" 
-                                onclick="showToast('{{ product.name }} added to cart')"
-                                class="bg-mc-white text-mc-black px-4 py-2 rounded-lg transition-colors font-semibold hover:bg-mc-accent">
-                            Add to Cart
-                        </button>
-                    </form>
-                    {% else %}
-                    <a href="{% url 'login' %}"
-                       hx-get="{% url 'login' %}"
-                       hx-target="#content-comp"
-                       hx-push-url="true"
-                       class="bg-mc-white text-mc-black px-4 py-2 rounded-lg transition-colors font-semibold hover:bg-mc-accent">
-                        Add to Cart
-                    </a>
-                    {% endif %}
                 </div>
-            </div>
+            </a>
             {% empty %}
             <div class="col-span-full text-center py-12">
                 <div class="text-5xl mb-4">📱</div>

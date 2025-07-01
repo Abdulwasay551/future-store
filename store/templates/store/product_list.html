@@ -16,8 +16,8 @@
                hx-push-url="true"
                class="group bg-mc-dark rounded-xl p-4 border border-mc-grey/30 hover:border-mc-accent transition-all duration-300">
                 <div class="aspect-square mb-3 overflow-hidden rounded-lg bg-mc-black">
-                    {% if category.image %}
-                    <img src="{{ category.image.url }}" alt="{{ category.name }}" 
+                    {% if category.get_image_url %}
+                    <img src="{{ category.get_image_url }}" alt="{{ category.name }}" 
                          class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
                     {% else %}
                     <div class="w-full h-full flex items-center justify-center text-mc-grey">
