@@ -115,15 +115,3 @@ def contact(request):
     
     return render(request, 'home_components/contact.html')
 
-def social_auth_complete(request, backend):
-    strategy = load_strategy(request)
-    try:
-        user = strategy.backend.complete(request=request)
-        if user and user.is_active:
-            login(request, user)
-            return redirect('home')
-    except AuthAlreadyAssociated:
-        messages.error(request, 'This Google account is already associated with another user')
-    except Exception as e:
-        messages.error(request, str(e))
-    return redirect('login')
