@@ -8,10 +8,14 @@
         <div class="bg-mc-dark rounded-2xl p-8 mb-8 card-hover border border-mc-grey/30">
             <div class="flex items-center space-x-6">
                 <div class="w-24 h-24 bg-mc-white rounded-full flex items-center justify-center">
-                    <span class="text-3xl font-bold text-mc-black">{{ user.email.0|upper }}</span>
+                    <span class="text-3xl font-bold text-mc-black">{{ user.first_name.0|upper }}</span>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-bold text-mc-white mb-2">{{ user.email }}</h1>
+                    {% if  user.first_name and user.last_name %}
+                    <h1 class="text-2xl font-bold text-mc-white mb-2">{{ user.first_name|capfirst }} {{ user.last_name|capfirst }}</h1>
+                    {% else %}
+                    <h1 class="text-2xl font-bold text-mc-white mb-2">{{ user.email|truncatechars:14 }}</h1>
+                    {% endif %}
                     <p class="text-mc-light-grey">Member since {{ user.date_joined|date:"F j, Y" }}</p>
                 </div>
             </div>
@@ -46,12 +50,12 @@
                         <textarea name="street_address" required rows="2"
                                   class="w-full p-2 bg-mc-black border border-mc-grey rounded-lg text-mc-white"></textarea>
                     </div>
-                    <div>
+                    <div class="col-span-2">
                         <label class="block text-mc-white mb-2">City</label>
                         <input type="text" name="city" required 
                                class="w-full p-2 bg-mc-black border border-mc-grey rounded-lg text-mc-white">
                     </div>
-                    <div>
+                    <div class="col-span-2">
                         <label class="block text-mc-white mb-2">State</label>
                         <input type="text" name="state" required 
                                class="w-full p-2 bg-mc-black border border-mc-grey rounded-lg text-mc-white">

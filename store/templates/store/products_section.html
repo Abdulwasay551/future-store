@@ -323,7 +323,7 @@ function openColorModal(productId, productName, productPrice) {
                 
                 const colorInfo = document.createElement('div');
                 colorInfo.innerHTML = `
-                    <div class="text-mc-white font-medium">${color.name}</div>
+                    <div class=" font-medium">${color.name}</div>
                     <div class="text-sm ${color.stock > 0 ? 'text-green-400' : 'text-red-400'}">
                         ${color.stock > 0 ? `${color.stock} in stock` : 'Out of stock'}
                     </div>
@@ -354,13 +354,13 @@ function closeColorModal() {
 function selectModalColor(colorId, colorElement) {
     // Remove previous selection
     document.querySelectorAll('#modalColorOptions > div').forEach(div => {
-        div.classList.remove('border-mc-accent', 'bg-mc-accent/10');
-        div.classList.add('border-mc-grey/30');
+        div.classList.remove('border-mc-accent', 'bg-mc-accent', 'text-mc-black');
+        div.classList.add('border-mc-grey/30 ');
     });
     
     // Add selection to clicked element
     colorElement.classList.remove('border-mc-grey/30');
-    colorElement.classList.add('border-mc-accent', 'bg-mc-accent/10');
+    colorElement.classList.add('border-mc-accent', 'bg-mc-accent', 'text-mc-black');
     
     selectedColorId = colorId;
 }

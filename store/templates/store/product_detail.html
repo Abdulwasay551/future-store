@@ -85,7 +85,7 @@
                     <button onclick="window.selectColor({{ color.id }}, '{{ color.name }}')" 
                             class="color-option flex flex-col items-center p-3 rounded-lg border-2 transition-all duration-300 hover:scale-105
                                    {% if selected_color and selected_color.id == color.id %}
-                                       border-mc-accent bg-mc-accent/20 shadow-lg shadow-mc-accent/30 ring-2 ring-mc-accent/50
+                                       border-mc-accent bg-mc-accent/60 shadow-lg shadow-mc-accent/50 ring-2 ring-mc-accent/70 text-mc-black
                                    {% else %}
                                        border-mc-grey/30 hover:border-mc-accent/50 hover:shadow-md hover:shadow-mc-accent/20
                                    {% endif %}"
@@ -93,22 +93,22 @@
                             data-color-name="{{ color.name }}"
                             data-color-stock="{{ color.stock }}">
                         {% if color.hex_code %}
-                        <div class="w-8 h-8 rounded-full border-2 border-mc-grey/50 mb-2 shadow-inner relative overflow-hidden" 
+                        <div class="w-8 h-8 rounded-full border-2 {% if selected_color and selected_color.id == color.id %}border-mc-black/50{% else %}border-mc-grey/50{% endif %} mb-2 shadow-inner relative overflow-hidden" 
                              style="background-color: {{ color.hex_code }}; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);">
                             <!-- Add a subtle highlight effect -->
                             <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-full"></div>
                         </div>
                         {% else %}
-                        <div class="w-8 h-8 rounded-full border-2 border-mc-grey/50 mb-2 bg-gradient-to-r from-gray-400 to-gray-600 shadow-inner relative overflow-hidden">
+                        <div class="w-8 h-8 rounded-full border-2 {% if selected_color and selected_color.id == color.id %}border-mc-black/50{% else %}border-mc-grey/50{% endif %} mb-2 bg-gradient-to-r from-gray-400 to-gray-600 shadow-inner relative overflow-hidden">
                             <!-- Add a subtle highlight effect -->
                             <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-full"></div>
                         </div>
                         {% endif %}
-                        <span class="text-xs text-mc-light-grey font-medium">{{ color.name }}</span>
+                        <span class="text-xs {% if selected_color and selected_color.id == color.id %}text-mc-black font-bold{% else %}text-mc-light-grey font-medium{% endif %}">{{ color.name }}</span>
                         {% if color.stock > 0 %}
-                        <span class="text-xs text-green-400 stock-indicator font-semibold">({{ color.stock }})</span>
+                        <span class="text-xs {% if selected_color and selected_color.id == color.id %}text-green-600 font-bold{% else %}text-green-400 font-semibold{% endif %} stock-indicator">({{ color.stock }})</span>
                         {% else %}
-                        <span class="text-xs text-red-400 stock-indicator font-semibold">(Out)</span>
+                        <span class="text-xs {% if selected_color and selected_color.id == color.id %}text-red-600 font-bold{% else %}text-red-400 font-semibold{% endif %} stock-indicator">(Out)</span>
                         {% endif %}
                     </button>
                     {% endfor %}
@@ -435,6 +435,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const colorName = selectedColorOption.getAttribute('data-color-name');
         const colorStock = selectedColorOption.getAttribute('data-color-stock');
         window.updateStockStatus(colorStock);
+    } else {
+        // If no color is selected by default, select the first available color
+        const firstColorOption = document.querySelector('.color-option');
+        if (firstColorOption) {
+            const colorId = firstColorOption.getAttribute('data-color-id');
+            const colorName = firstColorOption.getAttribute('data-color-name');
+            window.selectColor(colorId, colorName);
+        }
     }
     
     // Update image counter
@@ -451,14 +459,64 @@ window.selectColor = function(colorId, colorName) {
     
     // Update color selection UI
     document.querySelectorAll('.color-option').forEach(option => {
-        option.classList.remove('border-mc-accent', 'bg-mc-accent/20', 'shadow-lg', 'shadow-mc-accent/30', 'ring-2', 'ring-mc-accent/50');
+        // Remove selected state classes
+        option.classList.remove('border-mc-accent', 'bg-mc-accent', 'shadow-lg', 'shadow-mc-accent/50', 'ring-2', 'ring-mc-accent/70', 'text-mc-black');
+        // Add default state classes
         option.classList.add('border-mc-grey/30');
+        
+        // Reset text colors to default
+        const colorName = option.querySelector('span:first-of-type');
+        const stockIndicator = option.querySelector('.stock-indicator');
+        if (colorName) {
+            colorName.classList.remove('text-mc-black', 'font-bold');
+            colorName.classList.add('text-mc-light-grey', 'font-medium');
+        }
+        if (stockIndicator) {
+            stockIndicator.classList.remove('text-green-600', 'text-red-600', 'font-bold');
+            if (stockIndicator.textContent.includes('(') && !stockIndicator.textContent.includes('Out')) {
+                stockIndicator.classList.add('text-green-400', 'font-semibold');
+            } else {
+                stockIndicator.classList.add('text-red-400', 'font-semibold');
+            }
+        }
+        
+        // Reset color swatch borders
+        const colorSwatch = option.querySelector('div[style*="background-color"]');
+        if (colorSwatch) {
+            colorSwatch.classList.remove('border-mc-black/50');
+            colorSwatch.classList.add('border-mc-grey/50');
+        }
     });
     
     const selectedOption = document.querySelector(`[data-color-id="${colorId}"]`);
     if (selectedOption) {
+        // Remove default state classes
         selectedOption.classList.remove('border-mc-grey/30');
-        selectedOption.classList.add('border-mc-accent', 'bg-mc-accent/20', 'shadow-lg', 'shadow-mc-accent/30', 'ring-2', 'ring-mc-accent/50');
+        // Add selected state classes (matching the template)
+        selectedOption.classList.add('border-mc-accent', 'bg-mc-accent', 'shadow-lg', 'shadow-mc-accent/50', 'ring-2', 'ring-mc-accent/70', 'text-mc-black');
+        
+        // Update text colors for selected state
+        const colorName = selectedOption.querySelector('span:first-of-type');
+        const stockIndicator = selectedOption.querySelector('.stock-indicator');
+        if (colorName) {
+            colorName.classList.remove('text-mc-light-grey', 'font-medium');
+            colorName.classList.add('text-mc-black', 'font-bold');
+        }
+        if (stockIndicator) {
+            stockIndicator.classList.remove('text-green-400', 'text-red-400', 'font-semibold');
+            if (stockIndicator.textContent.includes('(') && !stockIndicator.textContent.includes('Out')) {
+                stockIndicator.classList.add('text-green-600', 'font-bold');
+            } else {
+                stockIndicator.classList.add('text-red-600', 'font-bold');
+            }
+        }
+        
+        // Update color swatch border for selected state
+        const colorSwatch = selectedOption.querySelector('div[style*="background-color"]');
+        if (colorSwatch) {
+            colorSwatch.classList.remove('border-mc-grey/50');
+            colorSwatch.classList.add('border-mc-black/50');
+        }
         
         // Update stock status
         const colorStock = selectedOption.getAttribute('data-color-stock');

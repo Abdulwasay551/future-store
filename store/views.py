@@ -218,7 +218,7 @@ def update_cart(request, item_id):
     cart_item.save()
     return redirect('cart_detail')
 
-@login_required
+@login_required(login_url='login')
 def add_review(request, product_id):
     if request.method == 'POST':
         product = get_object_or_404(Product, id=product_id)
@@ -237,7 +237,7 @@ def add_review(request, product_id):
     
     return redirect('product_list')
 
-@login_required
+@login_required(login_url='login')
 def checkout(request):
     cart, created = Cart.objects.get_or_create(user=request.user)
     
@@ -260,7 +260,7 @@ def checkout(request):
     
     return render(request, 'store/checkout.html', context)
 
-@login_required
+@login_required(login_url='login')
 def add_address(request):
     if request.method == 'POST':
         # Validate required fields
@@ -289,7 +289,7 @@ def add_address(request):
     
     return redirect('checkout')
 
-@login_required
+@login_required(login_url='login')
 def place_order(request):
     if request.method == 'POST':
         print(f"Order placement attempt - User: {request.user.email}")
@@ -418,7 +418,7 @@ def place_order(request):
     
     return redirect('checkout')
 
-@login_required
+@login_required(login_url='login')
 def order_detail(request, order_id):
     order = get_object_or_404(Order, id=order_id, user=request.user)
     
@@ -427,17 +427,17 @@ def order_detail(request, order_id):
     
     return render(request, 'store/order_detail.html', {'order': order})
 
-@login_required
+@login_required(login_url='login')
 def order_history(request):
     orders = Order.objects.filter(user=request.user).order_by('-created_at')
     return render(request, 'store/order_history.html', {'orders': orders})
 
-@login_required
+@login_required(login_url='login')
 def get_review(request, review_id):
     review = get_object_or_404(Review, id=review_id)
     return render(request, 'store/review_item.html', {'review': review})
 
-@login_required
+@login_required(login_url='login')
 def load_more_reviews(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     page = int(request.GET.get('page', 1))
@@ -456,7 +456,7 @@ def load_more_reviews(request, product_id):
     html = render_to_string('store/review_list.html', context)
     return HttpResponse(html)
 
-@login_required
+@login_required(login_url='login')
 def notifications_list(request):
     """View user notifications"""
     notifications = request.user.notifications.all()[:50]  # Last 50 notifications
@@ -467,7 +467,7 @@ def notifications_list(request):
         'unread_count': unread_count
     })
 
-@login_required
+@login_required(login_url='login')
 def mark_notification_read(request, notification_id):
     """Mark a notification as read via AJAX"""
     from django.http import JsonResponse
@@ -479,7 +479,7 @@ def mark_notification_read(request, notification_id):
     except Notification.DoesNotExist:
         return JsonResponse({'success': False, 'error': 'Notification not found'})
 
-@login_required
+@login_required(login_url='login')
 def mark_all_notifications_read(request):
     """Mark all notifications as read"""
     from django.http import JsonResponse

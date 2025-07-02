@@ -62,12 +62,12 @@ def signup_view(request):
 
     return render(request, 'auth/signup.html')
 
-@login_required
+@login_required(login_url='login')
 def logout_view(request):
     logout(request)
     return redirect('home')
 
-@login_required
+@login_required(login_url='login')
 def profile_view(request):
     addresses = request.user.addresses.all().order_by('-is_default')
     recent_orders = Order.objects.filter(user=request.user).order_by('-created_at')[:3]
@@ -77,7 +77,7 @@ def profile_view(request):
         'recent_orders': recent_orders
     })
 
-@login_required
+@login_required(login_url='login')
 def orders_view(request):
     orders = Order.objects.filter(user=request.user).order_by('-created_at')
     
