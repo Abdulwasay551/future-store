@@ -19,6 +19,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.http import JsonResponse
+from django.views.defaults import page_not_found, server_error, permission_denied, bad_request
 
 def debug_settings(request):
     """Debug view to check current settings"""
@@ -33,6 +34,19 @@ def debug_settings(request):
         'HOST_IN_ALLOWED': request.get_host() in settings.ALLOWED_HOSTS,
         'WILDCARD_IN_ALLOWED': '*' in settings.ALLOWED_HOSTS,
     })
+
+# Custom error handlers
+def custom_404(request, exception=None):
+    return page_not_found(request, exception, template_name='404.html')
+
+def custom_500(request):
+    return server_error(request, template_name='500.html')
+
+def custom_403(request, exception=None):
+    return permission_denied(request, exception, template_name='403.html')
+
+def custom_400(request, exception=None):
+    return bad_request(request, exception, template_name='400.html')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

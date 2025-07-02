@@ -29,7 +29,7 @@ class CategoryAdmin(ModelAdmin):
     list_display = ('name', 'slug', 'created_at', 'image_url')
     prepopulated_fields = {'slug': ('name',)}
     search_fields = ('name',)
-    fields = ['name', 'slug', 'description', 'image', 'image_url', 'created_at', 'updated_at']
+    fields = ['name', 'slug', 'description', 'image', 'image_url']
 
 
 @admin.register(Company)
@@ -38,7 +38,7 @@ class CompanyAdmin(ModelAdmin):
     list_filter = ('category', 'is_featured')
     prepopulated_fields = {'slug': ('name',)}
     search_fields = ('name', 'category__name')
-    fields = ['category', 'name', 'slug', 'logo', 'logo_url', 'description', 'is_featured', 'created_at', 'updated_at']
+    fields = ['category', 'name', 'slug', 'logo', 'logo_url', 'description', 'is_featured']
 
 
 @admin.register(Product)
@@ -137,7 +137,7 @@ class ProductAdmin(ModelAdmin):
 
 @admin.register(ProductColor)
 class ProductColorAdmin(ModelAdmin):
-    list_display = ('product', 'name', 'hex_code', 'is_primary', 'stock', 'created_at')
+    list_display = ('product', 'name', 'hex_code', 'is_primary', 'stock')
     list_filter = ('product', 'is_primary')
     search_fields = ('product__name', 'name')
     fields = ['product', 'name', 'hex_code', 'is_primary', 'stock']
@@ -145,7 +145,7 @@ class ProductColorAdmin(ModelAdmin):
 
 @admin.register(DeliveryService)
 class DeliveryServiceAdmin(ModelAdmin):
-    list_display = ('name', 'estimated_delivery_days', 'is_active', 'created_at')
+    list_display = ('name', 'estimated_delivery_days', 'is_active')
     list_filter = ('is_active',)
     search_fields = ('name',)
     fields = ['name', 'tracking_url_template', 'estimated_delivery_days', 'is_active']
@@ -273,7 +273,7 @@ class ProductImageAdmin(ModelAdmin):
     list_display = ('product', 'color', 'is_primary', 'created_at', 'image_url')
     list_filter = ('product', 'color', 'is_primary')
     search_fields = ('product__name', 'color__name', 'alt_text')
-    fields = ['product', 'color', 'image', 'image_url', 'is_primary', 'alt_text', 'created_at', 'updated_at']
+    fields = ['product', 'color', 'image', 'image_url', 'is_primary', 'alt_text']
 
 
 @admin.register(Contact)

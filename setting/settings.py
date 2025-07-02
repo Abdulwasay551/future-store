@@ -469,3 +469,9 @@ LOGGING = {
         },
     },
 }
+
+# Custom error handlers
+HANDLER404 = 'setting.urls.custom_404'
+HANDLER500 = 'setting.urls.custom_500'
+HANDLER403 = 'setting.urls.custom_403'
+HANDLER400 = 'setting.urls.custom_400'
