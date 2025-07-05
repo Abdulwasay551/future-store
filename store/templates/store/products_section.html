@@ -355,11 +355,11 @@ function selectModalColor(colorId, colorElement) {
     // Remove previous selection
     document.querySelectorAll('#modalColorOptions > div').forEach(div => {
         div.classList.remove('border-mc-accent', 'bg-mc-accent', 'text-mc-black');
-        div.classList.add('border-mc-grey/30 ');
+        div.classList.add('border-mc-grey');
     });
     
     // Add selection to clicked element
-    colorElement.classList.remove('border-mc-grey/30');
+    colorElement.classList.remove('border-mc-grey');
     colorElement.classList.add('border-mc-accent', 'bg-mc-accent', 'text-mc-black');
     
     selectedColorId = colorId;

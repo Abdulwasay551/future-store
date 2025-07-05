@@ -7,10 +7,7 @@
     <div id="add-address-form" 
          class="hidden mb-8 bg-mc-dark rounded-xl p-6 border border-mc-grey/30">
         <h3 class="text-lg font-semibold mb-4 text-mc-white">Add New Address</h3>
-        <form hx-post="{% url 'add_address' %}" 
-              hx-target="#address-list"
-              hx-swap="beforeend"
-              hx-on::after-request="if(event.detail.successful) { document.getElementById('add-address-form').classList.add('hidden'); }">
+        <form action="{% url 'add_address' %}" method="POST">
             {% csrf_token %}
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="col-span-2">
@@ -31,13 +28,13 @@
                               rows="3"
                               placeholder="Enter your street address"></textarea>
                 </div>
-                <div>
+                <div class="col-span-2">
                     <label class="block text-mc-white mb-2">City</label>
                     <input type="text" name="city" 
                            class="w-full p-3 rounded-lg bg-mc-black border border-mc-grey text-mc-white focus:border-mc-accent focus:outline-none"
                            placeholder="Enter city">
                 </div>
-                <div>
+                <div class="col-span-2">
                     <label class="block text-mc-white mb-2">State</label>
                     <input type="text" name="state" 
                            class="w-full p-3 rounded-lg bg-mc-black border border-mc-grey text-mc-white focus:border-mc-accent focus:outline-none"
