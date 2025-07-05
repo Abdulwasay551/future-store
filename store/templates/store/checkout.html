@@ -3,6 +3,76 @@
 
 {% block content %}
 <div class="container mx-auto px-4 py-8 text-mc-white">
+    <!-- Address Form (Outside main order form) -->
+    <div id="add-address-form" 
+         class="hidden mb-8 bg-mc-dark rounded-xl p-6 border border-mc-grey/30">
+        <h3 class="text-lg font-semibold mb-4 text-mc-white">Add New Address</h3>
+        <form hx-post="{% url 'add_address' %}" 
+              hx-target="#address-list"
+              hx-swap="beforeend"
+              hx-on::after-request="if(event.detail.successful) { document.getElementById('add-address-form').classList.add('hidden'); }">
+            {% csrf_token %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="col-span-2">
+                    <label class="block text-mc-white mb-2">Address Type</label>
+                    <select name="address_type" 
+                            class="w-full p-3 rounded-lg bg-mc-black border border-mc-grey text-mc-white focus:border-mc-accent focus:outline-none"
+                            onchange="toggleRequiredFields()">
+                        <option value="">Select Address Type</option>
+                        <option value="home">Home</option>
+                        <option value="office">Office</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-mc-white mb-2">Street Address</label>
+                    <textarea name="street_address" 
+                              class="w-full p-3 rounded-lg bg-mc-black border border-mc-grey text-mc-white focus:border-mc-accent focus:outline-none" 
+                              rows="3"
+                              placeholder="Enter your street address"></textarea>
+                </div>
+                <div>
+                    <label class="block text-mc-white mb-2">City</label>
+                    <input type="text" name="city" 
+                           class="w-full p-3 rounded-lg bg-mc-black border border-mc-grey text-mc-white focus:border-mc-accent focus:outline-none"
+                           placeholder="Enter city">
+                </div>
+                <div>
+                    <label class="block text-mc-white mb-2">State</label>
+                    <input type="text" name="state" 
+                           class="w-full p-3 rounded-lg bg-mc-black border border-mc-grey text-mc-white focus:border-mc-accent focus:outline-none"
+                           placeholder="Enter state">
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-mc-white mb-2">Postal Code</label>
+                    <input type="text" name="postal_code" 
+                           class="w-full p-3 rounded-lg bg-mc-black border border-mc-grey text-mc-white focus:border-mc-accent focus:outline-none"
+                           placeholder="Enter postal code">
+                </div>
+                <div class="col-span-2">
+                    <label class="flex items-center text-mc-white">
+                        <input type="checkbox" name="is_default" 
+                               class="mr-3 w-4 h-4 bg-mc-black border-mc-grey text-mc-accent focus:ring-mc-accent focus:ring-2">
+                        Set as default address
+                    </label>
+                </div>
+            </div>
+            <div class="flex gap-3 mt-6">
+                <button type="submit" 
+                        class="px-6 py-3 bg-mc-accent text-mc-black hover:bg-mc-accent/90 transition-colors duration-300 rounded-lg font-semibold">
+                    <i class="fas fa-save mr-2"></i>
+                    Save Address
+                </button>
+                <button type="button" 
+                        onclick="toggleAddressForm()"
+                        class="px-6 py-3 bg-mc-grey/30 text-mc-white hover:bg-mc-grey/50 transition-colors duration-300 rounded-lg font-semibold">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Main Order Form -->
     <form action="{% url 'place_order' %}" method="POST">
         {% csrf_token %}
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -46,7 +116,7 @@
                     {% endif %}
                 </div>
 
-                <!-- Add New Address -->
+                <!-- Add New Address Button -->
                 <div class="mb-8">
                     <button type="button" 
                             onclick="toggleAddressForm()"
@@ -54,74 +124,6 @@
                         <i class="fas fa-plus mr-2"></i>
                         Add New Address
                     </button>
-                    
-                    <div id="add-address-form" 
-                         class="hidden mt-4 bg-mc-dark rounded-xl p-6 border border-mc-grey/30">
-                        <h3 class="text-lg font-semibold mb-4 text-mc-white">Add New Address</h3>
-                        <form hx-post="{% url 'add_address' %}" 
-                              hx-target="#address-list"
-                              hx-swap="beforeend"
-                              hx-on::after-request="if(event.detail.successful) { document.getElementById('add-address-form').classList.add('hidden'); }">
-                            {% csrf_token %}
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="col-span-2">
-                                    <label class="block text-mc-white mb-2">Address Type</label>
-                                    <select name="address_type" 
-                                            class="w-full p-3 rounded-lg bg-mc-black border border-mc-grey text-mc-white focus:border-mc-accent focus:outline-none"
-                                            onchange="toggleRequiredFields()">
-                                        <option value="">Select Address Type</option>
-                                        <option value="home">Home</option>
-                                        <option value="office">Office</option>
-                                        <option value="other">Other</option>
-                                    </select>
-                                </div>
-                                <div class="col-span-2">
-                                    <label class="block text-mc-white mb-2">Street Address</label>
-                                    <textarea name="street_address" 
-                                              class="w-full p-3 rounded-lg bg-mc-black border border-mc-grey text-mc-white focus:border-mc-accent focus:outline-none" 
-                                              rows="3"
-                                              placeholder="Enter your street address"></textarea>
-                                </div>
-                                <div>
-                                    <label class="block text-mc-white mb-2">City</label>
-                                    <input type="text" name="city" 
-                                           class="w-full p-3 rounded-lg bg-mc-black border border-mc-grey text-mc-white focus:border-mc-accent focus:outline-none"
-                                           placeholder="Enter city">
-                                </div>
-                                <div>
-                                    <label class="block text-mc-white mb-2">State</label>
-                                    <input type="text" name="state" 
-                                           class="w-full p-3 rounded-lg bg-mc-black border border-mc-grey text-mc-white focus:border-mc-accent focus:outline-none"
-                                           placeholder="Enter state">
-                                </div>
-                                <div class="col-span-2">
-                                    <label class="block text-mc-white mb-2">Postal Code</label>
-                                    <input type="text" name="postal_code" 
-                                           class="w-full p-3 rounded-lg bg-mc-black border border-mc-grey text-mc-white focus:border-mc-accent focus:outline-none"
-                                           placeholder="Enter postal code">
-                                </div>
-                                <div class="col-span-2">
-                                    <label class="flex items-center text-mc-white">
-                                        <input type="checkbox" name="is_default" 
-                                               class="mr-3 w-4 h-4 bg-mc-black border-mc-grey text-mc-accent focus:ring-mc-accent focus:ring-2">
-                                        Set as default address
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="flex gap-3 mt-6">
-                                <button type="submit" 
-                                        class="px-6 py-3 bg-mc-accent text-mc-black hover:bg-mc-accent/90 transition-colors duration-300 rounded-lg font-semibold">
-                                    <i class="fas fa-save mr-2"></i>
-                                    Save Address
-                                </button>
-                                <button type="button" 
-                                        onclick="toggleAddressForm()"
-                                        class="px-6 py-3 bg-mc-grey/30 text-mc-white hover:bg-mc-grey/50 transition-colors duration-300 rounded-lg font-semibold">
-                                    Cancel
-                                </button>
-                            </div>
-                        </form>
-                    </div>
                 </div>
 
                 <!-- Payment Method -->
