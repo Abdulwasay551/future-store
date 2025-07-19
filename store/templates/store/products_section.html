@@ -3,8 +3,18 @@
 <!-- CSRF Token for AJAX requests -->
 {% csrf_token %}
 
-<!-- Filters and Sort -->
-<div class="mb-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+<!-- Filters and Sort Toggle Button -->
+<div class="mb-4 flex flex-row-reverse">
+    <button onclick="toggleFilters()" 
+            class="px-6 py-3 bg-mc-dark border border-mc-grey/30 rounded-xl text-mc-white hover:border-mc-accent transition-all duration-300 flex items-center gap-2">
+        <i class="fas fa-filter text-mc-accent"></i>
+        <span id="filter-toggle-text">Show More Filters</span>
+        <i class="fas fa-chevron-down transition-transform duration-300" id="filter-toggle-icon"></i>
+    </button>
+</div>
+
+<!-- Filters and Sort (Collapsible) -->
+<div id="filters-section" class="mb-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 hidden">
     <!-- Price Range Filter -->
     <div class="bg-mc-dark rounded-xl p-4 border border-mc-grey/30">
         <h3 class="text-mc-white font-medium mb-3">Price Range</h3>
@@ -14,6 +24,7 @@
               class="space-y-2">
             <input type="hidden" name="category" value="{{ request.GET.category }}">
             <input type="hidden" name="company" value="{{ request.GET.company }}">
+            <input type="hidden" name="search" value="{{ request.GET.search }}">
             <div class="flex gap-2">
                 <input type="number" name="min_price" placeholder="Min" value="{{ request.GET.min_price }}"
                        class="w-full px-3 py-2 bg-mc-black border border-mc-grey/30 rounded-lg text-mc-white">
@@ -32,6 +43,7 @@
               class="space-y-2">
             <input type="hidden" name="category" value="{{ request.GET.category }}">
             <input type="hidden" name="company" value="{{ request.GET.company }}">
+            <input type="hidden" name="search" value="{{ request.GET.search }}">
             <select name="rating" class="w-full px-3 py-2 bg-mc-black border border-mc-grey/30 rounded-lg text-mc-white">
                 <option value="">All Ratings</option>
                 <option value="4" {% if request.GET.rating == '4' %}selected{% endif %}>4+ Stars</option>
@@ -50,6 +62,7 @@
               class="space-y-2">
             <input type="hidden" name="category" value="{{ request.GET.category }}">
             <input type="hidden" name="company" value="{{ request.GET.company }}">
+            <input type="hidden" name="search" value="{{ request.GET.search }}">
             <select name="availability" class="w-full px-3 py-2 bg-mc-black border border-mc-grey/30 rounded-lg text-mc-white">
                 <option value="">All</option>
                 <option value="in_stock" {% if request.GET.availability == 'in_stock' %}selected{% endif %}>In Stock</option>
@@ -67,6 +80,7 @@
               class="space-y-2">
             <input type="hidden" name="category" value="{{ request.GET.category }}">
             <input type="hidden" name="company" value="{{ request.GET.company }}">
+            <input type="hidden" name="search" value="{{ request.GET.search }}">
             <select name="sort" class="w-full px-3 py-2 bg-mc-black border border-mc-grey/30 rounded-lg text-mc-white">
                 <option value="newest" {% if request.GET.sort == 'newest' %}selected{% endif %}>Newest First</option>
                 <option value="price_low" {% if request.GET.sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
@@ -248,8 +262,8 @@
 {% if products.has_other_pages %}
 <div class="flex justify-center space-x-2 mt-8">
     {% if products.has_previous %}
-    <a href="?page={{ products.previous_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.company %}&company={{ request.GET.company }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}{% if request.GET.rating %}&rating={{ request.GET.rating }}{% endif %}{% if request.GET.availability %}&availability={{ request.GET.availability }}{% endif %}"
-       hx-get="?page={{ products.previous_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.company %}&company={{ request.GET.company }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}{% if request.GET.rating %}&rating={{ request.GET.rating }}{% endif %}{% if request.GET.availability %}&availability={{ request.GET.availability }}{% endif %}"
+    <a href="?page={{ products.previous_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.company %}&company={{ request.GET.company }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}{% if request.GET.rating %}&rating={{ request.GET.rating }}{% endif %}{% if request.GET.availability %}&availability={{ request.GET.availability }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
+       hx-get="?page={{ products.previous_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.company %}&company={{ request.GET.company }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}{% if request.GET.rating %}&rating={{ request.GET.rating }}{% endif %}{% if request.GET.availability %}&availability={{ request.GET.availability }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
        hx-target="#products-section"
        class="px-4 py-2 bg-mc-dark text-mc-white hover:bg-mc-grey/30 transition-colors duration-300 rounded-lg border border-mc-grey/30">
         Previous
@@ -260,8 +274,8 @@
     {% if products.number == num %}
     <span class="px-4 py-2 bg-mc-accent text-mc-black rounded-lg">{{ num }}</span>
     {% else %}
-    <a href="?page={{ num }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.company %}&company={{ request.GET.company }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}{% if request.GET.rating %}&rating={{ request.GET.rating }}{% endif %}{% if request.GET.availability %}&availability={{ request.GET.availability }}{% endif %}"
-       hx-get="?page={{ num }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.company %}&company={{ request.GET.company }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}{% if request.GET.rating %}&rating={{ request.GET.rating }}{% endif %}{% if request.GET.availability %}&availability={{ request.GET.availability }}{% endif %}"
+    <a href="?page={{ num }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.company %}&company={{ request.GET.company }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}{% if request.GET.rating %}&rating={{ request.GET.rating }}{% endif %}{% if request.GET.availability %}&availability={{ request.GET.availability }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
+       hx-get="?page={{ num }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.company %}&company={{ request.GET.company }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}{% if request.GET.rating %}&rating={{ request.GET.rating }}{% endif %}{% if request.GET.availability %}&availability={{ request.GET.availability }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
        hx-target="#products-section"
        class="px-4 py-2 bg-mc-dark text-mc-white hover:bg-mc-grey/30 transition-colors duration-300 rounded-lg border border-mc-grey/30">
         {{ num }}
@@ -270,8 +284,8 @@
     {% endfor %}
 
     {% if products.has_next %}
-    <a href="?page={{ products.next_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.company %}&company={{ request.GET.company }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}{% if request.GET.rating %}&rating={{ request.GET.rating }}{% endif %}{% if request.GET.availability %}&availability={{ request.GET.availability }}{% endif %}"
-       hx-get="?page={{ products.next_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.company %}&company={{ request.GET.company }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}{% if request.GET.rating %}&rating={{ request.GET.rating }}{% endif %}{% if request.GET.availability %}&availability={{ request.GET.availability }}{% endif %}"
+    <a href="?page={{ products.next_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.company %}&company={{ request.GET.company }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}{% if request.GET.rating %}&rating={{ request.GET.rating }}{% endif %}{% if request.GET.availability %}&availability={{ request.GET.availability }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
+       hx-get="?page={{ products.next_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.company %}&company={{ request.GET.company }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}{% if request.GET.rating %}&rating={{ request.GET.rating }}{% endif %}{% if request.GET.availability %}&availability={{ request.GET.availability }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
        hx-target="#products-section"
        class="px-4 py-2 bg-mc-dark text-mc-white hover:bg-mc-grey/30 transition-colors duration-300 rounded-lg border border-mc-grey/30">
         Next
@@ -281,16 +295,50 @@
 {% endif %}
 
 <script>
-let selectedProductId = null;
-let selectedColorId = null;
-let selectedProductName = '';
-let selectedProductPrice = 0;
+// Use window object to avoid conflicts with HTMX
+if (!window.selectedProductId) window.selectedProductId = null;
+if (!window.selectedColorId) window.selectedColorId = null;
+if (!window.selectedProductName) window.selectedProductName = '';
+if (!window.selectedProductPrice) window.selectedProductPrice = 0;
+
+function toggleFilters() {
+    const filtersSection = document.getElementById('filters-section');
+    const filterToggleText = document.getElementById('filter-toggle-text');
+    const filterToggleIcon = document.getElementById('filter-toggle-icon');
+
+    if (filtersSection.classList.contains('hidden')) {
+        filtersSection.classList.remove('hidden');
+        filterToggleText.textContent = 'Hide More Filters';
+        filterToggleIcon.classList.remove('fa-chevron-down');
+        filterToggleIcon.classList.add('fa-chevron-up');
+    } else {
+        filtersSection.classList.add('hidden');
+        filterToggleText.textContent = 'Show More Filters';
+        filterToggleIcon.classList.remove('fa-chevron-up');
+        filterToggleIcon.classList.add('fa-chevron-down');
+    }
+}
+
+// Add scroll functionality to filter forms
+function addFilterScrollListeners() {
+    const filterForms = document.querySelectorAll('form[hx-get*="product_list"]');
+    filterForms.forEach(form => {
+        form.addEventListener('htmx:afterRequest', function() {
+            console.log('Filter changed, scheduling scroll...'); // Debug log
+            setTimeout(() => {
+                if (typeof scrollToProducts === 'function') {
+                    scrollToProducts();
+                }
+            }, 300);
+        });
+    });
+}
 
 function openColorModal(productId, productName, productPrice) {
-    selectedProductId = productId;
-    selectedProductName = productName;
-    selectedProductPrice = productPrice;
-    selectedColorId = null;
+    window.selectedProductId = productId;
+    window.selectedProductName = productName;
+    window.selectedProductPrice = productPrice;
+    window.selectedColorId = null;
     
     // Update modal title
     document.getElementById('modalProductName').textContent = `Select Color - ${productName}`;
@@ -345,10 +393,10 @@ function openColorModal(productId, productName, productPrice) {
 
 function closeColorModal() {
     document.getElementById('colorModal').classList.add('hidden');
-    selectedProductId = null;
-    selectedColorId = null;
-    selectedProductName = '';
-    selectedProductPrice = 0;
+    window.selectedProductId = null;
+    window.selectedColorId = null;
+    window.selectedProductName = '';
+    window.selectedProductPrice = 0;
 }
 
 function selectModalColor(colorId, colorElement) {
@@ -362,22 +410,22 @@ function selectModalColor(colorId, colorElement) {
     colorElement.classList.remove('border-mc-grey');
     colorElement.classList.add('border-mc-accent', 'bg-mc-accent', 'text-mc-black');
     
-    selectedColorId = colorId;
+    window.selectedColorId = colorId;
 }
 
 function addToCartWithColor() {
-    if (!selectedColorId) {
+    if (!window.selectedColorId) {
         showToast('Please select a color');
         return;
     }
     
     // Create form data
     const formData = new FormData();
-    formData.append('color_id', selectedColorId);
+    formData.append('color_id', window.selectedColorId);
     formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
     
     // Send request
-    fetch(`/store/add-to-cart/${selectedProductId}/`, {
+    fetch(`/store/add-to-cart/${window.selectedProductId}/`, {
         method: 'POST',
         body: formData,
         headers: {
@@ -388,7 +436,7 @@ function addToCartWithColor() {
     .then(html => {
         // Update cart count
         document.getElementById('cart-count').innerHTML = html;
-        showToast(`${selectedProductName} added to cart`);
+        showToast(`${window.selectedProductName} added to cart`);
         closeColorModal();
     })
     .catch(error => {
@@ -397,17 +445,32 @@ function addToCartWithColor() {
     });
 }
 
-// Close modal when clicking outside
-document.getElementById('colorModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeColorModal();
+// Initialize modal event listeners
+function initializeModalEvents() {
+    const modal = document.getElementById('colorModal');
+    if (modal) {
+        // Close modal when clicking outside
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeColorModal();
+            }
+        });
     }
-});
+    
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeColorModal();
+        }
+    });
+    
+    // Add filter scroll listeners
+    addFilterScrollListeners();
+}
 
-// Close modal with Escape key
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        closeColorModal();
-    }
-});
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', initializeModalEvents);
+
+// Also initialize when HTMX content is loaded
+document.addEventListener('htmx:afterSwap', initializeModalEvents);
 </script>

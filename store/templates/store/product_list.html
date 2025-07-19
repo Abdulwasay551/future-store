@@ -3,33 +3,194 @@
 
 {% block content %}
 <div class="container mx-auto px-4 py-8">
-    <!-- Category Navigation -->
+    <!-- Enhanced Category Filter Dropdown -->
     <div class="mb-8">
-        <div class="flex items-center mb-4">
-            <h2 class="text-2xl font-bold text-mc-white">Browse Categories</h2>
-        </div>
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {% for category in categories %}
-            <a href="{% url 'product_list' %}?category={{ category.slug }}" 
-               hx-get="{% url 'product_list' %}?category={{ category.slug }}"
-               hx-target="#content-comp"
-               hx-push-url="true"
-               class="group bg-mc-dark rounded-xl p-4 border border-mc-grey/30 hover:border-mc-accent transition-all duration-300">
-                <div class="aspect-square mb-3 overflow-hidden rounded-lg bg-mc-black">
-                    {% if category.get_image_url %}
-                    <img src="{{ category.get_image_url }}" alt="{{ category.name }}" 
-                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
-                    {% else %}
-                    <div class="w-full h-full flex items-center justify-center text-mc-grey">
-                        <i class="fas fa-folder text-4xl"></i>
+        <div class="md:flex grid grid-cols-1 sm:grid-cols-2 items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold text-mc-white">Browse Products</h2>
+            
+            <!-- Category Filter Dropdown -->
+            <div class="relative mt-2  flex flex-row-reverse" x-data="{ 
+                open: false, 
+                selectedCategory: '{{ selected_category.slug|default:"" }}',
+                searchTerm: '',
+                filterCategories() {
+                    const searchTerm = this.searchTerm.toLowerCase();
+                    const categoryItems = document.querySelectorAll('.category-item');
+                    categoryItems.forEach(item => {
+                        const categoryName = item.querySelector('.category-name').textContent.toLowerCase();
+                        if (categoryName.includes(searchTerm)) {
+                            item.style.display = 'flex';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                }
+            }">
+                <button @click="open = !open" 
+                        class="flex items-center gap-3 px-6 py-3 bg-mc-dark border border-mc-grey/30 rounded-xl text-mc-white hover:border-mc-accent transition-all duration-300">
+                    <i class="fas fa-filter text-mc-accent"></i>
+                    <span x-text="selectedCategory ? '{{ selected_category.name|default:"All Categories" }}' : 'All Categories'">All Categories</span>
+                    <i class="fas fa-chevron-down transition-transform duration-300" :class="{ 'rotate-180': open }"></i>
+                </button>
+                
+                <!-- Dropdown Menu -->
+                <div x-show="open" 
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 transform scale-95"
+                     x-transition:enter-end="opacity-100 transform scale-100"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 transform scale-100"
+                     x-transition:leave-end="opacity-0 transform scale-95"
+                     @click.away="open = false"
+                     class="absolute right-0 mt-2 w-80 bg-mc-dark border border-mc-grey/30 rounded-xl shadow-2xl z-50 max-h-96 overflow-y-auto">
+                    
+                    <!-- Search Box -->
+                    <div class="p-4 border-b border-mc-grey/30">
+                        <div class="relative">
+                            <input type="text" 
+                                   placeholder="Search categories..." 
+                                   class="w-full px-4 py-2 bg-mc-black border border-mc-grey/30 rounded-lg text-mc-white placeholder-mc-light-grey"
+                                   x-model="searchTerm"
+                                   @input="filterCategories()">
+                            <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-mc-light-grey"></i>
+                        </div>
                     </div>
-                    {% endif %}
+                    
+                    <!-- All Categories Option -->
+                    <div class="p-2">
+                        <a href="{% url 'product_list' %}"
+                           hx-get="{% url 'product_list' %}"
+                           hx-target="#content-comp"
+                           hx-push-url="true"
+                           @click="open = false; selectedCategory = ''; scrollToProducts()"
+                           class="flex items-center gap-3 p-3 rounded-lg hover:bg-mc-grey/20 transition-colors duration-200 group">
+                            <div class="w-10 h-10 bg-gradient-to-br from-mc-accent to-mc-accent/80 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-th-large text-mc-black text-lg"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="text-mc-white font-medium group-hover:text-mc-accent transition-colors">All Categories</div>
+                                <div class="text-xs text-mc-light-grey">Browse all products</div>
+                            </div>
+                            <div class="w-2 h-2 rounded-full bg-mc-accent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        </a>
+                    </div>
+                    
+                    <!-- Category Options -->
+                    <div class="p-2 space-y-1">
+                        {% for category in categories %}
+                        <a href="{% url 'product_list' %}?category={{ category.slug }}"
+                           hx-get="{% url 'product_list' %}?category={{ category.slug }}"
+                           hx-target="#content-comp"
+                           hx-push-url="true"
+                           @click="open = false; selectedCategory = '{{ category.slug }}'; scrollToProducts()"
+                           class="category-item flex items-center gap-3 p-3 rounded-lg hover:bg-mc-grey/20 transition-colors duration-200 group">
+                            <div class="w-10 h-10 bg-gradient-to-br from-mc-grey/30 to-mc-grey/50 rounded-lg flex items-center justify-center overflow-hidden">
+                                {% if category.get_image_url %}
+                                <img src="{{ category.get_image_url }}" alt="{{ category.name }}" 
+                                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                                {% else %}
+                                {% if "phone" in category.name|lower or "mobile" in category.name|lower %}
+                                    <i class="category-icon fas fa-mobile-alt text-mc-accent text-lg group-hover:scale-110 transition-transform duration-300"></i>
+                                {% elif "laptop" in category.name|lower or "computer" in category.name|lower %}
+                                    <i class="category-icon fas fa-laptop text-mc-accent text-lg group-hover:scale-110 transition-transform duration-300"></i>
+                                {% elif "tablet" in category.name|lower %}
+                                    <i class="category-icon fas fa-tablet-alt text-mc-accent text-lg group-hover:scale-110 transition-transform duration-300"></i>
+                                {% elif "headphone" in category.name|lower or "audio" in category.name|lower %}
+                                    <i class="category-icon fas fa-headphones text-mc-accent text-lg group-hover:scale-110 transition-transform duration-300"></i>
+                                {% elif "camera" in category.name|lower or "photo" in category.name|lower %}
+                                    <i class="category-icon fas fa-camera text-mc-accent text-lg group-hover:scale-110 transition-transform duration-300"></i>
+                                {% elif "watch" in category.name|lower or "smartwatch" in category.name|lower %}
+                                    <i class="category-icon fas fa-clock text-mc-accent text-lg group-hover:scale-110 transition-transform duration-300"></i>
+                                {% elif "gaming" in category.name|lower or "game" in category.name|lower %}
+                                    <i class="category-icon fas fa-gamepad text-mc-accent text-lg group-hover:scale-110 transition-transform duration-300"></i>
+                                {% elif "accessory" in category.name|lower or "accessories" in category.name|lower %}
+                                    <i class="category-icon fas fa-tools text-mc-accent text-lg group-hover:scale-110 transition-transform duration-300"></i>
+                                {% else %}
+                                    <i class="category-icon fas fa-folder text-mc-accent text-lg group-hover:scale-110 transition-transform duration-300"></i>
+                                {% endif %}
+                                {% endif %}
+                            </div>
+                            <div class="flex-1">
+                                <div class="category-name text-mc-white font-medium group-hover:text-mc-accent transition-colors">{{ category.name }}</div>
+                                <div class="text-xs text-mc-light-grey">{{ category.products.count }} products</div>
+                            </div>
+                            <div class="w-2 h-2 rounded-full bg-mc-accent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        </a>
+                        {% endfor %}
+                    </div>
                 </div>
-                <h3 class="text-mc-white text-center font-medium group-hover:text-mc-accent transition-colors">
-                    {{ category.name }}
-                </h3>
-            </a>
-            {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Search Bar -->
+    <div class="mb-8">
+        <div class="bg-mc-dark rounded-xl p-6 border border-mc-grey/30">
+            <h3 class="text-xl font-bold text-mc-white mb-4">Search Products</h3>
+            <form hx-get="{% url 'product_list' %}" 
+                  hx-target="#content-comp"
+                  hx-trigger="submit"
+                  hx-push-url="true"
+                  hx-indicator="#search-indicator"
+                  class="relative">
+                <div class="flex gap-2">
+                    <div class="relative flex-1">
+                        <input type="text" 
+                               name="search" 
+                               value="{{ search_query }}"
+                               placeholder="Search by product name, company, or description..." 
+                               class="w-full px-4 py-3 pl-12 bg-mc-black border border-mc-grey/30 rounded-lg text-mc-white placeholder-mc-light-grey focus:border-mc-accent focus:outline-none transition-colors"
+                               onkeyup="handleSearchInput(this)"
+                               onblur="handleSearchBlur(this)"
+                               onkeypress="handleSearchEnter(event)">
+                        <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-mc-light-grey"></i>
+                        
+                        <!-- Search Indicator -->
+                        <div id="search-indicator" class="htmx-indicator absolute right-4 top-1/2 transform -translate-y-1/2">
+                            <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-mc-accent"></div>
+                        </div>
+                        
+                        {% if search_query %}
+                        <button type="button" 
+                                onclick="clearSearch()"
+                                class="absolute right-4 top-1/2 transform -translate-y-1/2 text-mc-light-grey hover:text-mc-white transition-colors">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Search Button -->
+                    <button type="submit" 
+                            class="px-6 py-3 bg-mc-accent text-mc-black hover:bg-mc-accent/90 rounded-lg transition-all duration-300 font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95"
+                            id="search-button"
+                            title="Search products">
+                        <i class="fas fa-search" id="search-icon"></i>
+                        <span class="hidden sm:inline" id="search-text">Search</span>
+                        <i class="fas fa-spinner fa-spin hidden" id="search-spinner"></i>
+                    </button>
+                </div>
+                
+                <!-- Search Results Summary -->
+                {% if search_query %}
+                <div class="mt-4 p-3 bg-mc-black/50 rounded-lg">
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-mc-white">
+                            <i class="fas fa-search text-mc-accent mr-2"></i>
+                            Search results for "<span class="text-mc-accent font-medium">{{ search_query }}</span>"
+                        </span>
+                        <span class="text-mc-light-grey">
+                            {{ products.paginator.count }} product{{ products.paginator.count|pluralize }} found
+                        </span>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Search Tips -->
+                <div class="mt-3 text-xs text-mc-light-grey">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Click the Search button, press Enter, or wait 1.5 seconds for auto-search
+                </div>
+            </form>
         </div>
     </div>
 
@@ -44,6 +205,7 @@
                hx-get="{% url 'product_list' %}?category={{ selected_category.slug }}"
                hx-target="#content-comp"
                hx-push-url="true" 
+               @click="scrollToProducts()"
                class="flex-shrink-0 px-6 py-2 rounded-full {% if not selected_company %}bg-mc-accent text-mc-black{% else %}bg-mc-dark text-mc-white hover:bg-mc-grey/30{% endif %} transition-colors">
                 All Brands
             </a>
@@ -52,6 +214,7 @@
                hx-get="{% url 'product_list' %}?category={{ selected_category.slug }}&company={{ company.slug }}"
                hx-target="#content-comp"
                hx-push-url="true"
+               @click="scrollToProducts()"
                class="flex-shrink-0 px-6 py-2 rounded-full {% if selected_company.id == company.id %}bg-mc-accent text-mc-black{% else %}bg-mc-dark text-mc-white hover:bg-mc-grey/30{% endif %} transition-colors">
                 {{ company.name }}
             </a>
@@ -64,6 +227,22 @@
     <div id="products-section">
         {% include "store/products_section.html" %}
     </div>
+    
+    <!-- Floating Filter Button -->
+    <div class="fixed bottom-6 right-6 z-40 hidden">
+        <button onclick="toggleFilters()" 
+                class="floating-button w-14 h-14 bg-mc-accent rounded-full shadow-lg flex items-center justify-center text-mc-black hover:bg-mc-accent/90 transition-all duration-300 transform hover:scale-110">
+            <i class="fas fa-filter text-xl" id="filter-icon"></i>
+        </button>
+    </div>
+    
+    <!-- Debug Scroll Button (temporary) -->
+    <div class="fixed bottom-6 left-6 z-40">
+        <button onclick="scrollToProducts()" 
+                class="w-12 h-12 bg-mc-grey rounded-full shadow-lg flex items-center justify-center text-mc-white hover:bg-mc-accent transition-all duration-300">
+            <i class="fas fa-arrow-down text-lg"></i>
+        </button>
+    </div>
 </div>
 
 <style>
@@ -74,5 +253,373 @@
         -ms-overflow-style: none;
         scrollbar-width: none;
     }
+    
+    /* Enhanced animations for category cards */
+    .category-card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .category-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    
+    /* Dropdown animations */
+    .dropdown-enter {
+        opacity: 0;
+        transform: scale(0.95) translateY(-10px);
+    }
+    
+    .dropdown-enter-active {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+        transition: all 0.2s ease-out;
+    }
+    
+    .dropdown-leave {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+    
+    .dropdown-leave-active {
+        opacity: 0;
+        transform: scale(0.95) translateY(-10px);
+        transition: all 0.15s ease-in;
+    }
+    
+    /* Loading animation */
+    @keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.5;
+        }
+    }
+    
+    .animate-pulse {
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    
+    /* Category icon animations */
+    .category-icon {
+        transition: all 0.3s ease;
+    }
+    
+    .category-icon:hover {
+        transform: rotate(5deg) scale(1.1);
+    }
+    
+    /* Floating button animation */
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(0px);
+        }
+        50% {
+            transform: translateY(-5px);
+        }
+    }
+    
+    .floating-button {
+        animation: float 3s ease-in-out infinite;
+    }
+    
+    /* HTMX Indicator styles */
+    .htmx-indicator {
+        display: none;
+    }
+    
+    .htmx-request .htmx-indicator {
+        display: block;
+    }
+    
+    .htmx-request.htmx-indicator {
+        display: block;
+    }
 </style>
+
+<script>
+// Global variables to avoid conflicts
+window.searchTimeout = null;
+window.selectedProductId = null;
+window.selectedProductName = '';
+window.selectedProductPrice = 0;
+
+function scrollToProducts() {
+    console.log('scrollToProducts called'); // Debug log
+    
+    // Try multiple ways to find the products section
+    let productsSection = document.getElementById('products-section');
+    
+    if (!productsSection) {
+        // Try alternative selectors
+        productsSection = document.querySelector('.grid.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-3.xl\\:grid-cols-4');
+    }
+    
+    if (!productsSection) {
+        // Try finding any product grid
+        productsSection = document.querySelector('[class*="grid-cols"]');
+    }
+    
+    if (!productsSection) {
+        // Try finding products by looking for product cards
+        productsSection = document.querySelector('.card-hover');
+        if (productsSection) {
+            productsSection = productsSection.closest('.grid') || productsSection.parentElement;
+        }
+    }
+    
+    if (productsSection) {
+        console.log('Products section found, scrolling...'); // Debug log
+        
+        // Add loading overlay
+        const loadingOverlay = document.createElement('div');
+        loadingOverlay.id = 'loading-overlay';
+        loadingOverlay.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center';
+        loadingOverlay.innerHTML = `
+            <div class="bg-mc-dark rounded-xl p-6 border border-mc-grey/30">
+                <div class="flex items-center gap-3">
+                    <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-mc-accent"></div>
+                    <span class="text-mc-white">Loading products...</span>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(loadingOverlay);
+        
+        // Remove loading overlay and scroll after a longer delay
+        setTimeout(() => {
+            if (loadingOverlay.parentNode) {
+                loadingOverlay.parentNode.removeChild(loadingOverlay);
+            }
+            
+            // Smooth scroll to products section with offset
+            productsSection.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' 
+            });
+            
+            console.log('Scroll completed'); // Debug log
+        }, 800); // Increased delay to ensure content is loaded
+    } else {
+        console.log('Products section not found, trying alternative scroll...'); // Debug log
+        
+        // Fallback: scroll to a reasonable position
+        const container = document.querySelector('.container');
+        if (container) {
+            container.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' 
+            });
+            console.log('Fallback scroll completed'); // Debug log
+        }
+    }
+}
+
+function clearSearch() {
+    // Clear the search input
+    const searchInput = document.querySelector('input[name="search"]');
+    if (searchInput) {
+        searchInput.value = '';
+        // Trigger the form submission to clear results
+        searchInput.form.submit();
+    }
+}
+
+// Handle search input with debouncing
+function handleSearchInput(input) {
+    // Clear any existing timeout
+    if (window.searchTimeout) {
+        clearTimeout(window.searchTimeout);
+    }
+    
+    // Set a new timeout for auto-search (only if user stops typing for 1.5 seconds)
+    window.searchTimeout = setTimeout(() => {
+        if (input.value.trim() !== '{{ search_query }}') {
+            input.form.submit();
+        }
+    }, 1500); // 1.5 seconds delay
+}
+
+// Handle search on blur (when user clicks away)
+function handleSearchBlur(input) {
+    if (window.searchTimeout) {
+        clearTimeout(window.searchTimeout);
+    }
+    
+    // Submit if value has changed
+    if (input.value.trim() !== '{{ search_query }}') {
+        input.form.submit();
+    }
+}
+
+// Handle Enter key press
+function handleSearchEnter(event) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        const input = event.target;
+        
+        // Clear any pending timeout
+        if (window.searchTimeout) {
+            clearTimeout(window.searchTimeout);
+        }
+        
+        // Submit the form immediately
+        input.form.submit();
+    }
+}
+
+// Toggle filters function
+function toggleFilters() {
+    const filtersSection = document.getElementById('filters-section');
+    const filterToggleText = document.getElementById('filter-toggle-text');
+    const filterToggleIcon = document.getElementById('filter-toggle-icon');
+    const filterIcon = document.getElementById('filter-icon');
+
+    if (filtersSection) {
+        if (filtersSection.classList.contains('hidden')) {
+            filtersSection.classList.remove('hidden');
+            if (filterToggleText) filterToggleText.textContent = 'Hide Filters';
+            if (filterToggleIcon) {
+                filterToggleIcon.classList.remove('fa-chevron-down');
+                filterToggleIcon.classList.add('fa-chevron-up');
+            }
+            if (filterIcon) filterIcon.classList.add('fa-times');
+        } else {
+            filtersSection.classList.add('hidden');
+            if (filterToggleText) filterToggleText.textContent = 'Show Filters';
+            if (filterToggleIcon) {
+                filterToggleIcon.classList.remove('fa-chevron-up');
+                filterToggleIcon.classList.add('fa-chevron-down');
+            }
+            if (filterIcon) filterIcon.classList.remove('fa-times');
+        }
+    }
+}
+
+// Initialize functions when DOM is ready (works with HTMX)
+function initializeSearchFunctions() {
+    // Category links
+    const categoryLinks = document.querySelectorAll('a[hx-get*="product_list"]');
+    categoryLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            setTimeout(scrollToProducts, 200);
+        });
+    });
+    
+    // Search form - scroll after search submission
+    const searchForm = document.querySelector('form[hx-get*="product_list"]');
+    if (searchForm) {
+        // Show loading state on form submission
+        searchForm.addEventListener('htmx:beforeRequest', function() {
+            const searchButton = document.getElementById('search-button');
+            const searchIcon = document.getElementById('search-icon');
+            const searchText = document.getElementById('search-text');
+            const searchSpinner = document.getElementById('search-spinner');
+            
+            if (searchButton && searchIcon && searchText && searchSpinner) {
+                searchButton.disabled = true;
+                searchIcon.classList.add('hidden');
+                searchText.classList.add('hidden');
+                searchSpinner.classList.remove('hidden');
+            }
+        });
+        
+        // Reset button state after request
+        searchForm.addEventListener('htmx:afterRequest', function() {
+            const searchButton = document.getElementById('search-button');
+            const searchIcon = document.getElementById('search-icon');
+            const searchText = document.getElementById('search-text');
+            const searchSpinner = document.getElementById('search-spinner');
+            
+            if (searchButton && searchIcon && searchText && searchSpinner) {
+                searchButton.disabled = false;
+                searchIcon.classList.remove('hidden');
+                searchText.classList.remove('hidden');
+                searchSpinner.classList.add('hidden');
+            }
+            
+            setTimeout(scrollToProducts, 100);
+        });
+    }
+    
+    // Add keyboard navigation to dropdown
+    const dropdown = document.querySelector('[x-data*="open"]');
+    if (dropdown) {
+        dropdown.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                this.__x.$data.open = false;
+            }
+        });
+    }
+    
+    // Add Enter key support for search input
+    const searchInput = document.querySelector('input[name="search"]');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                
+                // Clear any pending timeout
+                if (window.searchTimeout) {
+                    clearTimeout(window.searchTimeout);
+                }
+                
+                // Submit the form immediately
+                this.form.submit();
+            }
+        });
+    }
+}
+
+// Enhanced search functionality for category dropdown
+function enhanceSearch() {
+    const searchInput = document.querySelector('input[x-model="searchTerm"]');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const categoryItems = document.querySelectorAll('.category-item');
+            let visibleCount = 0;
+            
+            categoryItems.forEach(item => {
+                const categoryName = item.querySelector('.category-name').textContent.toLowerCase();
+                if (categoryName.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            
+            // Show "no results" message if no categories match
+            const noResults = document.getElementById('no-results');
+            if (visibleCount === 0 && searchTerm.length > 0) {
+                if (!noResults) {
+                    const noResultsDiv = document.createElement('div');
+                    noResultsDiv.id = 'no-results';
+                    noResultsDiv.className = 'p-4 text-center text-mc-light-grey';
+                    noResultsDiv.innerHTML = `
+                        <i class="fas fa-search text-2xl mb-2"></i>
+                        <p>No categories found matching "${searchTerm}"</p>
+                    `;
+                    document.querySelector('.category-item').parentNode.appendChild(noResultsDiv);
+                }
+            } else if (noResults) {
+                noResults.remove();
+            }
+        });
+    }
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    initializeSearchFunctions();
+    enhanceSearch();
+});
+
+// Also initialize when HTMX content is loaded
+document.addEventListener('htmx:afterSwap', function() {
+    initializeSearchFunctions();
+    enhanceSearch();
+});
+</script>
 {% endblock %}

@@ -24,8 +24,19 @@ def product_list(request):
     category_slug = request.GET.get('category')
     company_slug = request.GET.get('company')
     
+    # Get search query
+    search_query = request.GET.get('search', '').strip()
+    
     # Start with all available products
     products = Product.objects.filter(is_available=True)
+    
+    # Apply search filter if provided
+    if search_query:
+        products = products.filter(
+            Q(name__icontains=search_query) |
+            Q(company__name__icontains=search_query) |
+            Q(description__icontains=search_query)
+        )
     
     # Filter by category and company if provided
     selected_category = None
@@ -84,6 +95,7 @@ def product_list(request):
         'products': products,
         'selected_category': selected_category,
         'selected_company': selected_company,
+        'search_query': search_query,
     }
     
     # If it's an HTMX request for just the products section
