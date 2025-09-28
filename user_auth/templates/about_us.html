@@ -1,56 +1,321 @@
 {% extends "shared/skeleton.html" %}
 {% load static %}
 {% load tz %}
+{% load wagtailcore_tags %}
 {% block content %}
 
 <!-- Hero Section -->
 <section class="relative min-h-[70vh] flex items-center justify-center" style="z-index: 1;">
+    <!-- Background Video -->
+    <div class="absolute inset-0 overflow-hidden">
+        <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover opacity-30">
+            {% if cms_about.hero_background_video_url %}
+            <source src="{{ cms_about.hero_background_video_url }}" type="video/mp4">
+            {% else %}
+            <source src="{% static 'videos/tech-hero-bg.mp4' %}" type="video/mp4">
+            {% endif %}
+        </video>
+        <div class="absolute inset-0 bg-gradient-to-br from-mc-black/70 to-mc-dark/70"></div>
+    </div>
+
     <!-- Background Elements -->
-    <div class="absolute inset-0 bg-gradient-to-br from-mc-black to-mc-dark overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-mc-black/50 to-mc-dark/50 overflow-hidden">
         <!-- Animated background patterns -->
         <div class="absolute inset-0 opacity-5">
             <div class="absolute inset-0 bg-repeat pattern-grid dark:opacity-20 light:opacity-10"></div>
         </div>
-        <!-- Gradient Overlay -->
-        <div class="absolute inset-0 bg-gradient-to-t from-mc-black/80 to-transparent opacity-80"></div>
         <!-- Animated Circles -->
-        <div class="absolute top-20 left-10 w-64 h-64 bg-mc-accent/10 rounded-full filter blur-3xl animate-float"></div>
+        <div class="absolute top-20 left-10 w-64 h-96 bg-mc-accent/10 rounded-full filter blur-3xl animate-float"></div>
         <div class="absolute bottom-20 right-10 w-96 h-96 bg-mc-accent/10 rounded-full filter blur-3xl animate-float" style="animation-delay: 1s"></div>
     </div>
 
-    <!-- Content -->
+   <!-- Content -->
+       <!-- Content -->
     <div class="relative z-10 pt-32 pb-20 px-6">
         <div class="container mx-auto text-center">
             <div class="animate-fade-in">
-                <h1 class="text-5xl md:text-7xl font-black mb-8">
+                <h1 class="text-5xl md:text-7xl font-bold mb-8 tracking-wider">
                     <span class="bg-gradient-to-r from-mc-white via-mc-accent to-mc-white bg-clip-text text-transparent">
-                        ABOUT US
+                        {% if cms_about.hero_title_part1 and cms_about.hero_title_part2 %}
+                            {{ cms_about.hero_title_part1 }} {{ cms_about.hero_title_part2 }}
+                        {% else %}
+                            ABOUT US
+                        {% endif %}
                     </span>
                 </h1>
                 <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-mc-text">
-                    Discover the story behind Mobile Corner - Your trusted technology partner
+                    {% if cms_about.hero_description %}{{ cms_about.hero_description }}{% else %}Discover the story behind Mobile Corner - Your trusted technology partner{% endif %}
                 </p>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Our Story Section -->
+<!-- Official Certifications & Shields Section -->
+<section class="py-20 px-6 bg-mc-dark">
+    <div class="container mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl md:text-5xl font-bold mb-6">
+                <span class="text-mc-white">{% if cms_about.certifications_title_part1 %}{{ cms_about.certifications_title_part1 }}{% else %}OFFICIAL{% endif %} </span>
+                <span class="text-mc-accent">{% if cms_about.certifications_title_part2 %}{{ cms_about.certifications_title_part2 }}{% else %}CERTIFICATIONS{% endif %}</span>
+            </h2>
+            <p class="text-mc-light-grey text-lg max-w-2xl mx-auto">
+                {% if cms_about.certifications_description %}{{ cms_about.certifications_description }}{% else %}Authorized dealer and certified partner of leading technology brands{% endif %}
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+            {% if cms_about.certifications.all %}
+                {% for cert in cms_about.certifications.all %}
+                <div class="bg-mc-black rounded-2xl p-8 border border-mc-grey/30 card-hover animate-slide-up text-center" {% if forloop.counter0 > 0 %}style="animation-delay: {{ forloop.counter0|add:1|floatformat:0 }}00ms;"{% endif %}>
+                    <div class="mb-6">
+                        {% if cert.icon %}
+                        <img src="{{ cert.icon.url }}" 
+                             alt="{{ cert.title }}" 
+                             class="w-32 h-32 mx-auto object-contain">
+                        {% else %}
+                        <img src="{% static 'certifications/default-cert.png' %}" 
+                             alt="{{ cert.title }}" 
+                             class="w-32 h-32 mx-auto object-contain">
+                        {% endif %}
+                    </div>
+                    <h3 class="text-xl font-bold text-mc-white mb-4">{{ cert.title }}</h3>
+                    <p class="text-mc-light-grey">{{ cert.description }}</p>
+                </div>
+                {% endfor %}
+            {% else %}
+                <!-- Fallback content -->
+                <!-- Apple Certification -->
+                <div class="bg-mc-black rounded-2xl p-8 border border-mc-grey/30 card-hover animate-slide-up text-center">
+                    <div class="mb-6">
+                        <img src="{% static 'certifications/apple-authorized.png' %}" 
+                             alt="Apple Authorized Reseller" 
+                             class="w-32 h-32 mx-auto object-contain">
+                    </div>
+                    <h3 class="text-xl font-bold text-mc-white mb-4">Apple Authorized Reseller</h3>
+                    <p class="text-mc-light-grey">Official Apple products with full warranty and support</p>
+                </div>
+
+                <!-- Samsung Partnership -->
+                <div class="bg-mc-black rounded-2xl p-8 border border-mc-grey/30 card-hover animate-slide-up text-center" style="animation-delay: 200ms;">
+                    <div class="mb-6">
+                        <img src="{% static 'certifications/samsung-partner.png' %}" 
+                             alt="Samsung Official Partner" 
+                             class="w-32 h-32 mx-auto object-contain">
+                    </div>
+                    <h3 class="text-xl font-bold text-mc-white mb-4">Samsung Official Partner</h3>
+                    <p class="text-mc-light-grey">Certified Samsung retailer with exclusive access to latest devices</p>
+                </div>
+
+                <!-- Xiaomi Authorization -->
+                <div class="bg-mc-black rounded-2xl p-8 border border-mc-grey/30 card-hover animate-slide-up text-center" style="animation-delay: 400ms;">
+                    <div class="mb-6">
+                        <img src="{% static 'certifications/xiaomi-auth.png' %}" 
+                             alt="Xiaomi Authorized Store" 
+                             class="w-32 h-32 mx-auto object-contain">
+                    </div>
+                    <h3 class="text-xl font-bold text-mc-white mb-4">Xiaomi Authorized Store</h3>
+                    <p class="text-mc-light-grey">Official Xiaomi products with genuine warranty</p>
+                </div>
+
+                <!-- Quality Assurance -->
+                <div class="bg-mc-black rounded-2xl p-8 border border-mc-grey/30 card-hover animate-slide-up text-center" style="animation-delay: 600ms;">
+                    <div class="mb-6">
+                        <img src="{% static 'certifications/quality-shield.png' %}" 
+                             alt="Quality Assurance" 
+                             class="w-32 h-32 mx-auto object-contain">
+                    </div>
+                    <h3 class="text-xl font-bold text-mc-white mb-4">Quality Assurance</h3>
+                    <p class="text-mc-light-grey">ISO certified quality management system</p>
+                </div>
+
+                <!-- Security Shield -->
+                <div class="bg-mc-black rounded-2xl p-8 border border-mc-grey/30 card-hover animate-slide-up text-center" style="animation-delay: 800ms;">
+                    <div class="mb-6">
+                        <img src="{% static 'certifications/security-shield.png' %}" 
+                             alt="Security Certified" 
+                             class="w-32 h-32 mx-auto object-contain">
+                    </div>
+                    <h3 class="text-xl font-bold text-mc-white mb-4">Security Certified</h3>
+                    <p class="text-mc-light-grey">Secure transactions and data protection guaranteed</p>
+                </div>
+
+                <!-- PTA Approved -->
+                <div class="bg-mc-black rounded-2xl p-8 border border-mc-grey/30 card-hover animate-slide-up text-center" style="animation-delay: 1000ms;">
+                    <div class="mb-6">
+                        <img src="{% static 'certifications/pta-approved.png' %}" 
+                             alt="PTA Approved" 
+                             class="w-32 h-32 mx-auto object-contain">
+                    </div>
+                    <h3 class="text-xl font-bold text-mc-white mb-4">PTA Approved</h3>
+                    <p class="text-mc-light-grey">All devices are PTA approved and legally compliant</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Certification Proof Images -->
+        <div class="bg-mc-black rounded-2xl p-8 border border-mc-grey/30">
+            <h3 class="text-2xl font-bold text-center mb-8 text-mc-white">Official Documentation</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="group cursor-pointer">
+                    <img src="{% static 'proof/apple-certificate.jpg' %}" 
+                         alt="Apple Authorization Certificate" 
+                         class="w-full h-48 object-cover rounded-lg group-hover:scale-105 transition-transform duration-300">
+                    <p class="text-mc-light-grey text-center mt-2">Apple Authorization</p>
+                </div>
+                <div class="group cursor-pointer">
+                    <img src="{% static 'proof/samsung-agreement.jpg' %}" 
+                         alt="Samsung Partnership Agreement" 
+                         class="w-full h-48 object-cover rounded-lg group-hover:scale-105 transition-transform duration-300">
+                    <p class="text-mc-light-grey text-center mt-2">Samsung Partnership</p>
+                </div>
+                <div class="group cursor-pointer">
+                    <img src="{% static 'proof/business-license.jpg' %}" 
+                         alt="Business License" 
+                         class="w-full h-48 object-cover rounded-lg group-hover:scale-105 transition-transform duration-300">
+                    <p class="text-mc-light-grey text-center mt-2">Business License</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Our Story Section with Video -->
 <section class="py-20 px-6 bg-mc-dark">
     <div class="container mx-auto">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div class="animate-slide-up">
-                <h2 class="text-4xl md:text-5xl font-bold mb-6 text-white/80">
-                    OUR STORY
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 dark:text-white/80">
+                    {% if cms_about.story_title %}{{ cms_about.story_title }}{% else %}OUR STORY{% endif %}
                 </h2>
-                <p class="text-mc-light-grey text-lg mb-6 leading-relaxed">
-                    Founded with a vision to revolutionize mobile technology access in Pakistan, Mobile Corner began its journey in the bustling tech hub of Baa. What started as a small passion project has grown into one of the region's most trusted mobile technology destinations.
-                </p>
-                <p class="text-mc-light-grey text-lg mb-6 leading-relaxed">
-                    We believe that everyone deserves access to premium mobile technology without compromise. Our commitment to authenticity, quality, and customer satisfaction has earned us the trust of thousands of satisfied customers across Pakistan.
-                </p>
+                {% if cms_about.story_content %}
+                    <div class="text-mc-light-grey text-lg leading-relaxed">
+                        {{ cms_about.story_content|safe }}
+                    </div>
+                {% else %}
+                    <p class="text-mc-light-grey text-lg mb-6 leading-relaxed">
+                        Founded with a vision to revolutionize mobile technology access in Pakistan, Mobile Corner began its journey in the bustling tech hub of Bahawalpur. What started as a small passion project has grown into one of the region's most trusted mobile technology destinations.
+                    </p>
+                    <p class="text-mc-light-grey text-lg mb-6 leading-relaxed">
+                        We believe that everyone deserves access to premium mobile technology without compromise. Our commitment to authenticity, quality, and customer satisfaction has earned us the trust of thousands of satisfied customers across Pakistan.
+                    </p>
+                    <p class="text-mc-light-grey text-lg mb-8 leading-relaxed">
+                        Today, Mobile Corner stands as a beacon of reliability in the tech retail space, offering not just products, but complete technology solutions that enhance lives and connect communities.
+                    </p>
+                {% endif %}
+            </div>
+            
+            <!-- Company Video -->
+            <div class="animate-slide-up" style="animation-delay: 300ms;">
+                <div class="relative rounded-2xl overflow-hidden">
+                    {% if cms_about.story_video %}
+                    <video controls poster="{% if cms_about.story_video_thumbnail %}{{ cms_about.story_video_thumbnail.url }}{% else %}{% static 'videos/company-story-thumb.jpg' %}{% endif %}" 
+                           class="w-full h-auto rounded-2xl">
+                        <source src="{{ cms_about.story_video.url }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    {% else %}
+                    <video controls poster="{% static 'videos/company-story-thumb.jpg' %}" 
+                           class="w-full h-auto rounded-2xl">
+                        <source src="{% static 'videos/company-story.mp4' %}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    {% endif %}
+                    <div class="absolute inset-0 bg-gradient-to-t from-mc-black/50 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <div class="text-center text-white">
+                            <i class="fas fa-play text-4xl mb-2"></i>
+                            <p class="text-lg font-semibold">Watch Our Story</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Big Clients & Partners Section -->
+<section class="py-20 px-6 bg-mc-black">
+    <div class="container mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl md:text-5xl font-bold mb-6">
+                <span class="text-mc-white">{% if cms_about.partners_title_part1 %}{{ cms_about.partners_title_part1 }}{% else %}TRUSTED BY{% endif %} </span>
+                <span class="text-mc-accent">{% if cms_about.partners_title_part2 %}{{ cms_about.partners_title_part2 }}{% else %}LEADING BRANDS{% endif %}</span>
+            </h2>
+            <p class="text-mc-light-grey text-lg max-w-2xl mx-auto">
+                {% if cms_about.partners_description %}{{ cms_about.partners_description }}{% else %}We partner with the world's most innovative technology companies to bring you the best products{% endif %}
+            </p>
+        </div>
+
+        <!-- Brand Logos Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 mb-16">
+            {% if cms_about.brand_logos.all %}
+                {% for logo in cms_about.brand_logos.all %}
+                <div class="dark:bg-mc-dark bg-black rounded-xl p-6 flex items-center justify-center h-24 card-hover animate-slide-up" {% if forloop.counter0 > 0 %}style="animation-delay: {{ forloop.counter0|add:1 }}00ms;"{% endif %}>
+                    <img src="{{ logo.logo.url }}" alt="{{ logo.name }}" class="max-h-12 max-w-full object-contain filter brightness-0 invert opacity-70 hover:opacity-100 transition-opacity">
+                </div>
+                {% endfor %}
+            {% else %}
+                <!-- Fallback content -->
+                <div class="dark:bg-mc-dark bg-black rounded-xl p-6 flex items-center justify-center h-24 card-hover animate-slide-up">
+                    <img src="{% static 'apple-logo.png' %}" alt="Apple" class="max-h-12 max-w-full object-contain filter brightness-0 invert opacity-70 hover:opacity-100 transition-opacity">
+                </div>
+                <div class="dark:bg-mc-dark bg-black rounded-xl p-6 flex items-center justify-center h-24 card-hover animate-slide-up" style="animation-delay: 100ms;">
+                    <img src="{% static 'samsung-logo.png' %}" alt="Samsung" class="max-h-12 max-w-full object-contain filter brightness-50 invert opacity-70 hover:opacity-100 transition-opacity">
+                </div>
+                <div class="dark:bg-mc-dark bg-black rounded-xl p-6 flex items-center justify-center h-24 card-hover animate-slide-up" style="animation-delay: 200ms;">
+                    <img src="{% static 'xiaomi-logo.png' %}" alt="Xiaomi" class="max-h-12 max-w-full object-contain filter grayscale opacity-70 hover:opacity-100 transition-opacity">
+                </div>
+                <div class="dark:bg-mc-dark bg-black rounded-xl p-6 flex items-center justify-center h-24 card-hover animate-slide-up" style="animation-delay: 300ms;">
+                    <img src="{% static 'oppo-logo.png' %}" alt="OPPO" class="max-h-12 max-w-full object-contain filter brightness-0 invert opacity-70 hover:opacity-100 transition-opacity">
+                </div>
+                <div class="dark:bg-mc-dark bg-black rounded-xl p-6 flex items-center justify-center h-24 card-hover animate-slide-up" style="animation-delay: 400ms;">
+                    <img src="{% static 'vivo-logo.png' %}" alt="Vivo" class="max-h-12 max-w-full object-contain filter brightness-0 invert opacity-70 hover:opacity-100 transition-opacity">
+                </div>
+                <div class="dark:bg-mc-dark bg-black rounded-xl p-6 flex items-center justify-center h-24 card-hover animate-slide-up" style="animation-delay: 500ms;">
+                    <img src="{% static 'oneplus-logo.png' %}" alt="OnePlus" class="max-h-12 max-w-full object-contain filter brightness-0 invert opacity-70 hover:opacity-100 transition-opacity">
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Partnership Highlights -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-mc-dark rounded-2xl p-8 text-center card-hover animate-slide-up">
+                <div class="w-16 h-16 bg-mc-accent rounded-full mx-auto mb-6 flex items-center justify-center">
+                    <i class="fas fa-handshake text-2xl text-mc-black"></i>
+                </div>
+                <h3 class="text-xl font-bold text-mc-white mb-4">Strategic Partnerships</h3>
+                <p class="text-mc-light-grey">Direct partnerships with manufacturers ensuring authentic products and best prices</p>
+            </div>
+
+            <div class="bg-mc-dark rounded-2xl p-8 text-center card-hover animate-slide-up" style="animation-delay: 200ms;">
+                <div class="w-16 h-16 bg-mc-accent rounded-full mx-auto mb-6 flex items-center justify-center">
+                    <i class="fas fa-star text-2xl text-mc-black"></i>
+                </div>
+                <h3 class="text-xl font-bold text-mc-white mb-4">Premium Access</h3>
+                <p class="text-mc-light-grey">First access to new product launches and exclusive limited editions</p>
+            </div>
+
+            <div class="bg-mc-dark rounded-2xl p-8 text-center card-hover animate-slide-up" style="animation-delay: 400ms;">
+                <div class="w-16 h-16 bg-mc-accent rounded-full mx-auto mb-6 flex items-center justify-center">
+                    <i class="fas fa-award text-2xl text-mc-black"></i>
+                </div>
+                <h3 class="text-xl font-bold text-mc-white mb-4">Brand Recognition</h3>
+                <p class="text-mc-light-grey">Award-winning retailer recognized by major technology brands</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Interactive Stats Section -->
+<section class="py-20 px-6 bg-mc-dark">
+    <div class="container mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div class="animate-slide-up">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 dark:text-white/80">
+                    BY THE NUMBERS
+                </h2>
                 <p class="text-mc-light-grey text-lg mb-8 leading-relaxed">
-                    Today, Mobile Corner stands as a beacon of reliability in the tech retail space, offering not just products, but complete technology solutions that enhance lives and connect communities.
+                    Our achievements speak for themselves. Here's what we've accomplished together with our amazing customers and partners.
                 </p>
             </div>
             
@@ -59,7 +324,7 @@
                 <div class="bg-mc-black rounded-2xl p-8 border border-mc-grey/30 card-hover">
                     <div class="grid grid-cols-2 gap-6">
                         <div class="text-center">
-                            <div class="text-4xl font-bold text-mc-white mb-2 counter" data-target="100000">0</div>
+                            <div class="text-4xl font-bold text-mc-white mb-2 counter" data-target="50000">0</div>
                             <div class="text-mc-light-grey">Happy Customers</div>
                         </div>
                         <div class="text-center">
@@ -67,7 +332,7 @@
                             <div class="text-mc-light-grey">Products Sold</div>
                         </div>
                         <div class="text-center">
-                            <div class="text-4xl font-bold text-mc-white mb-2 counter" data-target="{% now 'Y' as current_year %}{{ current_year|add:'-2000' }}">0</div>
+                            <div class="text-4xl font-bold text-mc-white mb-2 counter" data-target="{% now 'Y' as current_year %}{{ current_year|add:'-2019' }}">0</div>
                             <div class="text-mc-light-grey">Years Experience</div>
                         </div>
                         <div class="text-center">
@@ -81,20 +346,112 @@
     </div>
 </section>
 
-<!-- Mission & Vision Section -->
+<!-- Store Gallery Section -->
 <section class="py-20 px-6 bg-mc-black">
+    <div class="container mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl md:text-5xl font-bold mb-6">
+                <span class="text-mc-white">OUR </span>
+                <span class="text-mc-accent">SHOWROOM</span>
+            </h2>
+            <p class="text-mc-light-grey text-lg max-w-2xl mx-auto">
+                Step inside our modern showroom and experience the future of mobile technology
+            </p>
+        </div>
+
+        <!-- Gallery Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+            <div class="group cursor-pointer animate-slide-up">
+                <div class="relative overflow-hidden rounded-2xl">
+                    <img src="{% static 'about (1).jpg' %}" 
+                         alt="Store Front" 
+                         class="w-full h-96 object-cover group-hover:scale-110 transition-transform duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-mc-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                        <p class="text-white w-full backdrop-blur-3xl bg-black/10 dark:bg-white/10 p-4 font-semibold">Modern Store Front</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="group cursor-pointer animate-slide-up" style="animation-delay: 200ms;">
+                <div class="relative overflow-hidden rounded-2xl">
+                    <img src="{% static 'about (2).jpg' %}" 
+                         alt="Display Area" 
+                         class="w-full h-96 object-cover group-hover:scale-110 transition-transform duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-mc-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                        <p class="text-white w-full backdrop-blur-3xl bg-black/10 dark:bg-white/10 p-4 font-semibold">Interactive Display Area</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="group cursor-pointer animate-slide-up" style="animation-delay: 400ms;">
+                <div class="relative overflow-hidden rounded-2xl">
+                    <img src="{% static 'about (3).jpg' %}" 
+                         alt="Customer Service" 
+                         class="w-full h-96 object-cover group-hover:scale-110 transition-transform duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-mc-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                        <p class="text-white w-full backdrop-blur-3xl bg-black/10 dark:bg-white/10 p-4 font-semibold">Customer Service Area</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="group cursor-pointer animate-slide-up" style="animation-delay: 600ms;">
+                <div class="relative overflow-hidden rounded-2xl">
+                    <img src="{% static 'about (4).jpg' %}" 
+                         alt="Accessories Wall" 
+                         class="w-full h-96 object-cover group-hover:scale-110 transition-transform duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-mc-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                        <p class="text-white w-full backdrop-blur-3xl bg-black/10 dark:bg-white/10 p-4 font-semibold">Accessories Collection</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="group cursor-pointer animate-slide-up" style="animation-delay: 800ms;">
+                <div class="relative overflow-hidden rounded-2xl">
+                    <img src="{% static 'about (5).jpg' %}" 
+                         alt="Testing Station" 
+                         class="w-full h-96 object-cover group-hover:scale-110 transition-transform duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-mc-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                        <p class="text-white w-full backdrop-blur-3xl bg-black/10 dark:bg-white/10 p-4 font-semibold">Device Testing Station</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="group cursor-pointer animate-slide-up" style="animation-delay: 1000ms;">
+                <div class="relative overflow-hidden rounded-2xl">
+                    <img src="{% static 'about (6).jpg' %}" 
+                         alt="Our Team" 
+                         class="w-full h-96 object-cover group-hover:scale-110 transition-transform duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-mc-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                        <p class="text-white w-full backdrop-blur-3xl bg-black/10 dark:bg-white/10 p-4 font-semibold">Our Expert Team</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Virtual Tour Button -->
+        <div class="text-center">
+            <button class="bg-mc-accent text-mc-black px-8 py-3 rounded-lg font-semibold hover:bg-mc-white transition-colors inline-flex items-center space-x-2">
+                <i class="fas fa-street-view"></i>
+                <span>Take Virtual Tour</span>
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- Mission & Vision Section -->
+<section class="py-20 px-6 bg-mc-dark">
     <div class="container mx-auto">
         <div class="text-center mb-16">
             <h2 class="text-4xl md:text-5xl font-bold mb-4">
                 <span class="text-mc-white">OUR </span>
-                <span class="text-mc-white">MISSION</span>
+                <span class="text-mc-accent">MISSION</span>
             </h2>
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
             <!-- Mission -->
-            <div class="bg-mc-dark rounded-2xl p-8 card-hover animate-slide-up border border-mc-grey/30">
-                <div class="w-16 h-16 bg-mc-white rounded-full mx-auto mb-6 flex items-center justify-center">
+            <div class="bg-mc-black rounded-2xl p-8 card-hover animate-slide-up border border-mc-grey/30">
+                <div class="w-16 h-16 bg-mc-accent rounded-full mx-auto mb-6 flex items-center justify-center">
                     <i class="fas fa-rocket text-2xl text-mc-black"></i>
                 </div>
                 <h3 class="text-2xl font-bold text-center mb-6 text-mc-white">MISSION</h3>
@@ -104,8 +461,8 @@
             </div>
             
             <!-- Vision -->
-            <div class="bg-mc-dark rounded-2xl p-8 card-hover animate-slide-up border border-mc-grey/30" style="animation-delay: 200ms;">
-                <div class="w-16 h-16 bg-mc-white rounded-full mx-auto mb-6 flex items-center justify-center">
+            <div class="bg-mc-black rounded-2xl p-8 card-hover animate-slide-up border border-mc-grey/30" style="animation-delay: 200ms;">
+                <div class="w-16 h-16 bg-mc-accent rounded-full mx-auto mb-6 flex items-center justify-center">
                     <i class="fas fa-eye text-2xl text-mc-black"></i>
                 </div>
                 <h3 class="text-2xl font-bold text-center mb-6 text-mc-white">VISION</h3>
@@ -118,12 +475,12 @@
 </section>
 
 <!-- Why Choose Us Section -->
-<section class="py-20 px-6 bg-mc-dark">
+<section class="py-20 px-6 bg-mc-black">
     <div class="container mx-auto">
         <div class="text-center mb-16">
             <h2 class="text-4xl md:text-5xl font-bold mb-4">
                 <span class="text-mc-white">WHY CHOOSE </span>
-                <span class="text-mc-white">MOBILE CORNER</span>
+                <span class="text-mc-accent">MOBILE CORNER</span>
             </h2>
             <p class="text-mc-light-grey text-lg">Experience the difference that sets us apart</p>
         </div>
@@ -131,7 +488,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <!-- Feature 1 -->
             <div class="text-center group animate-slide-up">
-                <div class="w-20 h-20 bg-mc-white rounded-full mx-auto mb-6 flex items-center justify-center animate-float ">
+                <div class="w-20 h-20 bg-mc-accent rounded-full mx-auto mb-6 flex items-center justify-center animate-float">
                     <i class="fas fa-shield-alt text-2xl text-mc-black"></i>
                 </div>
                 <h3 class="text-xl font-bold mb-4 group-hover:text-mc-accent transition-colors">
@@ -142,7 +499,7 @@
             
             <!-- Feature 2 -->
             <div class="text-center group animate-slide-up" style="animation-delay: 200ms;">
-                <div class="w-20 h-20 bg-mc-white rounded-full mx-auto mb-6 flex items-center justify-center animate-float " style="animation-delay: 0.5s;">
+                <div class="w-20 h-20 bg-mc-accent rounded-full mx-auto mb-6 flex items-center justify-center animate-float" style="animation-delay: 0.5s;">
                     <i class="fas fa-shipping-fast text-2xl text-mc-black"></i>
                 </div>
                 <h3 class="text-xl font-bold mb-4 group-hover:text-mc-accent transition-colors">
@@ -153,7 +510,7 @@
             
             <!-- Feature 3 -->
             <div class="text-center group animate-slide-up" style="animation-delay: 400ms;">
-                <div class="w-20 h-20 bg-mc-white rounded-full mx-auto mb-6 flex items-center justify-center animate-float " style="animation-delay: 1s;">
+                <div class="w-20 h-20 bg-mc-accent rounded-full mx-auto mb-6 flex items-center justify-center animate-float" style="animation-delay: 1s;">
                     <i class="fas fa-headset text-2xl text-mc-black"></i>
                 </div>
                 <h3 class="text-xl font-bold mb-4 group-hover:text-mc-accent transition-colors">
@@ -164,7 +521,7 @@
             
             <!-- Feature 4 -->
             <div class="text-center group animate-slide-up" style="animation-delay: 600ms;">
-                <div class="w-20 h-20 bg-mc-white rounded-full mx-auto mb-6 flex items-center justify-center animate-float " style="animation-delay: 1.5s;">
+                <div class="w-20 h-20 bg-mc-accent rounded-full mx-auto mb-6 flex items-center justify-center animate-float" style="animation-delay: 1.5s;">
                     <i class="fas fa-money-bill-wave text-2xl text-mc-black"></i>
                 </div>
                 <h3 class="text-xl font-bold mb-4 group-hover:text-mc-accent transition-colors">
@@ -175,7 +532,7 @@
             
             <!-- Feature 5 -->
             <div class="text-center group animate-slide-up" style="animation-delay: 800ms;">
-                <div class="w-20 h-20 bg-mc-white rounded-full mx-auto mb-6 flex items-center justify-center animate-float " style="animation-delay: 2s;">
+                <div class="w-20 h-20 bg-mc-accent rounded-full mx-auto mb-6 flex items-center justify-center animate-float" style="animation-delay: 2s;">
                     <i class="fas fa-sync-alt text-2xl text-mc-black"></i>
                 </div>
                 <h3 class="text-xl font-bold mb-4 group-hover:text-mc-accent transition-colors">
@@ -186,13 +543,104 @@
             
             <!-- Feature 6 -->
             <div class="text-center group animate-slide-up" style="animation-delay: 1000ms;">
-                <div class="w-20 h-20 bg-mc-white rounded-full mx-auto mb-6 flex items-center justify-center animate-float " style="animation-delay: 2.5s;">
+                <div class="w-20 h-20 bg-mc-accent rounded-full mx-auto mb-6 flex items-center justify-center animate-float" style="animation-delay: 2.5s;">
                     <i class="fas fa-users text-2xl text-mc-black"></i>
                 </div>
                 <h3 class="text-xl font-bold mb-4 group-hover:text-mc-accent transition-colors">
                     TRUSTED COMMUNITY
                 </h3>
                 <p class="text-mc-light-grey">Join thousands of satisfied customers who trust Mobile Corner for their tech needs.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Customer Testimonials Video Section -->
+<section class="py-20 px-6 bg-mc-dark">
+    <div class="container mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl md:text-5xl font-bold mb-6">
+                <span class="text-mc-white">WHAT OUR </span>
+                <span class="text-mc-accent">CUSTOMERS SAY</span>
+            </h2>
+            <p class="text-mc-light-grey text-lg max-w-2xl mx-auto">
+                Real stories from real customers who have experienced the Mobile Corner difference
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <!-- Testimonial Video -->
+            <div class="animate-slide-up">
+                <div class="relative rounded-2xl overflow-hidden">
+                    <video controls poster="{% static 'videos/testimonial-thumb.jpg' %}" 
+                           class="w-full h-auto rounded-2xl">
+                        <source src="{% static 'videos/customer-testimonials.mp4' %}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <div class="absolute top-4 left-4 bg-mc-accent text-mc-black px-3 py-1 rounded-full text-sm font-semibold">
+                        Customer Stories
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Reviews -->
+            <div class="space-y-6 animate-slide-up" style="animation-delay: 300ms;">
+                <div class="bg-mc-black rounded-2xl p-6 border border-mc-grey/30">
+                    <div class="flex items-center mb-4">
+                        <img src="{% static 'customers/customer1.jpg' %}" 
+                             alt="Customer" 
+                             class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <h4 class="text-mc-white font-semibold">Ahmad Khan</h4>
+                            <div class="flex text-mc-accent">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-mc-light-grey">"Excellent service and genuine products. Got my iPhone 15 Pro Max here and couldn't be happier!"</p>
+                </div>
+
+                <div class="bg-mc-black rounded-2xl p-6 border border-mc-grey/30">
+                    <div class="flex items-center mb-4">
+                        <img src="{% static 'customers/customer2.jpg' %}" 
+                             alt="Customer" 
+                             class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <h4 class="text-mc-white font-semibold">Fatima Ali</h4>
+                            <div class="flex text-mc-accent">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-mc-light-grey">"Fast delivery and amazing customer support. Mobile Corner is my go-to for all tech needs!"</p>
+                </div>
+
+                <div class="bg-mc-black rounded-2xl p-6 border border-mc-grey/30">
+                    <div class="flex items-center mb-4">
+                        <img src="{% static 'customers/customer3.jpg' %}" 
+                             alt="Customer" 
+                             class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <h4 class="text-mc-white font-semibold">Muhammad Hassan</h4>
+                            <div class="flex text-mc-accent">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-mc-light-grey">"Best prices in town with authentic products. Highly recommend Mobile Corner to everyone!"</p>
+                </div>
             </div>
         </div>
     </div>
@@ -213,36 +661,41 @@
                 
                 <div class="space-y-6">
                     <div class="flex items-center space-x-4">
-                        <div class="w-12 h-12 bg-mc-white rounded-full flex items-center justify-center">
+                        <div class="w-12 h-12 bg-mc-accent rounded-full flex items-center justify-center">
                             <i class="fas fa-map-marker-alt text-mc-black"></i>
                         </div>
                         <div>
                             <h4 class="font-semibold text-mc-white">Address</h4>
-                            <a href="https://maps.app.goo.gl/aCX6eRab7staFQMa9" class="text-mc-light-grey">Dubai Plaza, shop#13 basment, Bahawalpur, 63100</a>
+                            <a href="https://maps.app.goo.gl/aCX6eRab7staFQMa9" class="text-mc-light-grey hover:text-mc-accent transition-colors">Dubai Plaza, shop#13 basement, Bahawalpur, 63100</a>
                         </div>
                     </div>
                     
                     <div class="flex items-center space-x-4">
-                        <div class="w-12 h-12 bg-mc-white rounded-full flex items-center justify-center">
+                        <div class="w-12 h-12 bg-mc-accent rounded-full flex items-center justify-center">
                             <i class="fas fa-phone text-mc-black"></i>
                         </div>
                         <div>
                             <h4 class="font-semibold text-mc-white">Phone</h4>
-                            <a href="tel:+923009681212" class="text-mc-light-grey">+92 300 9681212</a> | <a href="tel:+923159682684" class="text-mc-light-grey">+92 315 9682684</a>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <div class="w-12 h-12 bg-mc-white rounded-full flex items-center justify-center">
-                            <i class="fas fa-phone text-mc-black"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-mc-white">Email</h4>
-                            <a href="mailto:mobilercornerbwp@gmail.com" class="text-mc-light-grey">mobilercornerbwp@gmail.com</a>
+                            <div class="space-x-2">
+                                <a href="tel:+923009681212" class="text-mc-light-grey hover:text-mc-accent transition-colors">+92 300 9681212</a>
+                                <span class="text-mc-light-grey">|</span>
+                                <a href="tel:+923159682684" class="text-mc-light-grey hover:text-mc-accent transition-colors">+92 315 9682684</a>
+                            </div>
                         </div>
                     </div>
                     
                     <div class="flex items-center space-x-4">
-                        <div class="w-12 h-12 bg-mc-white rounded-full flex items-center justify-center">
+                        <div class="w-12 h-12 bg-mc-accent rounded-full flex items-center justify-center">
+                            <i class="fas fa-envelope text-mc-black"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-mc-white">Email</h4>
+                            <a href="mailto:mobilercornerbwp@gmail.com" class="text-mc-light-grey hover:text-mc-accent transition-colors">mobilercornerbwp@gmail.com</a>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 bg-mc-accent rounded-full flex items-center justify-center">
                             <i class="fas fa-clock text-mc-black"></i>
                         </div>
                         <div>
@@ -284,7 +737,7 @@
 <section class="py-20 px-6 bg-mc-dark">
     <div class="container mx-auto text-center">
         <div class="bg-mc-black rounded-2xl p-12 max-w-4xl mx-auto border border-mc-grey/30 animate-slide-up">
-            <h2 class="text-3xl md:text-4xl font-bold mb-6 text-white/80">
+            <h2 class="text-3xl md:text-4xl font-bold mb-6 dark:text-white/80">
                 READY TO EXPERIENCE THE DIFFERENCE?
             </h2>
             <p class="text-mc-light-grey text-lg mb-8">
@@ -295,11 +748,11 @@
                    hx-get="{% url 'product_list' %}"
                    hx-target="#content-comp"
                    hx-push-url="true"
-                   class="bg-mc-white text-mc-black px-8 py-3 rounded-lg font-semibold hover:bg-mc-accent transition-colors">
+                   class="bg-mc-accent text-mc-black px-8 py-3 rounded-lg font-semibold hover:bg-mc-white transition-colors">
                     SHOP NOW
                 </a>
                 <a href="#contact"
-                   class="border border-mc-white text-mc-white px-8 py-3 rounded-lg font-semibold hover:bg-mc-white hover:text-mc-black transition-colors">
+                   class="border border-mc-accent text-mc-accent px-8 py-3 rounded-lg font-semibold hover:bg-mc-accent hover:text-mc-black transition-colors">
                     CONTACT US
                 </a>
             </div>
@@ -322,6 +775,34 @@
 
     .animate-float {
         animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes fade-in {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-fade-in {
+        animation: fade-in 1s ease-out;
+    }
+
+    @keyframes slide-up {
+        from { opacity: 0; transform: translateY(50px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-slide-up {
+        animation: slide-up 0.8s ease-out forwards;
+        opacity: 0;
+    }
+
+    .card-hover {
+        transition: all 0.3s ease;
+    }
+
+    .card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
     }
 
     /* Card flip container styles */
@@ -429,13 +910,42 @@
     .card-container {
         animation: float 6s ease-in-out infinite;
     }
+
+    /* Image hover effects */
+    .group:hover img {
+        transform: scale(1.05);
+    }
+
+    /* Video styling */
+    video {
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Brand logo hover effects */
+    .brand-logo:hover {
+        transform: scale(1.1);
+        filter: brightness(1.2);
+    }
+
+    /* Smooth scroll for anchor links */
+    html {
+        scroll-behavior: smooth;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .card-container {
+            width: min(95vw, 350px);
+            height: min(50vh, 250px);
+        }
+    }
 </style>
 
 <script>
     // Counter animation
     function animateCounters() {
         const counters = document.querySelectorAll('.counter');
-        const speed = 250;
+        const speed = 200;
 
         counters.forEach(counter => {
             const updateCount = () => {
@@ -454,21 +964,61 @@
         });
     }
 
-    // Intersection Observer for counter animation
-    function setupCounterObserver() {
-        const counterObserver = new IntersectionObserver((entries) => {
+    // Intersection Observer for animations
+    function setupIntersectionObserver() {
+        const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    animateCounters();
-                    counterObserver.unobserve(entry.target);
+                    if (entry.target.classList.contains('counter')) {
+                        animateCounters();
+                    }
+                    entry.target.style.animationPlayState = 'running';
                 }
             });
-        }, { threshold: 0.5 });
+        }, { threshold: 0.1 });
 
-        // Start counter animation when stats section is visible
-        const statsSection = document.querySelector('.counter');
-        if (statsSection) {
-            counterObserver.observe(statsSection.closest('section'));
+        // Observe all animated elements
+        document.querySelectorAll('.animate-slide-up, .counter').forEach(el => {
+            observer.observe(el);
+        });
+    }
+
+    // Image gallery modal functionality
+    function setupImageGallery() {
+        const galleryImages = document.querySelectorAll('.gallery img');
+        galleryImages.forEach(img => {
+            img.addEventListener('click', function() {
+                // Create modal overlay
+                const modal = document.createElement('div');
+                modal.className = 'fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50';
+                modal.innerHTML = `
+                    <div class="relative max-w-4xl max-h-full p-4">
+                        <img src="${this.src}" alt="${this.alt}" class="max-w-full max-h-full object-contain">
+                        <button class="absolute top-4 right-4 text-white text-2xl hover:text-mc-accent" onclick="this.closest('.fixed').remove()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                
+                // Close on click outside
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        modal.remove();
+                    }
+                });
+            });
+        });
+    }
+
+    // Virtual tour functionality
+    function setupVirtualTour() {
+        const virtualTourBtn = document.querySelector('[data-virtual-tour]');
+        if (virtualTourBtn) {
+            virtualTourBtn.addEventListener('click', function() {
+                // Here you would integrate with a 360° tour service like Matterport
+                alert('Virtual tour coming soon! Visit our store for now.');
+            });
         }
     }
 
@@ -490,8 +1040,18 @@
             });
         });
 
-        // Setup counter observer
-        setupCounterObserver();
+        // Setup observers and features
+        setupIntersectionObserver();
+        setupImageGallery();
+        setupVirtualTour();
+
+        // Auto-play video on scroll
+        const videos = document.querySelectorAll('video');
+        videos.forEach(video => {
+            video.addEventListener('loadedmetadata', () => {
+                video.currentTime = 0;
+            });
+        });
     }
 
     // Run on DOMContentLoaded (for initial page load)

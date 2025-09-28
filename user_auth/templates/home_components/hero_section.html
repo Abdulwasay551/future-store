@@ -26,7 +26,11 @@
                     <div class="w-32 h-32 bg-mc-white rounded-full mx-auto mb-6 border-2 border-mc-accent flex items-center justify-center animate-float relative overflow-hidden group">
                         <!-- Gradient border effect -->
                         <div class="absolute inset-0 bg-gradient-to-br from-mc-accent to-mc-white opacity-100 group-hover:opacity-20 transition-opacity duration-500"></div>                        <!-- Logo images for different themes -->
+                        {% if cms_home.hero_logo_url %}
+                        <img src="{{ cms_home.hero_logo_url }}" class="text-4xl font-bold relative z-10 block  w-full h-full object-cover">
+                        {% else %}
                         <img src="{% static 'logo-light.JPG' %}" class="text-4xl font-bold relative z-10 block  w-full h-full object-cover">
+                        {% endif %}
 
                     </div>
                 </div>
@@ -35,20 +39,42 @@
                 <h1 class="relative text-5xl md:text-7xl font-black mb-8">
                     <span class="relative inline-block">
                         <span class="relative z-10 bg-gradient-to-r from-mc-white via-mc-accent to-mc-white bg-clip-text text-transparent dark:from-mc-white dark:via-mc-accent dark:to-mc-white">
-                            MOBILE CORNER
+                            {% if cms_home.hero_main_title %}{{ cms_home.hero_main_title }}{% else %}MOBILE CORNER{% endif %}
                         </span>
                     </span>
                 </h1>
 
                 <!-- Subtitle with better contrast -->
                 <p class="text-xl md:text-2xl mb-12 max-w-3xl mx-auto">
-                    <span class="text-mc-light-grey font-light">Your Premium Destination for Mobile Technology</span>
+                    <span class="text-mc-light-grey font-light">{% if cms_home.hero_subtitle_line1 %}{{ cms_home.hero_subtitle_line1 }}{% else %}Your Premium Destination for Mobile Technology{% endif %}</span>
                     <br>
-                    <span class="text-mc-accent font-medium mt-2 inline-block">Experience Excellence in Every Device</span>
+                    <span class="text-mc-accent font-medium mt-2 inline-block">{% if cms_home.hero_subtitle_line2 %}{{ cms_home.hero_subtitle_line2 }}{% else %}Experience Excellence in Every Device{% endif %}</span>
                 </p>
 
                 <!-- Enhanced buttons -->
                 <div class="flex flex-col md:flex-row gap-6 justify-center items-center">
+                    {% if cms_home.hero_buttons.all %}
+                        {% for button in cms_home.hero_buttons.all %}
+                        <button class="group relative px-8 py-4 rounded-lg font-semibold text-lg animate-slide-up overflow-hidden">
+                            {% if button.is_primary %}
+                            <!-- Primary button background -->
+                            <div class="absolute inset-0 bg-mc-white transition-transform duration-300 group-hover:scale-105"></div>
+                            <!-- Button text -->
+                            <a href="{{ button.link_url }}" class="relative z-10 text-mc-black">{{ button.text|upper }}</a>
+                            <!-- Hover effect -->
+                            <div class="absolute inset-0 bg-gradient-to-r from-mc-accent to-mc-white opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+                            {% else %}
+                            <!-- Secondary button border -->
+                            <div class="absolute inset-0 border-2 border-mc-white rounded-lg transition-transform duration-300 group-hover:scale-105"></div>
+                            <!-- Button text -->
+                            <a href="{{ button.link_url }}" class="relative z-10 text-mc-white group-hover:text-mc-black transition-colors duration-300">{{ button.text|upper }}</a>
+                            <!-- Hover background -->
+                            <div class="absolute inset-0 bg-mc-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-1"></div>
+                            {% endif %}
+                        </button>
+                        {% endfor %}
+                    {% else %}
+                    <!-- Default buttons -->
                     <button class="group relative px-8 py-4 rounded-lg font-semibold text-lg animate-slide-up overflow-hidden">
                         <!-- Button background -->
                         <div class="absolute inset-0 bg-mc-white transition-transform duration-300 group-hover:scale-105"></div>
@@ -65,6 +91,7 @@
                         <!-- Hover background -->
                         <div class="absolute inset-0 bg-mc-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-1"></div>
                     </button>
+                    {% endif %}
                 </div>
             </div>
         </div>

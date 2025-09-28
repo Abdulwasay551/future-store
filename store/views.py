@@ -5,12 +5,245 @@ from django.http import HttpResponse, JsonResponse
 from django.core.paginator import Paginator
 from django.template.loader import render_to_string
 from django.db import models
-from .models import Category, Company, Product, Cart, CartItem, Review, Address, Order, OrderItem, ProductColor, Notification
+from .models import Category, Company, Product, Cart, CartItem, Review, Address, Order, OrderItem, ProductColor, Notification, Contact
 from django.contrib.admin.views.decorators import staff_member_required
-from django.db.models import Sum, F, Count, Q, ExpressionWrapper, DecimalField
+from django.db.models import Sum, F, Count, Q, ExpressionWrapper, DecimalField, Avg
 from django.utils import timezone
-from datetime import timedelta
+from datetime import timedelta, datetime
 import re
+import json
+import random
+
+
+@staff_member_required
+def admin_dashboard(request):
+    """Custom admin dashboard with charts and statistics"""
+    
+    # Get date range from request
+    days = request.GET.get('days', '30')
+    try:
+        days = int(days)
+    except ValueError:
+        days = 30
+    
+    end_date = timezone.now()
+    start_date = end_date - timedelta(days=days)
+    
+    # Order Statistics
+    total_orders = Order.objects.count()
+    recent_orders = Order.objects.filter(created_at__gte=start_date).count()
+    pending_orders = Order.objects.filter(status='pending').count()
+    completed_orders = Order.objects.filter(status='delivered').count()
+    cancelled_orders = Order.objects.filter(status='cancelled').count()
+    
+    # Revenue Statistics
+    total_revenue = Order.objects.filter(status__in=['confirmed', 'processing', 'shipped', 'delivered']).aggregate(
+        total=Sum('total_amount')
+    )['total'] or 0
+    
+    recent_revenue = Order.objects.filter(
+        created_at__gte=start_date,
+        status__in=['confirmed', 'processing', 'shipped', 'delivered']
+    ).aggregate(total=Sum('total_amount'))['total'] or 0
+    
+    # Product Statistics
+    total_products = Product.objects.count()
+    available_products = Product.objects.filter(is_available=True).count()
+    featured_products = Product.objects.filter(is_featured=True).count()
+    low_stock_products = Product.objects.filter(colors__stock__lt=5).distinct().count()
+    
+    # User Statistics
+    from user_auth.models import User
+    total_users = User.objects.count()
+    recent_users = User.objects.filter(date_joined__gte=start_date).count()
+    
+    # Review Statistics
+    total_reviews = Review.objects.count()
+    avg_rating = Review.objects.aggregate(avg=Avg('rating'))['avg'] or 0
+    
+    # Contact Statistics
+    total_contacts = Contact.objects.count()
+    new_contacts = Contact.objects.filter(status='new').count()
+    
+    # Site Traffic Simulation (for demo purposes)
+    # In a real application, you would integrate with Google Analytics or similar
+    base_traffic = 1000
+    traffic_variation = random.uniform(0.8, 1.2)
+    total_page_views = int(base_traffic * traffic_variation)
+    unique_visitors = int(total_page_views * 0.6)
+    bounce_rate = random.uniform(0.3, 0.7)
+    avg_session_duration = random.uniform(2, 8)
+    
+    # Generate chart data
+    chart_data = generate_chart_data(start_date, end_date, days)
+    
+    context = {
+        'title': 'Admin Dashboard',
+        'days': days,
+        'start_date': start_date,
+        'end_date': end_date,
+        
+        # Statistics
+        'total_orders': total_orders,
+        'recent_orders': recent_orders,
+        'pending_orders': pending_orders,
+        'completed_orders': completed_orders,
+        'cancelled_orders': cancelled_orders,
+        
+        'total_revenue': total_revenue,
+        'recent_revenue': recent_revenue,
+        
+        'total_products': total_products,
+        'available_products': available_products,
+        'featured_products': featured_products,
+        'low_stock_products': low_stock_products,
+        
+        'total_users': total_users,
+        'recent_users': recent_users,
+        
+        'total_reviews': total_reviews,
+        'avg_rating': round(avg_rating, 1),
+        
+        'total_contacts': total_contacts,
+        'new_contacts': new_contacts,
+        
+        # Traffic statistics
+        'total_page_views': total_page_views,
+        'unique_visitors': unique_visitors,
+        'bounce_rate': round(bounce_rate * 100, 1),
+        'avg_session_duration': round(avg_session_duration, 1),
+        
+        # Chart data
+        'chart_data': json.dumps(chart_data),
+        
+        # Recent data for tables
+        'recent_orders_list': Order.objects.select_related('user').order_by('-created_at')[:10],
+        'low_stock_products_list': Product.objects.filter(colors__stock__lt=5).distinct()[:10],
+        'recent_contacts_list': Contact.objects.order_by('-created_at')[:10],
+    }
+    
+    return render(request, 'admin/dashboard.html', context)
+
+
+def generate_chart_data(start_date, end_date, days):
+    """Generate data for various charts"""
+    
+    # Order trends over time
+    order_trends = []
+    revenue_trends = []
+    product_trends = []
+    user_trends = []
+    
+    # Generate daily data points
+    current_date = start_date
+    while current_date <= end_date:
+        next_date = current_date + timedelta(days=1)
+        
+        # Orders for this day
+        daily_orders = Order.objects.filter(
+            created_at__gte=current_date,
+            created_at__lt=next_date
+        ).count()
+        order_trends.append({
+            'date': current_date.strftime('%Y-%m-%d'),
+            'orders': daily_orders
+        })
+        
+        # Revenue for this day
+        daily_revenue = Order.objects.filter(
+            created_at__gte=current_date,
+            created_at__lt=next_date,
+            status__in=['confirmed', 'processing', 'shipped', 'delivered']
+        ).aggregate(total=Sum('total_amount'))['total'] or 0
+        revenue_trends.append({
+            'date': current_date.strftime('%Y-%m-%d'),
+            'revenue': float(daily_revenue)
+        })
+        
+        # Products added this day
+        daily_products = Product.objects.filter(
+            created_at__gte=current_date,
+            created_at__lt=next_date
+        ).count()
+        product_trends.append({
+            'date': current_date.strftime('%Y-%m-%d'),
+            'products': daily_products
+        })
+        # Users registered this day
+        from user_auth.models import User
+        daily_users = User.objects.filter(
+            date_joined__gte=current_date,
+            date_joined__lt=next_date
+        ).count()
+        user_trends.append({
+            'date': current_date.strftime('%Y-%m-%d'),
+            'users': daily_users
+        })
+        
+        current_date = next_date
+    
+    # Category distribution
+    category_data = []
+    categories = Category.objects.annotate(
+        product_count=Count('products')
+    ).order_by('-product_count')[:10]
+    
+    for category in categories:
+        category_data.append({
+            'name': category.name,
+            'count': category.product_count
+        })
+    
+    # Order status distribution
+    status_data = []
+    status_counts = Order.objects.values('status').annotate(count=Count('id'))
+    for status in status_counts:
+        status_data.append({
+            'status': status['status'].title(),
+            'count': status['count']
+        })
+    
+    # Product availability
+    availability_data = [
+        {'status': 'Available', 'count': Product.objects.filter(is_available=True).count()},
+        {'status': 'Unavailable', 'count': Product.objects.filter(is_available=False).count()},
+    ]
+    
+    # Stock levels
+    stock_data = [
+        {'level': 'In Stock (>10)', 'count': Product.objects.filter(colors__stock__gt=10).distinct().count()},
+        {'level': 'Low Stock (5-10)', 'count': Product.objects.filter(colors__stock__gte=5, colors__stock__lte=10).distinct().count()},
+        {'level': 'Very Low (<5)', 'count': Product.objects.filter(colors__stock__lt=5).distinct().count()},
+        {'level': 'Out of Stock', 'count': Product.objects.filter(colors__stock=0).distinct().count()},
+    ]
+    
+    # Traffic trends (simulated)
+    traffic_trends = []
+    current_date = start_date
+    while current_date <= end_date:
+        next_date = current_date + timedelta(days=1)
+        
+        # Simulate daily traffic
+        daily_traffic = random.randint(800, 1200)
+        traffic_trends.append({
+            'date': current_date.strftime('%Y-%m-%d'),
+            'visitors': daily_traffic
+        })
+        
+        current_date = next_date
+    
+    return {
+        'order_trends': order_trends,
+        'revenue_trends': revenue_trends,
+        'product_trends': product_trends,
+        'user_trends': user_trends,
+        'traffic_trends': traffic_trends,
+        'category_data': category_data,
+        'status_data': status_data,
+        'availability_data': availability_data,
+        'stock_data': stock_data,
+    }
+
 
 def test_view(request):
     """Simple test view to check if the app is working"""

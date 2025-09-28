@@ -20,6 +20,16 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.http import JsonResponse
 from django.views.defaults import page_not_found, server_error, permission_denied, bad_request
+from store.views import admin_dashboard
+
+# Import Wagtail URLs
+try:
+    from wagtail.admin import urls as wagtailadmin_urls
+    from wagtail import urls as wagtail_urls
+    from wagtail.documents import urls as wagtaildocs_urls
+    WAGTAIL_AVAILABLE = True
+except ImportError:
+    WAGTAIL_AVAILABLE = False
 
 def debug_settings(request):
     """Debug view to check current settings"""
@@ -49,14 +59,24 @@ def custom_400(request, exception=None):
     return bad_request(request, exception, template_name='400.html')
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include('user_auth.urls')),  # Include user_auth app URLs
-    path('store/', include('store.urls')),  # Include store app URLs
+    path('admin/dashboard/', admin_dashboard, name='admin_dashboard'),
+    path('admin/', admin.site.urls),  # Django admin (Unfold)
+    
+    # Keep your existing user auth and store URLs working
+    path('', include('user_auth.urls')),  # Keep user_auth at root for compatibility
+    path('store/', include('store.urls')),  # Store URLs (both views and API)
     path('chatbot/', include('chatbot.urls')),  # Include chatbot app URLs
     path('erp/', include('inventory_erp.urls')),  # Include inventory_erp app URLs
     path('social-auth/', include('social_django.urls', namespace='social')),
     path('debug/', debug_settings, name='debug_settings'),
 ]
+
+# Add Wagtail URLs if available (admin only)
+if WAGTAIL_AVAILABLE:
+    urlpatterns += [
+        path('cms-admin/', include(wagtailadmin_urls)),  # Wagtail CMS admin only
+        path('documents/', include(wagtaildocs_urls)),  # Wagtail documents
+    ]
 
 # Serve static files in development
 if settings.DEBUG:

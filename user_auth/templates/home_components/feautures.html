@@ -3,12 +3,28 @@
         <div class="container mx-auto">
             <div class="text-center mb-16">
                 <h2 class="text-4xl md:text-5xl font-bold mb-4">
-                    <span class="text-mc-white">WHY CHOOSE </span>
-                    <span class="text-mc-white">MOBILE CORNER</span>
+                    <span class="text-mc-white">{% if cms_home.features_section_title %}{{ cms_home.features_section_title }}{% else %}WHY CHOOSE MOBILE CORNER{% endif %}</span>
                 </h2>
+                {% if cms_home.features_section_description %}
+                <p class="text-mc-light-grey text-lg">{{ cms_home.features_section_description }}</p>
+                {% endif %}
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {% if cms_home.features.all %}
+                    {% for feature in cms_home.features.all %}
+                    <div class="text-center group">
+                        <div class="w-20 h-20 bg-mc-white rounded-full mx-auto mb-6 flex items-center justify-center animate-float" style="animation-delay: {{ forloop.counter0|add:0.5 }}s;">
+                            <i class="fas fa-{{ feature.icon }} text-2xl text-mc-black"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4 group-hover:text-mc-accent transition-colors">
+                            {{ feature.title|upper }}
+                        </h3>
+                        <p class="text-mc-light-grey">{{ feature.description }}</p>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <!-- Default features -->
                 <div class="text-center group">
                     <div class="w-20 h-20 bg-mc-white rounded-full mx-auto mb-6 flex items-center justify-center animate-float ">
                         <i class="fas fa-shipping-fast text-2xl text-mc-black"></i>
@@ -38,6 +54,7 @@
                     </h3>
                     <p class="text-mc-light-grey">Round-the-clock customer support for all your tech needs</p>
                 </div>
+                {% endif %}
             </div>
         </div>
     </section>

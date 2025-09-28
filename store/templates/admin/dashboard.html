@@ -1,0 +1,617 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}Admin Dashboard - Mobile Corner{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
+<style>
+    .dashboard-card {
+        background: linear-gradient(135deg, var(--color-base-50) 0%, var(--color-base-100) 100%);
+        border: 1px solid var(--color-base-200);
+        border-radius: 12px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    
+    .dashboard-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stat-card {
+        background: linear-gradient(135deg, var(--color-primary-50) 0%, var(--color-primary-100) 100%);
+        border: 1px solid var(--color-primary-200);
+        border-radius: 8px;
+        padding: 1rem;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        color: var(--color-primary-600);
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+        font-size: 0.875rem;
+        color: var(--color-base-600);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .chart-container {
+        position: relative;
+        height: 300px;
+        margin: 1rem 0;
+    }
+    
+    .filter-buttons {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .filter-btn {
+        padding: 0.5rem 1rem;
+        border: 1px solid var(--color-base-300);
+        background: var(--color-base-50);
+        color: var(--color-base-700);
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 0.875rem;
+    }
+    
+    .filter-btn:hover {
+        background: var(--color-base-100);
+        border-color: var(--color-base-400);
+    }
+    
+    .filter-btn.active {
+        background: var(--color-primary-600);
+        color: white;
+        border-color: var(--color-primary-600);
+    }
+    
+    .recent-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+    }
+    
+    .recent-table th,
+    .recent-table td {
+        padding: 0.75rem;
+        text-align: left;
+        border-bottom: 1px solid var(--color-base-200);
+    }
+    
+    .recent-table th {
+        background: var(--color-base-100);
+        font-weight: 600;
+        color: var(--color-base-700);
+    }
+    
+    .status-badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+    }
+    
+    .status-pending { background: #fef3c7; color: #92400e; }
+    .status-confirmed { background: #dbeafe; color: #1e40af; }
+    .status-processing { background: #fef3c7; color: #92400e; }
+    .status-shipped { background: #d1fae5; color: #065f46; }
+    .status-delivered { background: #dcfce7; color: #166534; }
+    .status-cancelled { background: #fee2e2; color: #991b1b; }
+    
+    .grid-2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+    .grid-4 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+    
+    @media (max-width: 768px) {
+        .grid-2, .grid-3, .grid-4 {
+            grid-template-columns: 1fr;
+        }
+        
+        .filter-buttons {
+            justify-content: center;
+        }
+        
+        .stat-number {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container" x-data="{ activeFilter: '{{ days }}' }">
+    <!-- Header -->
+    <div class="dashboard-card mb-6">
+        <div class="flex justify-between items-center mb-4">
+            <div>
+                <h1 class="text-2xl font-bold text-base-800 dark:text-base-100">Admin Dashboard</h1>
+                <p class="text-base-600 dark:text-base-400">Overview of your store's performance</p>
+            </div>
+            <div class="filter-buttons">
+                <button 
+                    class="filter-btn" 
+                    :class="{ 'active': activeFilter === '7' }"
+                    @click="activeFilter = '7'; window.location.href = '?days=7'"
+                >
+                    Last 7 Days
+                </button>
+                <button 
+                    class="filter-btn" 
+                    :class="{ 'active': activeFilter === '30' }"
+                    @click="activeFilter = '30'; window.location.href = '?days=30'"
+                >
+                    Last 30 Days
+                </button>
+                <button 
+                    class="filter-btn" 
+                    :class="{ 'active': activeFilter === '90' }"
+                    @click="activeFilter = '90'; window.location.href = '?days=90'"
+                >
+                    Last 90 Days
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="grid grid-4 gap-4 mb-6">
+        <div class="stat-card">
+            <div class="stat-number">{{ total_orders }}</div>
+            <div class="stat-label">Total Orders</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">${{ total_revenue|floatformat:0 }}</div>
+            <div class="stat-label">Total Revenue</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ total_products }}</div>
+            <div class="stat-label">Total Products</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ total_users }}</div>
+            <div class="stat-label">Total Users</div>
+        </div>
+    </div>
+
+    <!-- Recent Activity Cards -->
+    <div class="grid grid-2 gap-6 mb-6">
+        <div class="stat-card">
+            <div class="stat-number">{{ recent_orders }}</div>
+            <div class="stat-label">Recent Orders ({{ days }} days)</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">${{ recent_revenue|floatformat:0 }}</div>
+            <div class="stat-label">Recent Revenue ({{ days }} days)</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ recent_users }}</div>
+            <div class="stat-label">New Users ({{ days }} days)</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ avg_rating }}</div>
+            <div class="stat-label">Average Rating</div>
+        </div>
+    </div>
+
+    <!-- Traffic Statistics -->
+    <div class="grid grid-4 gap-4 mb-6">
+        <div class="stat-card">
+            <div class="stat-number">{{ total_page_views }}</div>
+            <div class="stat-label">Page Views</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ unique_visitors }}</div>
+            <div class="stat-label">Unique Visitors</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ bounce_rate }}%</div>
+            <div class="stat-label">Bounce Rate</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ avg_session_duration }}m</div>
+            <div class="stat-label">Avg Session</div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="grid grid-2 gap-6 mb-6">
+        <!-- Orders Trend Chart -->
+        <div class="dashboard-card">
+            <h3 class="text-lg font-semibold mb-4 text-base-800 dark:text-base-100">Orders Trend</h3>
+            <div class="chart-container">
+                <canvas id="ordersChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Revenue Trend Chart -->
+        <div class="dashboard-card">
+            <h3 class="text-lg font-semibold mb-4 text-base-800 dark:text-base-100">Revenue Trend</h3>
+            <div class="chart-container">
+                <canvas id="revenueChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Category Distribution -->
+        <div class="dashboard-card">
+            <h3 class="text-lg font-semibold mb-4 text-base-800 dark:text-base-100">Product Categories</h3>
+            <div class="chart-container">
+                <canvas id="categoryChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Order Status Distribution -->
+        <div class="dashboard-card">
+            <h3 class="text-lg font-semibold mb-4 text-base-800 dark:text-base-100">Order Status</h3>
+            <div class="chart-container">
+                <canvas id="statusChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Product Availability -->
+        <div class="dashboard-card">
+            <h3 class="text-lg font-semibold mb-4 text-base-800 dark:text-base-100">Product Availability</h3>
+            <div class="chart-container">
+                <canvas id="availabilityChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Stock Levels -->
+        <div class="dashboard-card">
+            <h3 class="text-lg font-semibold mb-4 text-base-800 dark:text-base-100">Stock Levels</h3>
+            <div class="chart-container">
+                <canvas id="stockChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Site Traffic -->
+        <div class="dashboard-card">
+            <h3 class="text-lg font-semibold mb-4 text-base-800 dark:text-base-100">Site Traffic</h3>
+            <div class="chart-container">
+                <canvas id="trafficChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Data Tables -->
+    <div class="grid grid-2 gap-6">
+        <!-- Recent Orders -->
+        <div class="dashboard-card">
+            <h3 class="text-lg font-semibold mb-4 text-base-800 dark:text-base-100">Recent Orders</h3>
+            <div class="overflow-x-auto">
+                <table class="recent-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Status</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in recent_orders_list %}
+                        <tr>
+                            <td>#{{ order.id }}</td>
+                            <td>{{ order.user.email|truncatechars:20 }}</td>
+                            <td>
+                                <span class="status-badge status-{{ order.status }}">
+                                    {{ order.status|title }}
+                                </span>
+                            </td>
+                            <td>${{ order.total_amount }}</td>
+                            <td>{{ order.created_at|date:"M d, Y" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center text-base-500">No recent orders</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Low Stock Products -->
+        <div class="dashboard-card">
+            <h3 class="text-lg font-semibold mb-4 text-base-800 dark:text-base-100">Low Stock Products</h3>
+            <div class="overflow-x-auto">
+                <table class="recent-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Category</th>
+                            <th>Stock</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in low_stock_products_list %}
+                        <tr>
+                            <td>{{ product.name|truncatechars:25 }}</td>
+                            <td>{{ product.category.name }}</td>
+                            <td>{{ product.total_stock }}</td>
+                            <td>
+                                {% if product.total_stock == 0 %}
+                                    <span class="status-badge status-cancelled">Out of Stock</span>
+                                {% elif product.total_stock < 5 %}
+                                    <span class="status-badge status-pending">Low Stock</span>
+                                {% else %}
+                                    <span class="status-badge status-delivered">In Stock</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center text-base-500">No low stock products</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Parse chart data from Django context
+const chartData = {{ chart_data|safe }};
+
+// Common chart options
+const commonOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+        legend: {
+            position: 'bottom',
+            labels: {
+                color: getComputedStyle(document.documentElement).getPropertyValue('--color-base-700'),
+                usePointStyle: true,
+                padding: 20
+            }
+        }
+    },
+    scales: {
+        x: {
+            ticks: {
+                color: getComputedStyle(document.documentElement).getPropertyValue('--color-base-600')
+            },
+            grid: {
+                color: getComputedStyle(document.documentElement).getPropertyValue('--color-base-200')
+            }
+        },
+        y: {
+            ticks: {
+                color: getComputedStyle(document.documentElement).getPropertyValue('--color-base-600')
+            },
+            grid: {
+                color: getComputedStyle(document.documentElement).getPropertyValue('--color-base-200')
+            }
+        }
+    }
+};
+
+// Orders Trend Chart
+const ordersCtx = document.getElementById('ordersChart').getContext('2d');
+new Chart(ordersCtx, {
+    type: 'line',
+    data: {
+        labels: chartData.order_trends.map(item => item.date),
+        datasets: [{
+            label: 'Orders',
+            data: chartData.order_trends.map(item => item.orders),
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            tension: 0.4,
+            fill: true
+        }]
+    },
+    options: {
+        ...commonOptions,
+        plugins: {
+            ...commonOptions.plugins,
+            title: {
+                display: true,
+                text: 'Daily Orders',
+                color: getComputedStyle(document.documentElement).getPropertyValue('--color-base-800')
+            }
+        }
+    }
+});
+
+// Revenue Trend Chart
+const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+new Chart(revenueCtx, {
+    type: 'line',
+    data: {
+        labels: chartData.revenue_trends.map(item => item.date),
+        datasets: [{
+            label: 'Revenue ($)',
+            data: chartData.revenue_trends.map(item => item.revenue),
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            tension: 0.4,
+            fill: true
+        }]
+    },
+    options: {
+        ...commonOptions,
+        plugins: {
+            ...commonOptions.plugins,
+            title: {
+                display: true,
+                text: 'Daily Revenue',
+                color: getComputedStyle(document.documentElement).getPropertyValue('--color-base-800')
+            }
+        }
+    }
+});
+
+// Category Distribution Chart
+const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+new Chart(categoryCtx, {
+    type: 'doughnut',
+    data: {
+        labels: chartData.category_data.map(item => item.name),
+        datasets: [{
+            data: chartData.category_data.map(item => item.count),
+            backgroundColor: [
+                '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6',
+                '#06b6d4', '#84cc16', '#f97316', '#ec4899', '#6366f1'
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    color: getComputedStyle(document.documentElement).getPropertyValue('--color-base-700'),
+                    usePointStyle: true,
+                    padding: 20
+                }
+            }
+        }
+    }
+});
+
+// Order Status Chart
+const statusCtx = document.getElementById('statusChart').getContext('2d');
+new Chart(statusCtx, {
+    type: 'doughnut',
+    data: {
+        labels: chartData.status_data.map(item => item.status),
+        datasets: [{
+            data: chartData.status_data.map(item => item.count),
+            backgroundColor: [
+                '#f59e0b', '#3b82f6', '#f59e0b', '#10b981', '#10b981',
+                '#ef4444', '#8b5cf6', '#06b6d4'
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    color: getComputedStyle(document.documentElement).getPropertyValue('--color-base-700'),
+                    usePointStyle: true,
+                    padding: 20
+                }
+            }
+        }
+    }
+});
+
+// Product Availability Chart
+const availabilityCtx = document.getElementById('availabilityChart').getContext('2d');
+new Chart(availabilityCtx, {
+    type: 'doughnut',
+    data: {
+        labels: chartData.availability_data.map(item => item.status),
+        datasets: [{
+            data: chartData.availability_data.map(item => item.count),
+            backgroundColor: ['#10b981', '#ef4444']
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    color: getComputedStyle(document.documentElement).getPropertyValue('--color-base-700'),
+                    usePointStyle: true,
+                    padding: 20
+                }
+            }
+        }
+    }
+});
+
+// Stock Levels Chart
+const stockCtx = document.getElementById('stockChart').getContext('2d');
+new Chart(stockCtx, {
+    type: 'bar',
+    data: {
+        labels: chartData.stock_data.map(item => item.level),
+        datasets: [{
+            label: 'Products',
+            data: chartData.stock_data.map(item => item.count),
+            backgroundColor: [
+                '#10b981', '#f59e0b', '#ef4444', '#6b7280'
+            ]
+        }]
+    },
+    options: {
+        ...commonOptions,
+        plugins: {
+            ...commonOptions.plugins,
+            title: {
+                display: true,
+                text: 'Stock Levels',
+                color: getComputedStyle(document.documentElement).getPropertyValue('--color-base-800')
+            }
+        }
+    }
+});
+
+// Site Traffic Chart
+const trafficCtx = document.getElementById('trafficChart').getContext('2d');
+new Chart(trafficCtx, {
+    type: 'line',
+    data: {
+        labels: chartData.traffic_trends.map(item => item.date),
+        datasets: [{
+            label: 'Daily Visitors',
+            data: chartData.traffic_trends.map(item => item.visitors),
+            borderColor: '#8b5cf6',
+            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+            tension: 0.4,
+            fill: true
+        }]
+    },
+    options: {
+        ...commonOptions,
+        plugins: {
+            ...commonOptions.plugins,
+            title: {
+                display: true,
+                text: 'Daily Site Traffic',
+                color: getComputedStyle(document.documentElement).getPropertyValue('--color-base-800')
+            }
+        }
+    }
+});
+
+// Auto-refresh every 5 minutes
+setInterval(() => {
+    window.location.reload();
+}, 300000);
+</script>
+{% endblock %} 

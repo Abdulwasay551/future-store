@@ -15,13 +15,12 @@ from django.templatetags.static import static
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 import os
-import environ
+from dotenv import load_dotenv
 import sys
 import socket
 
-# Initialize environ
-env = environ.Env()
-environ.Env.read_env()
+# Initialize dotenv
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -32,21 +31,21 @@ sys.path.append(str(BASE_DIR))
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env('DJANGO_SECRET_KEY', default='mobilecorner1212')
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', default='mobilecorner1212')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env.bool('DEBUG', default=False)  # Change this line
+DEBUG = os.getenv('DEBUG', default=False)  # Change this line
 
 # Development/Production environment settings
-DEVELOPMENT = env.bool('DEVELOPMENT', default=DEBUG)  # Default to DEBUG value
+DEVELOPMENT = os.getenv('DEVELOPMENT', default=DEBUG)  # Default to DEBUG value
 
 # Update ALLOWED_HOSTS based on environment
 if DEBUG:
-    ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
+    ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 else:
     # Production settings - include Vercel domains
     # Get from environment or use default production hosts
-    env_allowed_hosts = env.list('ALLOWED_HOSTS', default=[])
+    env_allowed_hosts = os.getenv('ALLOWED_HOSTS', default=[])
     if env_allowed_hosts:
         ALLOWED_HOSTS = env_allowed_hosts
     else:
@@ -85,10 +84,29 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
+    # Wagtail CMS apps
+    'wagtail.contrib.forms',
+    'wagtail.contrib.redirects',
+    'wagtail.embeds',
+    'wagtail.sites',
+    'wagtail.users',
+    'wagtail.snippets',
+    'wagtail.documents',
+    'wagtail.images',
+    'wagtail.search',
+    'wagtail.admin',
+    'wagtail',
+    # 'wagtail_modeladmin',  # Temporarily disabled due to compatibility issues
+    'wagtail.contrib.styleguide',
+    'modelcluster',
+    'taggit',
+    
     'social_django',  # Add social auth app
     'whitenoise.runserver_nostatic',
     'user_auth',  # 
     'store.apps.StoreConfig',
+    'cms_store.apps.CmsStoreConfig',  # New CMS app for store pages
     'chatbot.apps.ChatbotConfig',
     'inventory_erp.apps.InventoryErpConfig',
 ]
@@ -103,6 +121,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'social_django.middleware.SocialAuthExceptionMiddleware',
+    
+    # Wagtail middleware
+    'wagtail.contrib.redirects.middleware.RedirectMiddleware',
 ]
 
 ROOT_URLCONF = 'setting.urls'
@@ -119,6 +140,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'store.context_processors.categories_processor',
+                'cms_store.context_processors.cms_context',
             ],
         },
     },
@@ -131,13 +153,13 @@ WSGI_APPLICATION = 'setting.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {        
-        'ENGINE': env('DB_ENGINE', default='django.db.backends.postgresql'),
-        'NAME': env('DB_NAME', default='verceldb'),
-        'USER': env('DB_USER', default='default'),
-        'PASSWORD': env('DB_PASSWORD', default=''),
-        'HOST': env('DB_HOST', default=''),
-        'PORT': env('DB_PORT', default='5432'),
+    'default': {
+        'ENGINE': os.getenv('DB_ENGINE'),
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT'),
     }
 }
 
@@ -326,6 +348,12 @@ UNFOLD = {
                         "permission": lambda request: request.user.is_superuser,
                     },
                     {
+                        "title": _("Analytics Dashboard"),
+                        "icon": "analytics",  # Supported icon set: https://fonts.google.com/icons
+                        "link": reverse_lazy("admin_dashboard"),
+                        "permission": lambda request: request.user.is_superuser,
+                    },
+                    {
                         "title": _("Users"),
                         "icon": "people",
                         "badge": "Careful",
@@ -369,8 +397,8 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 # Google OAuth2 Configuration
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = env('GOOGLE_OAUTH2_KEY')
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env('GOOGLE_OAUTH2_SECRET')
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY =os.getenv('GOOGLE_OAUTH2_KEY', default='')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET =os.getenv('GOOGLE_OAUTH2_SECRET', default='')
 
 # Redirect to home page after successful social authentication
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
@@ -475,3 +503,17 @@ HANDLER404 = 'setting.urls.custom_404'
 HANDLER500 = 'setting.urls.custom_500'
 HANDLER403 = 'setting.urls.custom_403'
 HANDLER400 = 'setting.urls.custom_400'
+
+# Wagtail settings
+WAGTAIL_SITE_NAME = 'Mobile Corner CMS'
+WAGTAILIMAGES_IMAGE_MODEL = 'wagtailimages.Image'
+
+# Base URL to use when referring to full URLs within the Wagtail admin backend
+BASE_URL = 'http://localhost:8000' if DEBUG else 'https://mobilecorner.pk'
+WAGTAILADMIN_BASE_URL = BASE_URL
+
+# Wagtail email notifications from address
+WAGTAILADMIN_NOTIFICATION_FROM_EMAIL = EMAIL_HOST_USER
+
+# Reverse the default case-sensitive handling of tags
+TAGGIT_CASE_INSENSITIVE = True

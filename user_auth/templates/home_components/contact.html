@@ -5,10 +5,15 @@
     <div class="container mx-auto max-w-4xl">
         <div class="text-center mb-16">
             <h2 class="text-4xl md:text-5xl font-bold mb-4">
-                <span class="text-mc-white">GET IN </span>
-                <span class="text-gradient">TOUCH</span>
+                {% if cms_contact.page_title_part1 and cms_contact.page_title_part2 %}
+                    <span class="text-mc-white">{{ cms_contact.page_title_part1 }} </span>
+                    <span class="text-gradient">{{ cms_contact.page_title_part2 }}</span>
+                {% else %}
+                    <span class="text-mc-white">GET IN </span>
+                    <span class="text-gradient">TOUCH</span>
+                {% endif %}
             </h2>
-            <p class="text-mc-light-grey text-lg">Have questions? We'd love to hear from you.</p>
+            <p class="text-mc-light-grey text-lg">{% if cms_contact.page_description %}{{ cms_contact.page_description }}{% else %}Have questions? We'd love to hear from you.{% endif %}</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -55,15 +60,19 @@
             <!-- Contact Information -->
             <div class="space-y-8">
                 <div class="bg-mc-dark rounded-xl p-6 border border-mc-grey/30">
-                    <h3 class="text-xl font-bold text-mc-white mb-4">Contact Information</h3>
+                    <h3 class="text-xl font-bold text-mc-white mb-4">{% if cms_contact.contact_title %}{{ cms_contact.contact_title }}{% else %}Contact Information{% endif %}</h3>
                     <div class="space-y-4">
                         <div class="flex items-start space-x-4">
                             <div class="p-2 bg-mc-black rounded-lg">
                                 <i class="fas fa-map-marker-alt text-mc-accent"></i>
                             </div>
                             <div>
-                                <p class="text-mc-white font-medium">Address</p>
-                                <a href="https://maps.app.goo.gl/aCX6eRab7staFQMa9" class="text-mc-light-grey">Dubai Plaza, shop#13 basment, Bahawalpur, 63100</a>
+                                <p class="text-mc-white font-medium">{% if cms_contact.address_label %}{{ cms_contact.address_label }}{% else %}Address{% endif %}</p>
+                                {% if cms_contact.address_url %}
+                                <a href="{{ cms_contact.address_url }}" class="text-mc-light-grey">{% if cms_contact.address_text %}{{ cms_contact.address_text }}{% else %}Dubai Plaza, shop#13 basment, Bahawalpur, 63100{% endif %}</a>
+                                {% else %}
+                                <a href="https://maps.app.goo.gl/aCX6eRab7staFQMa9" class="text-mc-light-grey">{% if cms_contact.address_text %}{{ cms_contact.address_text }}{% else %}Dubai Plaza, shop#13 basment, Bahawalpur, 63100{% endif %}</a>
+                                {% endif %}
                             </div>
                         </div>
                         <div class="flex items-start space-x-4">
@@ -71,8 +80,8 @@
                                 <i class="fas fa-phone text-mc-accent"></i>
                             </div>
                             <div>
-                                <p class="text-mc-white font-medium">Phone</p>
-                                <a href="tel:+923009681212" class="text-mc-light-grey">+92 300 9681212</a> | <a href="tel:+923159682684" class="text-mc-light-grey">+92 315 9682684</a>
+                                <p class="text-mc-white font-medium">{% if cms_contact.phone_label %}{{ cms_contact.phone_label }}{% else %}Phone{% endif %}</p>
+                                <a href="tel:{% if cms_contact.phone1 %}{{ cms_contact.phone1 }}{% else %}+923009681212{% endif %}" class="text-mc-light-grey">{% if cms_contact.phone1 %}{{ cms_contact.phone1 }}{% else %}+92 300 9681212{% endif %}</a> | <a href="tel:{% if cms_contact.phone2 %}{{ cms_contact.phone2 }}{% else %}+923159682684{% endif %}" class="text-mc-light-grey">{% if cms_contact.phone2 %}{{ cms_contact.phone2 }}{% else %}+92 315 9682684{% endif %}</a>
                             </div>
                         </div>
                         <div class="flex items-start space-x-4">
@@ -80,8 +89,8 @@
                                 <i class="fas fa-envelope text-mc-accent"></i>
                             </div>
                             <div>
-                                <p class="text-mc-white font-medium">Email</p>
-                                <a href="mailto:mobilercornerbwp@gmail.com" class="text-mc-light-grey">mobilercornerbwp@gmail.com</a>
+                                <p class="text-mc-white font-medium">{% if cms_contact.email_label %}{{ cms_contact.email_label }}{% else %}Email{% endif %}</p>
+                                <a href="mailto:{% if cms_contact.email %}{{ cms_contact.email }}{% else %}mobilercornerbwp@gmail.com{% endif %}" class="text-mc-light-grey">{% if cms_contact.email %}{{ cms_contact.email }}{% else %}mobilercornerbwp@gmail.com{% endif %}</a>
                             </div>
                         </div>
                     </div>
@@ -89,19 +98,19 @@
 
                 <!-- Business Hours -->
                 <div class="bg-mc-dark rounded-xl p-6 border border-mc-grey/30">
-                    <h3 class="text-xl font-bold text-mc-white mb-4">Business Hours</h3>
+                    <h3 class="text-xl font-bold text-mc-white mb-4">{% if cms_contact.hours_title %}{{ cms_contact.hours_title }}{% else %}Business Hours{% endif %}</h3>
                     <div class="space-y-2">
                         <div class="flex justify-between">
-                            <span class="text-mc-light-grey">Monday - Thursday</span>
-                            <span class="text-mc-white">11:00 AM - 11:00 PM</span>
+                            <span class="text-mc-light-grey">{% if cms_contact.hours_weekdays_label %}{{ cms_contact.hours_weekdays_label }}{% else %}Monday - Thursday{% endif %}</span>
+                            <span class="text-mc-white">{% if cms_contact.hours_weekdays_time %}{{ cms_contact.hours_weekdays_time }}{% else %}11:00 AM - 11:00 PM{% endif %}</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-mc-light-grey">Saturday - Sunday</span>
-                            <span class="text-mc-white">12:00 PM - 11:00 PM</span>
+                            <span class="text-mc-light-grey">{% if cms_contact.hours_weekend_label %}{{ cms_contact.hours_weekend_label }}{% else %}Saturday - Sunday{% endif %}</span>
+                            <span class="text-mc-white">{% if cms_contact.hours_weekend_time %}{{ cms_contact.hours_weekend_time }}{% else %}12:00 PM - 11:00 PM{% endif %}</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-mc-light-grey">Friday</span>
-                            <span class="text-mc-white">Closed</span>
+                            <span class="text-mc-light-grey">{% if cms_contact.hours_friday_label %}{{ cms_contact.hours_friday_label }}{% else %}Friday{% endif %}</span>
+                            <span class="text-mc-white">{% if cms_contact.hours_friday_time %}{{ cms_contact.hours_friday_time }}{% else %}Closed{% endif %}</span>
                         </div>
                     </div>
                 </div>

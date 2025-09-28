@@ -3,9 +3,9 @@
         <div class="container mx-auto text-center">
             <div class="bg-mc-dark rounded-2xl p-12 max-w-4xl mx-auto border border-mc-grey/30">
                 <h2 class="text-3xl md:text-4xl font-bold mb-6 text-mc-white">
-                    STAY CONNECTED
+                    {% if cms_home.newsletter_title %}{{ cms_home.newsletter_title|upper }}{% else %}STAY CONNECTED{% endif %}
                 </h2>
-                <p class="text-mc-light-grey text-lg mb-8">Get exclusive deals and latest updates on mobile technology</p>
+                <p class="text-mc-light-grey text-lg mb-8">{% if cms_home.newsletter_description %}{{ cms_home.newsletter_description }}{% else %}Get exclusive deals and latest updates on mobile technology{% endif %}</p>
                 <div class="flex flex-col md:flex-row gap-4 justify-center max-w-md mx-auto">
                     <input type="email" placeholder="Your email address" 
                            class="flex-1 px-6 py-3 bg-mc-black border border-mc-grey rounded-lg focus:outline-none focus:border-mc-white text-mc-white placeholder-mc-light-grey">

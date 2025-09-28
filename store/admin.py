@@ -283,3 +283,6 @@ class ContactAdmin(admin.ModelAdmin):
     search_fields = ('name', 'email', 'subject', 'message')
     readonly_fields = ('created_at', 'updated_at')
     ordering = ('-created_at',)
+    fields = ['name', 'email', 'subject', 'message', 'status']
+
+
