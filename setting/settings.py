@@ -34,20 +34,20 @@ sys.path.append(str(BASE_DIR))
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', default='mobilecorner1212')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', default=False)  # Change this line
+DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
 # Development/Production environment settings
-DEVELOPMENT = os.getenv('DEVELOPMENT', default=DEBUG)  # Default to DEBUG value
+DEVELOPMENT = DEBUG
 
 # Update ALLOWED_HOSTS based on environment
-if DEBUG:
-    ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
+env_allowed_hosts = os.getenv('ALLOWED_HOSTS', '')
+if env_allowed_hosts:
+    # Split comma-separated string into list
+    ALLOWED_HOSTS = [host.strip() for host in env_allowed_hosts.split(',') if host.strip()]
 else:
-    # Production settings - include Vercel domains
-    # Get from environment or use default production hosts
-    env_allowed_hosts = os.getenv('ALLOWED_HOSTS', default=[])
-    if env_allowed_hosts:
-        ALLOWED_HOSTS = env_allowed_hosts
+    # Default hosts based on environment
+    if DEBUG:
+        ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
     else:
         ALLOWED_HOSTS = [
             'future-store-one.vercel.app',
@@ -59,13 +59,9 @@ else:
             '127.0.0.1',
         ]
 
-# Additional security check - ensure the current host is allowed
-try:
-    hostname = socket.gethostname()
-    if hostname not in ALLOWED_HOSTS and '*' not in ALLOWED_HOSTS:
-        ALLOWED_HOSTS.append(hostname)
-except:
-    pass
+# Ensure ALLOWED_HOSTS is always a list
+if not isinstance(ALLOWED_HOSTS, (list, tuple)):
+    ALLOWED_HOSTS = [str(ALLOWED_HOSTS)]
 
 
 # Application definition
