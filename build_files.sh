@@ -36,13 +36,25 @@ python3 manage.py collectstatic --noinput --verbosity=2
 
 # Verify Wagtail static files were collected
 echo "Verifying Wagtail static files..."
+echo "Contents of staticfiles directory:"
+ls -la staticfiles/
+
 if [ -d "staticfiles/wagtailadmin" ]; then
     echo "✓ Wagtail admin static files collected successfully"
-    ls -la staticfiles/wagtailadmin/
+    echo "Wagtail admin CSS files:"
+    ls -la staticfiles/wagtailadmin/css/ 2>/dev/null || echo "No CSS directory found"
+    echo "Wagtail admin JS files:"
+    ls -la staticfiles/wagtailadmin/js/ | head -10 2>/dev/null || echo "No JS directory found"
 else
     echo "⚠ WARNING: Wagtail admin static files not found!"
     echo "Available directories in staticfiles:"
     ls -la staticfiles/
 fi
+
+# Also verify critical files exist
+echo "Checking for critical Wagtail files:"
+test -f "staticfiles/wagtailadmin/css/core.css" && echo "✓ core.css found" || echo "✗ core.css missing"
+test -f "staticfiles/wagtailadmin/js/core.js" && echo "✓ core.js found" || echo "✗ core.js missing"
+test -f "staticfiles/wagtailadmin/js/icons.js" && echo "✓ icons.js found" || echo "✗ icons.js missing"
 
 echo "Build completed successfully!" 

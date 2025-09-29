@@ -109,7 +109,14 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware', 
+]
+
+# Add WhiteNoise middleware only if not on Vercel
+VERCEL_DEPLOYMENT = os.getenv('VERCEL', False) or os.getenv('VERCEL_ENV', False)
+if not DEVELOPMENT and not VERCEL_DEPLOYMENT:
+    MIDDLEWARE.append('whitenoise.middleware.WhiteNoiseMiddleware')
+
+MIDDLEWARE.extend([
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -120,7 +127,7 @@ MIDDLEWARE = [
     
     # Wagtail middleware
     'wagtail.contrib.redirects.middleware.RedirectMiddleware',
-]
+])
 
 ROOT_URLCONF = 'setting.urls'
 
@@ -214,18 +221,20 @@ if DEVELOPMENT:
         # Directory creation failed (e.g., read-only filesystem in production)
         pass
 
-# Enable WhiteNoise for static files
-if not DEVELOPMENT:
-    # In production, use WhiteNoise for static file serving
+# Static files storage configuration
+# Check if we're on Vercel (which handles static files itself)
+VERCEL_DEPLOYMENT = os.getenv('VERCEL', False) or os.getenv('VERCEL_ENV', False)
+
+if not DEVELOPMENT and not VERCEL_DEPLOYMENT:
+    # In production (non-Vercel), use WhiteNoise for static file serving
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
     # Add WhiteNoise configuration for better performance
     WHITENOISE_USE_FINDERS = True
     WHITENOISE_AUTOREFRESH = True
     WHITENOISE_INDEX_FILE = True
-
     WHITENOISE_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 else:
-    # In development, use default static files storage
+    # In development or Vercel, use default static files storage
     STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 # Media files
