@@ -47,7 +47,7 @@ if env_allowed_hosts:
 else:
     # Default hosts based on environment
     if DEBUG:
-        ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
+        ALLOWED_HOSTS = ['*']
     else:
         ALLOWED_HOSTS = [
             'future-store-one.vercel.app',
