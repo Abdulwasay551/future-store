@@ -18,6 +18,7 @@ sleep 2
 python3 manage.py makemigrations store --noinput
 python3 manage.py makemigrations user_auth --noinput
 python3 manage.py makemigrations inventory_erp --noinput
+python3 manage.py makemigrations cms_store --noinput
 sleep 2
 
 # Apply migrations
@@ -29,17 +30,19 @@ echo "Collecting static files..."
 rm -rf staticfiles/*
 mkdir -p staticfiles
 
-# Collect all static files including Django admin
-echo "Collecting Django static files..."
+# Collect all static files including Django admin and Wagtail
+echo "Collecting all static files (Django, Wagtail, and custom)..."
 python3 manage.py collectstatic --noinput --verbosity=2
 
-# Copy your custom static files (if they exist)
-echo "Copying custom static files..."
-if [ -d "static" ]; then
-    cp -r static/* staticfiles/
-    echo "✓ Custom static files copied"
+# Verify Wagtail static files were collected
+echo "Verifying Wagtail static files..."
+if [ -d "staticfiles/wagtailadmin" ]; then
+    echo "✓ Wagtail admin static files collected successfully"
+    ls -la staticfiles/wagtailadmin/
 else
-    echo "⚠ Custom static directory not found"
+    echo "⚠ WARNING: Wagtail admin static files not found!"
+    echo "Available directories in staticfiles:"
+    ls -la staticfiles/
 fi
 
 echo "Build completed successfully!" 
