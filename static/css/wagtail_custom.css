@@ -1,0 +1,26 @@
+/* Wagtail Custom Styles */
+
+/* This file is loaded by wagtail_hooks.py for Wagtail admin customization */
+
+/* Basic styling to prevent 404 errors */
+body.wagtail-admin {
+    /* Add any custom Wagtail admin styles here */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* You can add custom Wagtail admin styling here */
+.wagtail-admin-custom {
+    /* Custom styles for Wagtail admin interface */
+    margin: 0;
+}
+
+/* Example: Custom button styling */
+.button-custom {
+    background-color: #007cba;
+    border-color: #006ba6;
+}
+
+.button-custom:hover {
+    background-color: #006ba6;
+    border-color: #005a87;
+}

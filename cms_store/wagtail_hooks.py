@@ -16,7 +16,8 @@ def register_unfold_admin_menu_item():
 
 @hooks.register('insert_global_admin_css')
 def global_admin_css():
-    return format_html('<link rel="stylesheet" href="/static/css/wagtail_custom.css">')
+    from django.templatetags.static import static
+    return format_html('<link rel="stylesheet" href="{}">', static('css/wagtail_custom.css'))
 
 
 @hooks.register('construct_main_menu')
