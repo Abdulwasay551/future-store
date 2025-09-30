@@ -9,11 +9,11 @@
         <div class="text-center mb-16">
             <h1 class="text-5xl md:text-7xl font-bold mb-8 tracking-wider">
                 <span class="bg-gradient-to-r from-mc-white via-mc-accent to-mc-white bg-clip-text text-transparent">
-                    {% if cms_contact.title %}{{ cms_contact.title }}{% else %}CONTACT US{% endif %}
+                    {% if self.title %}{{ self.title }}{% else %}CONTACT US{% endif %}
                 </span>
             </h1>
             <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-mc-text">
-                {% if cms_contact.description %}{{ cms_contact.description }}{% else %}Get in touch with us for any inquiries about our products and services{% endif %}
+                {% if self.description %}{{ self.description }}{% else %}Get in touch with us for any inquiries about our products and services{% endif %}
             </p>
         </div>
 
@@ -48,14 +48,14 @@
             <div class="space-y-8">
                 <!-- Store Information -->
                 <div class="bg-mc-black rounded-2xl p-8 border border-mc-grey/30">
-                    <h3 class="text-xl font-bold text-mc-white mb-4">{% if cms_contact.store_info_title %}{{ cms_contact.store_info_title }}{% else %}Store Information{% endif %}</h3>
+                    <h3 class="text-xl font-bold text-mc-white mb-4">{% if self.store_info_title %}{{ self.store_info_title }}{% else %}Store Information{% endif %}</h3>
                     <div class="space-y-4">
                         <div class="flex items-start space-x-4">
                             <i class="fas fa-map-marker-alt text-mc-accent text-xl mt-1"></i>
                             <div>
                                 <p class="text-mc-white font-semibold">Address</p>
                                 <p class="text-mc-light-grey">
-                                    {% if cms_contact.address %}{{ cms_contact.address }}{% else %}123 Tech Street, Mobile Corner Plaza, Bahawalpur, Pakistan{% endif %}
+                                    {% if self.address %}{{ self.address }}{% else %}123 Tech Street, Mobile Corner Plaza, Bahawalpur, Pakistan{% endif %}
                                 </p>
                             </div>
                         </div>
@@ -64,7 +64,7 @@
                             <div>
                                 <p class="text-mc-white font-semibold">Phone</p>
                                 <p class="text-mc-light-grey">
-                                    {% if cms_contact.phone %}{{ cms_contact.phone }}{% else %}+92 300 1234567{% endif %}
+                                    {% if self.phone %}{{ self.phone }}{% else %}+92 300 1234567{% endif %}
                                 </p>
                             </div>
                         </div>
@@ -73,7 +73,7 @@
                             <div>
                                 <p class="text-mc-white font-semibold">Email</p>
                                 <p class="text-mc-light-grey">
-                                    {% if cms_contact.email %}{{ cms_contact.email }}{% else %}info@mobilecorner.pk{% endif %}
+                                    {% if self.email %}{{ self.email }}{% else %}info@mobilecorner.pk{% endif %}
                                 </p>
                             </div>
                         </div>
@@ -82,19 +82,19 @@
 
                 <!-- Business Hours -->
                 <div class="bg-mc-black rounded-2xl p-8 border border-mc-grey/30">
-                    <h3 class="text-xl font-bold text-mc-white mb-4">{% if cms_contact.hours_title %}{{ cms_contact.hours_title }}{% else %}Business Hours{% endif %}</h3>
+                    <h3 class="text-xl font-bold text-mc-white mb-4">{% if self.hours_title %}{{ self.hours_title }}{% else %}Business Hours{% endif %}</h3>
                     <div class="space-y-2">
                         <div class="flex justify-between">
-                            <span class="text-mc-light-grey">{% if cms_contact.hours_weekdays_label %}{{ cms_contact.hours_weekdays_label }}{% else %}Monday - Thursday{% endif %}</span>
-                            <span class="text-mc-white">{% if cms_contact.hours_weekdays_time %}{{ cms_contact.hours_weekdays_time }}{% else %}11:00 AM - 11:00 PM{% endif %}</span>
+                            <span class="text-mc-light-grey">{% if self.hours_weekdays_label %}{{ self.hours_weekdays_label }}{% else %}Monday - Thursday{% endif %}</span>
+                            <span class="text-mc-white">{% if self.hours_weekdays_time %}{{ self.hours_weekdays_time }}{% else %}11:00 AM - 11:00 PM{% endif %}</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-mc-light-grey">{% if cms_contact.hours_weekend_label %}{{ cms_contact.hours_weekend_label }}{% else %}Saturday - Sunday{% endif %}</span>
-                            <span class="text-mc-white">{% if cms_contact.hours_weekend_time %}{{ cms_contact.hours_weekend_time }}{% else %}12:00 PM - 11:00 PM{% endif %}</span>
+                            <span class="text-mc-light-grey">{% if self.hours_weekend_label %}{{ self.hours_weekend_label }}{% else %}Saturday - Sunday{% endif %}</span>
+                            <span class="text-mc-white">{% if self.hours_weekend_time %}{{ self.hours_weekend_time }}{% else %}12:00 PM - 11:00 PM{% endif %}</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-mc-light-grey">{% if cms_contact.hours_friday_label %}{{ cms_contact.hours_friday_label }}{% else %}Friday{% endif %}</span>
-                            <span class="text-mc-white">{% if cms_contact.hours_friday_time %}{{ cms_contact.hours_friday_time }}{% else %}Closed{% endif %}</span>
+                            <span class="text-mc-light-grey">{% if self.hours_friday_label %}{{ self.hours_friday_label }}{% else %}Friday{% endif %}</span>
+                            <span class="text-mc-white">{% if self.hours_friday_time %}{{ self.hours_friday_time }}{% else %}Closed{% endif %}</span>
                         </div>
                     </div>
                 </div>

@@ -15,7 +15,23 @@ def home(request):
     # Get featured products (newest and highest rated)
     from store.models import Product
     featured_products = Product.objects.filter(is_available=True).order_by('-created_at')[:3]
-    return render(request, 'index.html', {'featured_products': featured_products})
+    
+    # Import CMS models here to avoid circular imports
+    try:
+        from cms_store.models import HomePage
+        # Get the CMS home page content
+        home_page = HomePage.objects.live().first()
+        context = {'featured_products': featured_products}
+        if home_page:
+            # Use the same variable name that the template expects
+            context['cms_home'] = home_page
+            # Also use 'self' for Wagtail compatibility
+            context['self'] = home_page
+            context['page'] = home_page
+    except ImportError:
+        context = {'featured_products': featured_products}
+        
+    return render(request, 'index.html', context)
 
 def login_view(request):
     if request.method == 'POST':
@@ -92,9 +108,38 @@ def orders_view(request):
     })
 
 def about_view(request):
-    return render(request, 'about_us.html')
+    # Import CMS models here to avoid circular imports
+    try:
+        from cms_store.models import AboutPage
+        # Get the CMS about page content
+        about_page = AboutPage.objects.live().first()
+        context = {}
+        if about_page:
+            # Use the same variable name that the template expects
+            context['cms_about'] = about_page
+            # Also use 'self' for Wagtail compatibility
+            context['self'] = about_page
+            context['page'] = about_page
+    except ImportError:
+        context = {}
+    return render(request, 'about_us.html', context)
 
 def contact(request):
+    # Import CMS models here to avoid circular imports
+    try:
+        from cms_store.models import ContactPage
+        # Get the CMS contact page content
+        contact_page = ContactPage.objects.live().first()
+        context = {}
+        if contact_page:
+            # Use the same variable name that the template expects
+            context['cms_contact'] = contact_page
+            # Also use 'self' for Wagtail compatibility
+            context['self'] = contact_page
+            context['page'] = contact_page
+    except ImportError:
+        context = {}
+    
     if request.method == 'POST':
         name = request.POST.get('name')
         email = request.POST.get('email')
@@ -113,5 +158,5 @@ def contact(request):
         else:
             messages.error(request, 'Please fill in all fields')
     
-    return render(request, 'home_components/contact.html')
+    return render(request, 'home_components/contact.html', context)
 

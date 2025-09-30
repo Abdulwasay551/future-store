@@ -249,6 +249,27 @@ class Testimonial(models.Model):
     ]
 
 
+class CustomerReview(models.Model):
+    """Customer reviews for testimonials section"""
+    page = ParentalKey('AboutPage', on_delete=models.CASCADE, related_name='customer_reviews')
+    customer_name = models.CharField(max_length=100)
+    customer_image_url = models.URLField(blank=True, help_text="Customer photo URL")
+    review_text = models.TextField()
+    rating = models.IntegerField(default=5, help_text="Rating out of 5")
+    order = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ['order']
+
+    panels = [
+        FieldPanel('customer_name'),
+        FieldPanel('customer_image_url'),
+        FieldPanel('review_text'),
+        FieldPanel('rating'),
+        FieldPanel('order'),
+    ]
+
+
 # Home Page
 class HomePage(CMSBasePage):
     """CMS Home Page - manages the main landing page content"""
@@ -350,37 +371,54 @@ class AboutPage(CMSBasePage):
     )
     
     # Stats Section
-    stats_customers_count = models.IntegerField(default=10000)
-    stats_products_count = models.IntegerField(default=500)
-    stats_years_experience = models.IntegerField(default=10)
-    stats_brands_count = models.IntegerField(default=15)
+    stats_title = models.CharField(max_length=100, default="BY THE NUMBERS")
+    stats_description = models.TextField(default="Our achievements speak for themselves. Here's what we've accomplished together with our amazing customers and partners.")
+    stats_customers_count = models.IntegerField(default=50000)
+    stats_customers_label = models.CharField(max_length=50, default="Happy Customers")
+    stats_products_count = models.IntegerField(default=100000)
+    stats_products_label = models.CharField(max_length=50, default="Products Sold")
+    stats_years_experience = models.IntegerField(default=6)
+    stats_years_label = models.CharField(max_length=50, default="Years Experience")
+    stats_support_text = models.CharField(max_length=20, default="24/7")
+    stats_support_label = models.CharField(max_length=50, default="Support")
     
     # Gallery Section
-    gallery_title = models.CharField(max_length=100, default="Store Gallery")
-    gallery_description = models.TextField(default="Take a look at our premium store and facilities")
+    gallery_title_part1 = models.CharField(max_length=100, default="OUR")
+    gallery_title_part2 = models.CharField(max_length=100, default="SHOWROOM")
+    gallery_description = models.TextField(default="Step inside our modern showroom and experience the future of mobile technology")
     virtual_tour_url = models.URLField(blank=True, help_text="Virtual tour URL")
+    virtual_tour_button_text = models.CharField(max_length=50, default="Take Virtual Tour")
     
     # Mission & Vision
-    mission_title = models.CharField(max_length=100, default="Our Mission")
-    mission_content = RichTextField(blank=True)
-    vision_title = models.CharField(max_length=100, default="Our Vision")
-    vision_content = RichTextField(blank=True)
+    mission_vision_title_part1 = models.CharField(max_length=100, default="OUR")
+    mission_vision_title_part2 = models.CharField(max_length=100, default="MISSION")
+    mission_title = models.CharField(max_length=100, default="MISSION")
+    mission_content = RichTextField(default="To democratize access to premium mobile technology by providing authentic, high-quality devices and exceptional customer service that exceeds expectations. We strive to be the bridge between cutting-edge technology and the Pakistani market.")
+    vision_title = models.CharField(max_length=100, default="VISION")
+    vision_content = RichTextField(default="To become Pakistan's leading mobile technology retailer, known for innovation, trust, and customer-centricity. We envision a future where every Pakistani has access to the latest mobile technology to enhance their digital lifestyle.")
     
     # Why Choose Us Section
-    why_choose_title = models.CharField(max_length=100, default="Why Choose Us")
-    why_choose_description = models.TextField(default="Discover what makes us the preferred choice for mobile technology")
+    why_choose_title_part1 = models.CharField(max_length=100, default="WHY CHOOSE")
+    why_choose_title_part2 = models.CharField(max_length=100, default="MOBILE CORNER")
+    why_choose_description = models.TextField(default="Experience the difference that sets us apart")
     
     # Testimonials Section
-    testimonials_title = models.CharField(max_length=100, default="What Our Customers Say")
-    testimonials_description = models.TextField(default="Real experiences from real customers")
+    testimonials_title_part1 = models.CharField(max_length=100, default="WHAT OUR")
+    testimonials_title_part2 = models.CharField(max_length=100, default="CUSTOMERS SAY")
+    testimonials_description = models.TextField(default="Real stories from real customers who have experienced the Mobile Corner difference")
     testimonials_video_url = models.URLField(blank=True, help_text="Customer testimonials video URL")
     
     # Location Section
-    location_title = models.CharField(max_length=100, default="Visit Our Store")
+    location_title = models.CharField(max_length=100, default="VISIT US")
+    location_description = models.TextField(default="Located in the heart of Bahawalpur, our store is your gateway to the latest mobile technology. Visit us for hands-on experience with our products and personalized assistance from our expert team.")
+    location_address_label = models.CharField(max_length=50, default="Address")
     location_address = models.TextField(default="Dubai Plaza, shop#13 basement, Bahawalpur, 63100")
+    location_phone_label = models.CharField(max_length=50, default="Phone")
     location_phone1 = models.CharField(max_length=20, default="+92 300 9681212")
     location_phone2 = models.CharField(max_length=20, default="+92 315 9682684")
+    location_email_label = models.CharField(max_length=50, default="Email")
     location_email = models.EmailField(default="mobilercornerbwp@gmail.com")
+    location_hours_label = models.CharField(max_length=50, default="Business Hours")
     location_maps_url = models.URLField(blank=True, help_text="Google Maps URL")
     
     # Business Hours
@@ -389,10 +427,12 @@ class AboutPage(CMSBasePage):
     hours_friday = models.CharField(max_length=50, default="Closed")
     
     # CTA Section
-    cta_title = models.CharField(max_length=100, default="Ready to Get Started?")
-    cta_description = models.TextField(default="Join thousands of satisfied customers who trust Mobile Corner")
-    cta_button_text = models.CharField(max_length=50, default="Shop Now")
-    cta_button_url = models.URLField(blank=True)
+    cta_title = models.CharField(max_length=100, default="READY TO EXPERIENCE THE DIFFERENCE?")
+    cta_description = models.TextField(default="Join thousands of satisfied customers who have made Mobile Corner their trusted tech partner.")
+    cta_button1_text = models.CharField(max_length=50, default="Shop Now")
+    cta_button1_url = models.URLField(blank=True, help_text="First CTA button URL")
+    cta_button2_text = models.CharField(max_length=50, default="Contact Us")
+    cta_button2_url = models.URLField(blank=True, help_text="Second CTA button URL")
     
     content_panels = Page.content_panels + [
         MultiFieldPanel([
@@ -419,40 +459,58 @@ class AboutPage(CMSBasePage):
             InlinePanel('brand_logos', label="Brand Logos"),
         ], heading='Partners Section'),
         MultiFieldPanel([
+            FieldPanel('stats_title'),
+            FieldPanel('stats_description'),
             FieldPanel('stats_customers_count'),
+            FieldPanel('stats_customers_label'),
             FieldPanel('stats_products_count'),
+            FieldPanel('stats_products_label'),
             FieldPanel('stats_years_experience'),
-            FieldPanel('stats_brands_count'),
+            FieldPanel('stats_years_label'),
+            FieldPanel('stats_support_text'),
+            FieldPanel('stats_support_label'),
         ], heading='Statistics'),
         MultiFieldPanel([
-            FieldPanel('gallery_title'),
+            FieldPanel('gallery_title_part1'),
+            FieldPanel('gallery_title_part2'),
             FieldPanel('gallery_description'),
             FieldPanel('virtual_tour_url'),
+            FieldPanel('virtual_tour_button_text'),
             InlinePanel('gallery_images', label="Gallery Images"),
         ], heading='Gallery Section'),
         MultiFieldPanel([
+            FieldPanel('mission_vision_title_part1'),
+            FieldPanel('mission_vision_title_part2'),
             FieldPanel('mission_title'),
             FieldPanel('mission_content'),
             FieldPanel('vision_title'),
             FieldPanel('vision_content'),
         ], heading='Mission & Vision'),
         MultiFieldPanel([
-            FieldPanel('why_choose_title'),
+            FieldPanel('why_choose_title_part1'),
+            FieldPanel('why_choose_title_part2'),
             FieldPanel('why_choose_description'),
             InlinePanel('why_choose_us_items', label="Why Choose Us Items"),
         ], heading='Why Choose Us Section'),
         MultiFieldPanel([
-            FieldPanel('testimonials_title'),
+            FieldPanel('testimonials_title_part1'),
+            FieldPanel('testimonials_title_part2'),
             FieldPanel('testimonials_description'),
             FieldPanel('testimonials_video_url'),
-            InlinePanel('testimonials', label="Testimonials"),
+            InlinePanel('testimonials', label="Main Testimonials"),
+            InlinePanel('customer_reviews', label="Customer Reviews"),
         ], heading='Testimonials Section'),
         MultiFieldPanel([
             FieldPanel('location_title'),
+            FieldPanel('location_description'),
+            FieldPanel('location_address_label'),
             FieldPanel('location_address'),
+            FieldPanel('location_phone_label'),
             FieldPanel('location_phone1'),
             FieldPanel('location_phone2'),
+            FieldPanel('location_email_label'),
             FieldPanel('location_email'),
+            FieldPanel('location_hours_label'),
             FieldPanel('location_maps_url'),
         ], heading='Location & Contact'),
         MultiFieldPanel([
@@ -463,8 +521,10 @@ class AboutPage(CMSBasePage):
         MultiFieldPanel([
             FieldPanel('cta_title'),
             FieldPanel('cta_description'),
-            FieldPanel('cta_button_text'),
-            FieldPanel('cta_button_url'),
+            FieldPanel('cta_button1_text'),
+            FieldPanel('cta_button1_url'),
+            FieldPanel('cta_button2_text'),
+            FieldPanel('cta_button2_url'),
         ], heading='Call to Action'),
     ]
     

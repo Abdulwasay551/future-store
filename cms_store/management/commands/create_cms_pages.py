@@ -97,13 +97,46 @@ class Command(BaseCommand):
                 slug='about',
                 hero_title_part1='ABOUT',
                 hero_title_part2='MOBILE CORNER',
-                hero_description='Your trusted partner in mobile technology since day one',
-                story_content='<p>Mobile Corner has been serving customers in Bahawalpur for over a decade, providing premium mobile devices and exceptional service. We pride ourselves on offering authentic products, competitive prices, and unmatched customer support.</p>',
-                mission_content='<p>To provide our customers with the latest mobile technology at competitive prices while ensuring exceptional service and support.</p>',
-                vision_content='<p>To become the leading mobile technology retailer in the region, known for trust, quality, and innovation.</p>',
+                hero_description='Leading Mobile Technology Hub in Bahawalpur',
+                
+                # Statistics
+                stats_customers_count=10000,
+                stats_customers_label='Happy Customers',
+                stats_products_count=25000,
+                stats_products_label='Devices Sold',
+                stats_years_experience=12,
+                stats_years_label='Years Experience',
+                stats_support_text='99%',
+                stats_support_label='Service Rate',
+                
+                # Mission & Vision
+                mission_title='Our Mission',
+                mission_content='<p>To provide cutting-edge mobile technology solutions that enhance connectivity and productivity for our customers while maintaining the highest standards of service and authenticity.</p>',
+                vision_title='Our Vision',
+                vision_content='<p>To be the most trusted and preferred destination for mobile technology in Punjab, known for innovation, quality, and exceptional customer experience.</p>',
+                
+                # Location Section
+                location_title='Visit Our Store',
+                location_description='Located in the heart of Bahawalpur, our modern showroom offers a comprehensive range of mobile devices and accessories.',
+                location_phone1='+92 300 9681212',
+                location_phone2='+92 315 9682684',
+                location_email='mobilercornerbwp@gmail.com',
+                location_address='Dubai Plaza, shop#13 basement, Bahawalpur, 63100',
+                hours_monday_thursday='11:00 AM - 11:00 PM',
+                hours_saturday_sunday='12:00 PM - 11:00 PM',
+                hours_friday='Closed',
+                
+                # CTA Section
+                cta_title='READY TO EXPERIENCE THE DIFFERENCE?',
+                cta_description='Join thousands of satisfied customers who have made Mobile Corner their trusted tech partner.',
+                cta_button1_text='SHOP NOW',
+                cta_button1_url='https://mobilecorner.pk/store/',
+                cta_button2_text='CONTACT US',
+                cta_button2_url='https://mobilecorner.pk/contact/',
+                
                 # SEO fields
-                search_description='Learn about Mobile Corner - Bahawalpur\'s trusted mobile phone store with over 10 years of experience in mobile technology.',
-                keywords='mobile corner about, mobile shop bahawalpur, mobile store history, authentic mobile phones',
+                search_description='Learn about Mobile Corner Bahawalpur - Your trusted mobile technology partner with 12+ years of experience, 10,000+ happy customers, and premium device selection.',
+                keywords='about mobile corner, mobile shop bahawalpur, mobile store history, trusted mobile retailer, mobile corner story',
             )
             home_page.add_child(instance=about_page)
             self.stdout.write(self.style.SUCCESS(f'Created about page: {about_page.title}'))

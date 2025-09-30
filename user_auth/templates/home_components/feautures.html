@@ -3,16 +3,16 @@
         <div class="container mx-auto">
             <div class="text-center mb-16">
                 <h2 class="text-4xl md:text-5xl font-bold mb-4">
-                    <span class="text-mc-white">{% if cms_home.features_section_title %}{{ cms_home.features_section_title }}{% else %}WHY CHOOSE MOBILE CORNER{% endif %}</span>
+                    <span class="text-mc-white">{% if self.features_section_title %}{{ self.features_section_title }}{% else %}WHY CHOOSE MOBILE CORNER{% endif %}</span>
                 </h2>
-                {% if cms_home.features_section_description %}
-                <p class="text-mc-light-grey text-lg">{{ cms_home.features_section_description }}</p>
+                {% if self.features_section_description %}
+                <p class="text-mc-light-grey text-lg">{{ self.features_section_description }}</p>
                 {% endif %}
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {% if cms_home.features.all %}
-                    {% for feature in cms_home.features.all %}
+                {% if self.features.all %}
+                    {% for feature in self.features.all %}
                     <div class="text-center group">
                         <div class="w-20 h-20 bg-mc-white rounded-full mx-auto mb-6 flex items-center justify-center animate-float" style="animation-delay: {{ forloop.counter0|add:0.5 }}s;">
                             <i class="fas fa-{{ feature.icon }} text-2xl text-mc-black"></i>

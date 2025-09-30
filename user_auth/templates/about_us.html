@@ -9,8 +9,8 @@
     <!-- Background Video -->
     <div class="absolute inset-0 overflow-hidden">
         <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover opacity-30">
-            {% if cms_about.hero_background_video_url %}
-            <source src="{{ cms_about.hero_background_video_url }}" type="video/mp4">
+            {% if self.hero_background_video_url %}
+            <source src="{{ self.hero_background_video_url }}" type="video/mp4">
             {% else %}
             <source src="{% static 'videos/tech-hero-bg.mp4' %}" type="video/mp4">
             {% endif %}
@@ -22,11 +22,11 @@
     <div class="absolute inset-0 bg-gradient-to-br from-mc-black/50 to-mc-dark/50 overflow-hidden">
         <!-- Animated background patterns -->
         <div class="absolute inset-0 opacity-5">
-            <div class="absolute inset-0 bg-repeat pattern-grid dark:opacity-20 light:opacity-10"></div>
+            <div class="absolute bg-transparent/40 inset-0 bg-repeat pattern-grid dark:opacity-20 light:opacity-10"></div>
         </div>
         <!-- Animated Circles -->
-        <div class="absolute top-20 left-10 w-64 h-96 bg-mc-accent/10 rounded-full filter blur-3xl animate-float"></div>
-        <div class="absolute bottom-20 right-10 w-96 h-96 bg-mc-accent/10 rounded-full filter blur-3xl animate-float" style="animation-delay: 1s"></div>
+        <div class="absolute bg-transparent/40 top-20 left-10 w-64 h-96 bg-mc-accent/10 rounded-full filter blur-3xl animate-float"></div>
+        <div class="absolute bg-transparent/20 bottom-20 right-10 w-96 h-96 bg-mc-accent/10 rounded-full filter blur-3xl animate-float" style="animation-delay: 1s"></div>
     </div>
 
    <!-- Content -->
@@ -36,15 +36,15 @@
             <div class="animate-fade-in">
                 <h1 class="text-5xl md:text-7xl font-bold mb-8 tracking-wider">
                     <span class="bg-gradient-to-r from-mc-white via-mc-accent to-mc-white bg-clip-text text-transparent">
-                        {% if cms_about.hero_title_part1 and cms_about.hero_title_part2 %}
-                            {{ cms_about.hero_title_part1 }} {{ cms_about.hero_title_part2 }}
+                        {% if self.hero_title_part1 and self.hero_title_part2 %}
+                            {{ self.hero_title_part1 }} {{ self.hero_title_part2 }}
                         {% else %}
                             ABOUT US
                         {% endif %}
                     </span>
                 </h1>
                 <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-mc-text">
-                    {% if cms_about.hero_description %}{{ cms_about.hero_description }}{% else %}Discover the story behind Mobile Corner - Your trusted technology partner{% endif %}
+                    {% if self.hero_description %}{{ self.hero_description }}{% else %}Discover the story behind Mobile Corner - Your trusted technology partner{% endif %}
                 </p>
             </div>
         </div>
@@ -56,17 +56,17 @@
     <div class="container mx-auto">
         <div class="text-center mb-16">
             <h2 class="text-4xl md:text-5xl font-bold mb-6">
-                <span class="text-mc-white">{% if cms_about.certifications_title_part1 %}{{ cms_about.certifications_title_part1 }}{% else %}OFFICIAL{% endif %} </span>
-                <span class="text-mc-accent">{% if cms_about.certifications_title_part2 %}{{ cms_about.certifications_title_part2 }}{% else %}CERTIFICATIONS{% endif %}</span>
+                <span class="text-mc-white">{% if self.certifications_title_part1 %}{{ self.certifications_title_part1 }}{% else %}OFFICIAL{% endif %} </span>
+                <span class="text-mc-accent">{% if self.certifications_title_part2 %}{{ self.certifications_title_part2 }}{% else %}CERTIFICATIONS{% endif %}</span>
             </h2>
             <p class="text-mc-light-grey text-lg max-w-2xl mx-auto">
-                {% if cms_about.certifications_description %}{{ cms_about.certifications_description }}{% else %}Authorized dealer and certified partner of leading technology brands{% endif %}
+                {% if self.certifications_description %}{{ self.certifications_description }}{% else %}Authorized dealer and certified partner of leading technology brands{% endif %}
             </p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-            {% if cms_about.certifications.all %}
-                {% for cert in cms_about.certifications.all %}
+            {% if self.certifications.all %}
+                {% for cert in self.certifications.all %}
                 <div class="bg-mc-black rounded-2xl p-8 border border-mc-grey/30 card-hover animate-slide-up text-center" {% if forloop.counter0 > 0 %}style="animation-delay: {{ forloop.counter0|add:1|floatformat:0 }}00ms;"{% endif %}>
                     <div class="mb-6">
                         {% if cert.icon %}
@@ -186,11 +186,11 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div class="animate-slide-up">
                 <h2 class="text-4xl md:text-5xl font-bold mb-6 dark:text-white/80">
-                    {% if cms_about.story_title %}{{ cms_about.story_title }}{% else %}OUR STORY{% endif %}
+                    {% if self.story_title %}{{ self.story_title }}{% else %}OUR STORY{% endif %}
                 </h2>
-                {% if cms_about.story_content %}
+                {% if self.story_content %}
                     <div class="text-mc-light-grey text-lg leading-relaxed">
-                        {{ cms_about.story_content|safe }}
+                        {{ self.story_content|safe }}
                     </div>
                 {% else %}
                     <p class="text-mc-light-grey text-lg mb-6 leading-relaxed">
@@ -208,20 +208,18 @@
             <!-- Company Video -->
             <div class="animate-slide-up" style="animation-delay: 300ms;">
                 <div class="relative rounded-2xl overflow-hidden bg-mc-black border border-mc-grey/30">
-                    {% if cms_about.story_video %}
+                    {% if self.story_video_url %}
                     <video controls 
-                           poster="{% if cms_about.story_video_thumbnail %}{{ cms_about.story_video_thumbnail.url }}{% else %}{% static 'videos/company-story-thumb.jpg' %}{% endif %}" 
-                           class="w-full aspect-video rounded-2xl bg-mc-black"
-                           preload="metadata">
-                        <source src="{{ cms_about.story_video.url }}" type="video/mp4">
+                           preload="metadata"
+                           class="w-full aspect-video rounded-2xl bg-mc-black video-player">
+                        <source src="{{ self.story_video_url }}" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
                     {% else %}
                     <video controls 
-                           poster="{% static 'videos/company-story-thumb.jpg' %}" 
-                           class="w-full aspect-video rounded-2xl bg-mc-black"
-                           preload="metadata">
-                        <source src="https://scontent-ams2-1.cdninstagram.com/o1/v/t2/f2/m86/AQMpT4mc-Tz68r7dM9XpmbmGyk_XlYKfVpay-qVma6D20jZhj9SwrA6kkHmuhWc5Z7S_LFXiWzPPfjhE2-53gvcgIPdqfm0W83PyWSk.mp4?_nc_cat=100&_nc_sid=5e9851&_nc_ht=scontent-ams2-1.cdninstagram.com&_nc_ohc=SMWwEPkoyz0Q7kNvwE698gU&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6MTIwNDEyNDg1NDM1MjI3NSwidmlfdXNlY2FzZV9pZCI6MTAwOTksImR1cmF0aW9uX3MiOjE5LCJ1cmxnZW5fc291cmNlIjoid3d3In0%3D&ccb=17-1&vs=fad498cb9a113957&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC82NzRFMUVBMTZGNzU0MzhFM0RBREE0MTY4NjcxRUI4MF92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYOnBhc3N0aHJvdWdoX2V2ZXJzdG9yZS9HSnktQ1I3TnliQXpZQUVFQVB0dXNHQVF3cGdYYnFfRUFBQUYVAgLIARIAKAAYABsCiAd1c2Vfb2lsATEScHJvZ3Jlc3NpdmVfcmVjaXBlATEVAAAmpuaro6XJowQVAigCQzMsF0AzAAAAAAAAGBJkYXNoX2Jhc2VsaW5lXzFfdjERAHX-B2XmnQEA&_nc_gid=ke2d4S5N0HLGJmWWhr9rRA&_nc_zt=28&oh=00_Afa1vPk7ww5GE0L6Sn_4EOtmsqNDSvXytZUhdKT1A4B9yA&oe=68DE141D" type="video/mp4">
+                           preload="metadata"
+                           class="w-full aspect-video rounded-2xl bg-mc-black video-player">
+                        <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
                     {% endif %}
@@ -243,18 +241,18 @@
     <div class="container mx-auto">
         <div class="text-center mb-16">
             <h2 class="text-4xl md:text-5xl font-bold mb-6">
-                <span class="text-mc-white">{% if cms_about.partners_title_part1 %}{{ cms_about.partners_title_part1 }}{% else %}TRUSTED BY{% endif %} </span>
-                <span class="text-mc-accent">{% if cms_about.partners_title_part2 %}{{ cms_about.partners_title_part2 }}{% else %}LEADING BRANDS{% endif %}</span>
+                <span class="text-mc-white">{% if self.partners_title_part1 %}{{ self.partners_title_part1 }}{% else %}TRUSTED BY{% endif %} </span>
+                <span class="text-mc-accent">{% if self.partners_title_part2 %}{{ self.partners_title_part2 }}{% else %}LEADING BRANDS{% endif %}</span>
             </h2>
             <p class="text-mc-light-grey text-lg max-w-2xl mx-auto">
-                {% if cms_about.partners_description %}{{ cms_about.partners_description }}{% else %}We partner with the world's most innovative technology companies to bring you the best products{% endif %}
+                {% if self.partners_description %}{{ self.partners_description }}{% else %}We partner with the world's most innovative technology companies to bring you the best products{% endif %}
             </p>
         </div>
 
         <!-- Brand Logos Grid -->
         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 mb-16">
-            {% if cms_about.brand_logos.all %}
-                {% for logo in cms_about.brand_logos.all %}
+            {% if self.brand_logos.all %}
+                {% for logo in self.brand_logos.all %}
                 <div class="dark:bg-mc-dark bg-black rounded-xl p-6 flex items-center justify-center h-24 card-hover animate-slide-up" {% if forloop.counter0 > 0 %}style="animation-delay: {{ forloop.counter0|add:1 }}00ms;"{% endif %}>
                     <img src="{{ logo.logo.url }}" alt="{{ logo.name }}" class="max-h-12 max-w-full object-contain filter brightness-0 invert opacity-70 hover:opacity-100 transition-opacity">
                 </div>
@@ -317,10 +315,10 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div class="animate-slide-up">
                 <h2 class="text-4xl md:text-5xl font-bold mb-6 dark:text-white/80">
-                    BY THE NUMBERS
+                    {% if self.stats_title %}{{ self.stats_title }}{% else %}BY THE NUMBERS{% endif %}
                 </h2>
                 <p class="text-mc-light-grey text-lg mb-8 leading-relaxed">
-                    Our achievements speak for themselves. Here's what we've accomplished together with our amazing customers and partners.
+                    {% if self.stats_description %}{{ self.stats_description }}{% else %}Our achievements speak for themselves. Here's what we've accomplished together with our amazing customers and partners.{% endif %}
                 </p>
             </div>
             
@@ -329,20 +327,20 @@
                 <div class="bg-mc-black rounded-2xl p-8 border border-mc-grey/30 card-hover">
                     <div class="grid grid-cols-2 gap-6">
                         <div class="text-center">
-                            <div class="text-4xl font-bold text-mc-white mb-2 counter" data-target="50000">0</div>
-                            <div class="text-mc-light-grey">Happy Customers</div>
+                            <div class="text-4xl font-bold text-mc-white mb-2 counter" data-target="{% if self.stats_customers_count %}{{ self.stats_customers_count }}{% else %}50000{% endif %}">0</div>
+                            <div class="text-mc-light-grey">{% if self.stats_customers_label %}{{ self.stats_customers_label }}{% else %}Happy Customers{% endif %}</div>
                         </div>
                         <div class="text-center">
-                            <div class="text-4xl font-bold text-mc-white mb-2 counter" data-target="100000">0</div>
-                            <div class="text-mc-light-grey">Products Sold</div>
+                            <div class="text-4xl font-bold text-mc-white mb-2 counter" data-target="{% if self.stats_products_count %}{{ self.stats_products_count }}{% else %}100000{% endif %}">0</div>
+                            <div class="text-mc-light-grey">{% if self.stats_products_label %}{{ self.stats_products_label }}{% else %}Products Sold{% endif %}</div>
                         </div>
                         <div class="text-center">
-                            <div class="text-4xl font-bold text-mc-white mb-2 counter" data-target="{% now 'Y' as current_year %}{{ current_year|add:'-2019' }}">0</div>
-                            <div class="text-mc-light-grey">Years Experience</div>
+                            <div class="text-4xl font-bold text-mc-white mb-2 counter" data-target="{% if self.stats_years_experience %}{{ self.stats_years_experience }}{% else %}6{% endif %}">0</div>
+                            <div class="text-mc-light-grey">{% if self.stats_years_label %}{{ self.stats_years_label }}{% else %}Years Experience{% endif %}</div>
                         </div>
                         <div class="text-center">
-                            <div class="text-4xl font-bold text-mc-white mb-2">24/7</div>
-                            <div class="text-mc-light-grey">Support</div>
+                            <div class="text-4xl font-bold text-mc-white mb-2">{% if self.stats_support_text %}{{ self.stats_support_text }}{% else %}24/7{% endif %}</div>
+                            <div class="text-mc-light-grey">{% if self.stats_support_label %}{{ self.stats_support_label }}{% else %}Support{% endif %}</div>
                         </div>
                     </div>
                 </div>
@@ -356,89 +354,112 @@
     <div class="container mx-auto">
         <div class="text-center mb-16">
             <h2 class="text-4xl md:text-5xl font-bold mb-6">
-                <span class="text-mc-white">OUR </span>
-                <span class="text-mc-accent">SHOWROOM</span>
+                <span class="text-mc-white">{% if self.gallery_title_part1 %}{{ self.gallery_title_part1 }}{% else %}OUR{% endif %} </span>
+                <span class="text-mc-accent">{% if self.gallery_title_part2 %}{{ self.gallery_title_part2 }}{% else %}SHOWROOM{% endif %}</span>
             </h2>
             <p class="text-mc-light-grey text-lg max-w-2xl mx-auto">
-                Step inside our modern showroom and experience the future of mobile technology
+                {% if self.gallery_description %}{{ self.gallery_description }}{% else %}Step inside our modern showroom and experience the future of mobile technology{% endif %}
             </p>
         </div>
 
         <!-- Gallery Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            <div class="group cursor-pointer animate-slide-up">
-                <div class="relative overflow-hidden rounded-2xl">
-                    <img src="{% static 'about (1).jpg' %}" 
-                         alt="Store Front" 
-                         class="w-full h-96 object-cover group-hover:scale-110 transition-transform duration-500">
-                    <div class="absolute inset-0 bg-gradient-to-t from-mc-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
-                        <p class="text-white w-full backdrop-blur-3xl bg-black/10 dark:bg-white/10 p-4 font-semibold">Modern Store Front</p>
+            {% if self.gallery_images.all %}
+                {% for image in self.gallery_images.all %}
+                <div class="group cursor-pointer animate-slide-up" {% if forloop.counter0 > 0 %}style="animation-delay: {{ forloop.counter0|add:1|mul:200 }}ms;"{% endif %}>
+                    <div class="relative overflow-hidden rounded-2xl">
+                        <img src="{{ image.image_url }}" 
+                             alt="{{ image.title }}" 
+                             class="w-full h-96 object-cover group-hover:scale-110 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-mc-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                            <p class="text-white w-full backdrop-blur-3xl bg-black/10 dark:bg-white/10 p-4 font-semibold">{{ image.title }}</p>
+                        </div>
                     </div>
                 </div>
-            </div>
+                {% endfor %}
+            {% else %}
+                <!-- Fallback content -->
+                <div class="group cursor-pointer animate-slide-up">
+                    <div class="relative overflow-hidden rounded-2xl">
+                        <img src="{% static 'about (1).jpg' %}" 
+                             alt="Store Front" 
+                             class="w-full h-96 object-cover group-hover:scale-110 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-mc-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                            <p class="text-white w-full backdrop-blur-3xl bg-black/10 dark:bg-white/10 p-4 font-semibold">Modern Store Front</p>
+                        </div>
+                    </div>
+                </div>
 
-            <div class="group cursor-pointer animate-slide-up" style="animation-delay: 200ms;">
-                <div class="relative overflow-hidden rounded-2xl">
-                    <img src="{% static 'about (2).jpg' %}" 
-                         alt="Display Area" 
-                         class="w-full h-96 object-cover group-hover:scale-110 transition-transform duration-500">
-                    <div class="absolute inset-0 bg-gradient-to-t from-mc-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
-                        <p class="text-white w-full backdrop-blur-3xl bg-black/10 dark:bg-white/10 p-4 font-semibold">Interactive Display Area</p>
+                <div class="group cursor-pointer animate-slide-up" style="animation-delay: 200ms;">
+                    <div class="relative overflow-hidden rounded-2xl">
+                        <img src="{% static 'about (2).jpg' %}" 
+                             alt="Display Area" 
+                             class="w-full h-96 object-cover group-hover:scale-110 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-mc-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                            <p class="text-white w-full backdrop-blur-3xl bg-black/10 dark:bg-white/10 p-4 font-semibold">Interactive Display Area</p>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="group cursor-pointer animate-slide-up" style="animation-delay: 400ms;">
-                <div class="relative overflow-hidden rounded-2xl">
-                    <img src="{% static 'about (3).jpg' %}" 
-                         alt="Customer Service" 
-                         class="w-full h-96 object-cover group-hover:scale-110 transition-transform duration-500">
-                    <div class="absolute inset-0 bg-gradient-to-t from-mc-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
-                        <p class="text-white w-full backdrop-blur-3xl bg-black/10 dark:bg-white/10 p-4 font-semibold">Customer Service Area</p>
+                <div class="group cursor-pointer animate-slide-up" style="animation-delay: 400ms;">
+                    <div class="relative overflow-hidden rounded-2xl">
+                        <img src="{% static 'about (3).jpg' %}" 
+                             alt="Customer Service" 
+                             class="w-full h-96 object-cover group-hover:scale-110 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-mc-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                            <p class="text-white w-full backdrop-blur-3xl bg-black/10 dark:bg-white/10 p-4 font-semibold">Customer Service Area</p>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="group cursor-pointer animate-slide-up" style="animation-delay: 600ms;">
-                <div class="relative overflow-hidden rounded-2xl">
-                    <img src="{% static 'about (4).jpg' %}" 
-                         alt="Accessories Wall" 
-                         class="w-full h-96 object-cover group-hover:scale-110 transition-transform duration-500">
-                    <div class="absolute inset-0 bg-gradient-to-t from-mc-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
-                        <p class="text-white w-full backdrop-blur-3xl bg-black/10 dark:bg-white/10 p-4 font-semibold">Accessories Collection</p>
+                <div class="group cursor-pointer animate-slide-up" style="animation-delay: 600ms;">
+                    <div class="relative overflow-hidden rounded-2xl">
+                        <img src="{% static 'about (4).jpg' %}" 
+                             alt="Accessories Wall" 
+                             class="w-full h-96 object-cover group-hover:scale-110 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-mc-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                            <p class="text-white w-full backdrop-blur-3xl bg-black/10 dark:bg-white/10 p-4 font-semibold">Accessories Collection</p>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="group cursor-pointer animate-slide-up" style="animation-delay: 800ms;">
-                <div class="relative overflow-hidden rounded-2xl">
-                    <img src="{% static 'about (5).jpg' %}" 
-                         alt="Testing Station" 
-                         class="w-full h-96 object-cover group-hover:scale-110 transition-transform duration-500">
-                    <div class="absolute inset-0 bg-gradient-to-t from-mc-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
-                        <p class="text-white w-full backdrop-blur-3xl bg-black/10 dark:bg-white/10 p-4 font-semibold">Device Testing Station</p>
+                <div class="group cursor-pointer animate-slide-up" style="animation-delay: 800ms;">
+                    <div class="relative overflow-hidden rounded-2xl">
+                        <img src="{% static 'about (5).jpg' %}" 
+                             alt="Testing Station" 
+                             class="w-full h-96 object-cover group-hover:scale-110 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-mc-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                            <p class="text-white w-full backdrop-blur-3xl bg-black/10 dark:bg-white/10 p-4 font-semibold">Device Testing Station</p>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="group cursor-pointer animate-slide-up" style="animation-delay: 1000ms;">
-                <div class="relative overflow-hidden rounded-2xl">
-                    <img src="{% static 'about (6).jpg' %}" 
-                         alt="Our Team" 
-                         class="w-full h-96 object-cover group-hover:scale-110 transition-transform duration-500">
-                    <div class="absolute inset-0 bg-gradient-to-t from-mc-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
-                        <p class="text-white w-full backdrop-blur-3xl bg-black/10 dark:bg-white/10 p-4 font-semibold">Our Expert Team</p>
+                <div class="group cursor-pointer animate-slide-up" style="animation-delay: 1000ms;">
+                    <div class="relative overflow-hidden rounded-2xl">
+                        <img src="{% static 'about (6).jpg' %}" 
+                             alt="Our Team" 
+                             class="w-full h-96 object-cover group-hover:scale-110 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-mc-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                            <p class="text-white w-full backdrop-blur-3xl bg-black/10 dark:bg-white/10 p-4 font-semibold">Our Expert Team</p>
+                        </div>
                     </div>
                 </div>
-            </div>
+            {% endif %}
         </div>
 
         <!-- Virtual Tour Button -->
         <div class="text-center">
+            {% if self.virtual_tour_url %}
+            <a href="{{ self.virtual_tour_url }}" target="_blank" class="bg-mc-accent text-mc-black px-8 py-3 rounded-lg font-semibold hover:bg-mc-white transition-colors inline-flex items-center space-x-2">
+                <i class="fas fa-street-view"></i>
+                <span>{% if self.virtual_tour_button_text %}{{ self.virtual_tour_button_text }}{% else %}Take Virtual Tour{% endif %}</span>
+            </a>
+            {% else %}
             <button class="bg-mc-accent text-mc-black px-8 py-3 rounded-lg font-semibold hover:bg-mc-white transition-colors inline-flex items-center space-x-2">
                 <i class="fas fa-street-view"></i>
-                <span>Take Virtual Tour</span>
+                <span>{% if self.virtual_tour_button_text %}{{ self.virtual_tour_button_text }}{% else %}Take Virtual Tour{% endif %}</span>
             </button>
+            {% endif %}
         </div>
     </div>
 </section>
@@ -448,8 +469,8 @@
     <div class="container mx-auto">
         <div class="text-center mb-16">
             <h2 class="text-4xl md:text-5xl font-bold mb-4">
-                <span class="text-mc-white">OUR </span>
-                <span class="text-mc-accent">MISSION</span>
+                <span class="text-mc-white">{% if self.mission_vision_title_part1 %}{{ self.mission_vision_title_part1 }}{% else %}OUR{% endif %} </span>
+                <span class="text-mc-accent">{% if self.mission_vision_title_part2 %}{{ self.mission_vision_title_part2 }}{% else %}MISSION{% endif %}</span>
             </h2>
         </div>
         
@@ -459,9 +480,9 @@
                 <div class="w-16 h-16 bg-mc-accent rounded-full mx-auto mb-6 flex items-center justify-center">
                     <i class="fas fa-rocket text-2xl text-mc-black"></i>
                 </div>
-                <h3 class="text-2xl font-bold text-center mb-6 text-mc-white">MISSION</h3>
+                <h3 class="text-2xl font-bold text-center mb-6 text-mc-white">{% if self.mission_title %}{{ self.mission_title }}{% else %}MISSION{% endif %}</h3>
                 <p class="text-mc-light-grey text-center leading-relaxed">
-                    To democratize access to premium mobile technology by providing authentic, high-quality devices and exceptional customer service that exceeds expectations. We strive to be the bridge between cutting-edge technology and the Pakistani market.
+                    {% if self.mission_content %}{{ self.mission_content|safe }}{% else %}To democratize access to premium mobile technology by providing authentic, high-quality devices and exceptional customer service that exceeds expectations. We strive to be the bridge between cutting-edge technology and the Pakistani market.{% endif %}
                 </p>
             </div>
             
@@ -470,9 +491,9 @@
                 <div class="w-16 h-16 bg-mc-accent rounded-full mx-auto mb-6 flex items-center justify-center">
                     <i class="fas fa-eye text-2xl text-mc-black"></i>
                 </div>
-                <h3 class="text-2xl font-bold text-center mb-6 text-mc-white">VISION</h3>
+                <h3 class="text-2xl font-bold text-center mb-6 text-mc-white">{% if self.vision_title %}{{ self.vision_title }}{% else %}VISION{% endif %}</h3>
                 <p class="text-mc-light-grey text-center leading-relaxed">
-                    To become Pakistan's leading mobile technology retailer, known for innovation, trust, and customer-centricity. We envision a future where every Pakistani has access to the latest mobile technology to enhance their digital lifestyle.
+                    {% if self.vision_content %}{{ self.vision_content|safe }}{% else %}To become Pakistan's leading mobile technology retailer, known for innovation, trust, and customer-centricity. We envision a future where every Pakistani has access to the latest mobile technology to enhance their digital lifestyle.{% endif %}
                 </p>
             </div>
         </div>
@@ -484,78 +505,93 @@
     <div class="container mx-auto">
         <div class="text-center mb-16">
             <h2 class="text-4xl md:text-5xl font-bold mb-4">
-                <span class="text-mc-white">WHY CHOOSE </span>
-                <span class="text-mc-accent">MOBILE CORNER</span>
+                <span class="text-mc-white">{% if self.why_choose_title_part1 %}{{ self.why_choose_title_part1 }}{% else %}WHY CHOOSE{% endif %} </span>
+                <span class="text-mc-accent">{% if self.why_choose_title_part2 %}{{ self.why_choose_title_part2 }}{% else %}MOBILE CORNER{% endif %}</span>
             </h2>
-            <p class="text-mc-light-grey text-lg">Experience the difference that sets us apart</p>
+            <p class="text-mc-light-grey text-lg">{% if self.why_choose_description %}{{ self.why_choose_description }}{% else %}Experience the difference that sets us apart{% endif %}</p>
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Feature 1 -->
-            <div class="text-center group animate-slide-up">
-                <div class="w-20 h-20 bg-mc-accent rounded-full mx-auto mb-6 flex items-center justify-center animate-float">
-                    <i class="fas fa-shield-alt text-2xl text-mc-black"></i>
+            {% if self.why_choose_us_items.all %}
+                {% for item in self.why_choose_us_items.all %}
+                <div class="text-center group animate-slide-up" {% if forloop.counter0 > 0 %}style="animation-delay: {{ forloop.counter0|add:1|mul:200 }}ms;"{% endif %}>
+                    <div class="w-20 h-20 bg-mc-accent rounded-full mx-auto mb-6 flex items-center justify-center animate-float" {% if forloop.counter0 > 0 %}style="animation-delay: {{ forloop.counter0|add:1|mul:0.5 }}s;"{% endif %}>
+                        <i class="{{ item.icon_class }} text-2xl text-mc-black"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4 group-hover:text-mc-accent transition-colors">
+                        {{ item.title|upper }}
+                    </h3>
+                    <p class="text-mc-light-grey">{{ item.description }}</p>
                 </div>
-                <h3 class="text-xl font-bold mb-4 group-hover:text-mc-accent transition-colors">
-                    100% AUTHENTIC
-                </h3>
-                <p class="text-mc-light-grey">Every product comes with official warranty and authenticity guarantee. No compromises on quality.</p>
-            </div>
-            
-            <!-- Feature 2 -->
-            <div class="text-center group animate-slide-up" style="animation-delay: 200ms;">
-                <div class="w-20 h-20 bg-mc-accent rounded-full mx-auto mb-6 flex items-center justify-center animate-float" style="animation-delay: 0.5s;">
-                    <i class="fas fa-shipping-fast text-2xl text-mc-black"></i>
+                {% endfor %}
+            {% else %}
+                <!-- Fallback content -->
+                <!-- Feature 1 -->
+                <div class="text-center group animate-slide-up">
+                    <div class="w-20 h-20 bg-mc-accent rounded-full mx-auto mb-6 flex items-center justify-center animate-float">
+                        <i class="fas fa-shield-alt text-2xl text-mc-black"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4 group-hover:text-mc-accent transition-colors">
+                        100% AUTHENTIC
+                    </h3>
+                    <p class="text-mc-light-grey">Every product comes with official warranty and authenticity guarantee. No compromises on quality.</p>
                 </div>
-                <h3 class="text-xl font-bold mb-4 group-hover:text-mc-accent transition-colors">
-                    FAST DELIVERY
-                </h3>
-                <p class="text-mc-light-grey">Lightning-fast delivery across Pakistan with real-time tracking and secure packaging.</p>
-            </div>
-            
-            <!-- Feature 3 -->
-            <div class="text-center group animate-slide-up" style="animation-delay: 400ms;">
-                <div class="w-20 h-20 bg-mc-accent rounded-full mx-auto mb-6 flex items-center justify-center animate-float" style="animation-delay: 1s;">
-                    <i class="fas fa-headset text-2xl text-mc-black"></i>
+                
+                <!-- Feature 2 -->
+                <div class="text-center group animate-slide-up" style="animation-delay: 200ms;">
+                    <div class="w-20 h-20 bg-mc-accent rounded-full mx-auto mb-6 flex items-center justify-center animate-float" style="animation-delay: 0.5s;">
+                        <i class="fas fa-shipping-fast text-2xl text-mc-black"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4 group-hover:text-mc-accent transition-colors">
+                        FAST DELIVERY
+                    </h3>
+                    <p class="text-mc-light-grey">Lightning-fast delivery across Pakistan with real-time tracking and secure packaging.</p>
                 </div>
-                <h3 class="text-xl font-bold mb-4 group-hover:text-mc-accent transition-colors">
-                    24/7 SUPPORT
-                </h3>
-                <p class="text-mc-light-grey">Round-the-clock customer support with expert technicians ready to help you anytime.</p>
-            </div>
-            
-            <!-- Feature 4 -->
-            <div class="text-center group animate-slide-up" style="animation-delay: 600ms;">
-                <div class="w-20 h-20 bg-mc-accent rounded-full mx-auto mb-6 flex items-center justify-center animate-float" style="animation-delay: 1.5s;">
-                    <i class="fas fa-money-bill-wave text-2xl text-mc-black"></i>
+                
+                <!-- Feature 3 -->
+                <div class="text-center group animate-slide-up" style="animation-delay: 400ms;">
+                    <div class="w-20 h-20 bg-mc-accent rounded-full mx-auto mb-6 flex items-center justify-center animate-float" style="animation-delay: 1s;">
+                        <i class="fas fa-headset text-2xl text-mc-black"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4 group-hover:text-mc-accent transition-colors">
+                        24/7 SUPPORT
+                    </h3>
+                    <p class="text-mc-light-grey">Round-the-clock customer support with expert technicians ready to help you anytime.</p>
                 </div>
-                <h3 class="text-xl font-bold mb-4 group-hover:text-mc-accent transition-colors">
-                    BEST PRICES
-                </h3>
-                <p class="text-mc-light-grey">Competitive pricing with regular deals and discounts. Get premium quality at affordable rates.</p>
-            </div>
-            
-            <!-- Feature 5 -->
-            <div class="text-center group animate-slide-up" style="animation-delay: 800ms;">
-                <div class="w-20 h-20 bg-mc-accent rounded-full mx-auto mb-6 flex items-center justify-center animate-float" style="animation-delay: 2s;">
-                    <i class="fas fa-sync-alt text-2xl text-mc-black"></i>
+                
+                <!-- Feature 4 -->
+                <div class="text-center group animate-slide-up" style="animation-delay: 600ms;">
+                    <div class="w-20 h-20 bg-mc-accent rounded-full mx-auto mb-6 flex items-center justify-center animate-float" style="animation-delay: 1.5s;">
+                        <i class="fas fa-money-bill-wave text-2xl text-mc-black"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4 group-hover:text-mc-accent transition-colors">
+                        BEST PRICES
+                    </h3>
+                    <p class="text-mc-light-grey">Competitive pricing with regular deals and discounts. Get premium quality at affordable rates.</p>
                 </div>
-                <h3 class="text-xl font-bold mb-4 group-hover:text-mc-accent transition-colors">
-                    EASY RETURNS
-                </h3>
-                <p class="text-mc-light-grey">Hassle-free return and exchange policy. Your satisfaction is our top priority.</p>
-            </div>
-            
-            <!-- Feature 6 -->
-            <div class="text-center group animate-slide-up" style="animation-delay: 1000ms;">
-                <div class="w-20 h-20 bg-mc-accent rounded-full mx-auto mb-6 flex items-center justify-center animate-float" style="animation-delay: 2.5s;">
-                    <i class="fas fa-users text-2xl text-mc-black"></i>
+                
+                <!-- Feature 5 -->
+                <div class="text-center group animate-slide-up" style="animation-delay: 800ms;">
+                    <div class="w-20 h-20 bg-mc-accent rounded-full mx-auto mb-6 flex items-center justify-center animate-float" style="animation-delay: 2s;">
+                        <i class="fas fa-sync-alt text-2xl text-mc-black"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4 group-hover:text-mc-accent transition-colors">
+                        EASY RETURNS
+                    </h3>
+                    <p class="text-mc-light-grey">Hassle-free return and exchange policy. Your satisfaction is our top priority.</p>
                 </div>
-                <h3 class="text-xl font-bold mb-4 group-hover:text-mc-accent transition-colors">
-                    TRUSTED COMMUNITY
-                </h3>
-                <p class="text-mc-light-grey">Join thousands of satisfied customers who trust Mobile Corner for their tech needs.</p>
-            </div>
+                
+                <!-- Feature 6 -->
+                <div class="text-center group animate-slide-up" style="animation-delay: 1000ms;">
+                    <div class="w-20 h-20 bg-mc-accent rounded-full mx-auto mb-6 flex items-center justify-center animate-float" style="animation-delay: 2.5s;">
+                        <i class="fas fa-users text-2xl text-mc-black"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4 group-hover:text-mc-accent transition-colors">
+                        TRUSTED COMMUNITY
+                    </h3>
+                    <p class="text-mc-light-grey">Join thousands of satisfied customers who trust Mobile Corner for their tech needs.</p>
+                </div>
+            {% endif %}
         </div>
     </div>
 </section>
@@ -565,11 +601,11 @@
     <div class="container mx-auto">
         <div class="text-center mb-16">
             <h2 class="text-4xl md:text-5xl font-bold mb-6">
-                <span class="text-mc-white">WHAT OUR </span>
-                <span class="text-mc-accent">CUSTOMERS SAY</span>
+                <span class="text-mc-white">{% if self.testimonials_title_part1 %}{{ self.testimonials_title_part1 }}{% else %}WHAT OUR{% endif %} </span>
+                <span class="text-mc-accent">{% if self.testimonials_title_part2 %}{{ self.testimonials_title_part2 }}{% else %}CUSTOMERS SAY{% endif %}</span>
             </h2>
             <p class="text-mc-light-grey text-lg max-w-2xl mx-auto">
-                Real stories from real customers who have experienced the Mobile Corner difference
+                {% if self.testimonials_description %}{{ self.testimonials_description }}{% else %}Real stories from real customers who have experienced the Mobile Corner difference{% endif %}
             </p>
         </div>
 
@@ -577,13 +613,22 @@
             <!-- Testimonial Video -->
             <div class="animate-slide-up">
                 <div class="relative rounded-2xl overflow-hidden bg-mc-black border border-mc-grey/30">
+                    {% if self.testimonials_video_url %}
+                    <video controls 
+                           preload="metadata"
+                           class="w-full aspect-video rounded-2xl bg-mc-black video-player">
+                        <source src="{{ self.testimonials_video_url }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    {% else %}
                     <video controls 
                            poster="{% static 'videos/testimonial-thumb.jpg' %}" 
-                           class="w-full aspect-video rounded-2xl bg-mc-black"
+                           class="w-full aspect-video rounded-2xl bg-mc-black video-player"
                            preload="metadata">
                         <source src="{% static 'videos/customer-testimonials.mp4' %}" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
+                    {% endif %}
                     <div class="absolute top-4 left-4 bg-mc-accent text-mc-black px-3 py-1 rounded-full text-sm font-semibold pointer-events-none">
                         Customer Stories
                     </div>
@@ -599,62 +644,94 @@
 
             <!-- Customer Reviews -->
             <div class="space-y-6 animate-slide-up" style="animation-delay: 300ms;">
-                <div class="bg-mc-black rounded-2xl p-6 border border-mc-grey/30">
-                    <div class="flex items-center mb-4">
-                        <img src="{% static 'customers/customer1.jpg' %}" 
-                             alt="Customer" 
-                             class="w-12 h-12 rounded-full mr-4">
-                        <div>
-                            <h4 class="text-mc-white font-semibold">Ahmad Khan</h4>
-                            <div class="flex text-mc-accent">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
+                {% if self.customer_reviews.all %}
+                    {% for review in self.customer_reviews.all %}
+                    <div class="bg-mc-black rounded-2xl p-6 border border-mc-grey/30">
+                        <div class="flex items-center mb-4">
+                            {% if review.customer_image_url %}
+                            <img src="{{ review.customer_image_url }}" 
+                                 alt="{{ review.customer_name }}" 
+                                 class="w-12 h-12 rounded-full mr-4">
+                            {% else %}
+                            <img src="{% static 'customers/default-customer.jpg' %}" 
+                                 alt="{{ review.customer_name }}" 
+                                 class="w-12 h-12 rounded-full mr-4">
+                            {% endif %}
+                            <div>
+                                <h4 class="text-mc-white font-semibold">{{ review.customer_name }}</h4>
+                                <div class="flex text-mc-accent">
+                                    {% for i in "12345"|make_list %}
+                                        {% if forloop.counter <= review.rating %}
+                                            <i class="fas fa-star"></i>
+                                        {% else %}
+                                            <i class="far fa-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
                             </div>
                         </div>
+                        <p class="text-mc-light-grey">{{ review.review_text }}</p>
                     </div>
-                    <p class="text-mc-light-grey">"Excellent service and genuine products. Got my iPhone 15 Pro Max here and couldn't be happier!"</p>
-                </div>
+                    {% endfor %}
+                {% else %}
+                    <!-- Fallback content -->
+                    <div class="bg-mc-black rounded-2xl p-6 border border-mc-grey/30">
+                        <div class="flex items-center mb-4">
+                            <img src="{% static 'customers/customer1.jpg' %}" 
+                                 alt="Customer" 
+                                 class="w-12 h-12 rounded-full mr-4">
+                            <div>
+                                <h4 class="text-mc-white font-semibold">Ahmad Khan</h4>
+                                <div class="flex text-mc-accent">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-mc-light-grey">"Excellent service and genuine products. Got my iPhone 15 Pro Max here and couldn't be happier!"</p>
+                    </div>
 
-                <div class="bg-mc-black rounded-2xl p-6 border border-mc-grey/30">
-                    <div class="flex items-center mb-4">
-                        <img src="{% static 'customers/customer2.jpg' %}" 
-                             alt="Customer" 
-                             class="w-12 h-12 rounded-full mr-4">
-                        <div>
-                            <h4 class="text-mc-white font-semibold">Fatima Ali</h4>
-                            <div class="flex text-mc-accent">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
+                    <div class="bg-mc-black rounded-2xl p-6 border border-mc-grey/30">
+                        <div class="flex items-center mb-4">
+                            <img src="{% static 'customers/customer2.jpg' %}" 
+                                 alt="Customer" 
+                                 class="w-12 h-12 rounded-full mr-4">
+                            <div>
+                                <h4 class="text-mc-white font-semibold">Fatima Ali</h4>
+                                <div class="flex text-mc-accent">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
                             </div>
                         </div>
+                        <p class="text-mc-light-grey">"Fast delivery and amazing customer support. Mobile Corner is my go-to for all tech needs!"</p>
                     </div>
-                    <p class="text-mc-light-grey">"Fast delivery and amazing customer support. Mobile Corner is my go-to for all tech needs!"</p>
-                </div>
 
-                <div class="bg-mc-black rounded-2xl p-6 border border-mc-grey/30">
-                    <div class="flex items-center mb-4">
-                        <img src="{% static 'customers/customer3.jpg' %}" 
-                             alt="Customer" 
-                             class="w-12 h-12 rounded-full mr-4">
-                        <div>
-                            <h4 class="text-mc-white font-semibold">Muhammad Hassan</h4>
-                            <div class="flex text-mc-accent">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
+                    <div class="bg-mc-black rounded-2xl p-6 border border-mc-grey/30">
+                        <div class="flex items-center mb-4">
+                            <img src="{% static 'customers/customer3.jpg' %}" 
+                                 alt="Customer" 
+                                 class="w-12 h-12 rounded-full mr-4">
+                            <div>
+                                <h4 class="text-mc-white font-semibold">Muhammad Hassan</h4>
+                                <div class="flex text-mc-accent">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
                             </div>
                         </div>
+                        <p class="text-mc-light-grey">"Best prices in town with authentic products. Highly recommend Mobile Corner to everyone!"</p>
                     </div>
-                    <p class="text-mc-light-grey">"Best prices in town with authentic products. Highly recommend Mobile Corner to everyone!"</p>
-                </div>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -667,10 +744,10 @@
             <!-- Contact Info -->
             <div class="animate-slide-up">
                 <h2 class="text-4xl md:text-5xl font-bold mb-6 text-mc-white">
-                    VISIT US
+                    {% if self.location_title %}{{ self.location_title }}{% else %}VISIT US{% endif %}
                 </h2>
                 <p class="text-mc-light-grey text-lg mb-8 leading-relaxed">
-                    Located in the heart of Bahawalpur, our store is your gateway to the latest mobile technology. Visit us for hands-on experience with our products and personalized assistance from our expert team.
+                    {% if self.location_description %}{{ self.location_description }}{% else %}Located in the heart of Bahawalpur, our store is your gateway to the latest mobile technology. Visit us for hands-on experience with our products and personalized assistance from our expert team.{% endif %}
                 </p>
                 
                 <div class="space-y-6">
@@ -679,8 +756,12 @@
                             <i class="fas fa-map-marker-alt text-mc-black"></i>
                         </div>
                         <div>
-                            <h4 class="font-semibold text-mc-white">Address</h4>
-                            <a href="https://maps.app.goo.gl/aCX6eRab7staFQMa9" class="text-mc-light-grey hover:text-mc-accent transition-colors">Dubai Plaza, shop#13 basement, Bahawalpur, 63100</a>
+                            <h4 class="font-semibold text-mc-white">{% if self.location_address_label %}{{ self.location_address_label }}{% else %}Address{% endif %}</h4>
+                            {% if self.location_maps_url %}
+                            <a href="{{ self.location_maps_url }}" target="_blank" class="text-mc-light-grey hover:text-mc-accent transition-colors">{% if self.location_address %}{{ self.location_address }}{% else %}Dubai Plaza, shop#13 basement, Bahawalpur, 63100{% endif %}</a>
+                            {% else %}
+                            <a href="https://maps.app.goo.gl/aCX6eRab7staFQMa9" target="_blank" class="text-mc-light-grey hover:text-mc-accent transition-colors">{% if self.location_address %}{{ self.location_address }}{% else %}Dubai Plaza, shop#13 basement, Bahawalpur, 63100{% endif %}</a>
+                            {% endif %}
                         </div>
                     </div>
                     
@@ -689,11 +770,16 @@
                             <i class="fas fa-phone text-mc-black"></i>
                         </div>
                         <div>
-                            <h4 class="font-semibold text-mc-white">Phone</h4>
+                            <h4 class="font-semibold text-mc-white">{% if self.location_phone_label %}{{ self.location_phone_label }}{% else %}Phone{% endif %}</h4>
                             <div class="space-x-2">
-                                <a href="tel:+923009681212" class="text-mc-light-grey hover:text-mc-accent transition-colors">+92 300 9681212</a>
+                                <a href="tel:{% if self.location_phone1 %}{{ self.location_phone1|cut:' '|cut:'-' }}{% else %}+923009681212{% endif %}" class="text-mc-light-grey hover:text-mc-accent transition-colors">{% if self.location_phone1 %}{{ self.location_phone1 }}{% else %}+92 300 9681212{% endif %}</a>
+                                {% if self.location_phone2 %}
+                                <span class="text-mc-light-grey">|</span>
+                                <a href="tel:{{ self.location_phone2|cut:' '|cut:'-' }}" class="text-mc-light-grey hover:text-mc-accent transition-colors">{{ self.location_phone2 }}</a>
+                                {% else %}
                                 <span class="text-mc-light-grey">|</span>
                                 <a href="tel:+923159682684" class="text-mc-light-grey hover:text-mc-accent transition-colors">+92 315 9682684</a>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -703,8 +789,8 @@
                             <i class="fas fa-envelope text-mc-black"></i>
                         </div>
                         <div>
-                            <h4 class="font-semibold text-mc-white">Email</h4>
-                            <a href="mailto:mobilercornerbwp@gmail.com" class="text-mc-light-grey hover:text-mc-accent transition-colors">mobilercornerbwp@gmail.com</a>
+                            <h4 class="font-semibold text-mc-white">{% if self.location_email_label %}{{ self.location_email_label }}{% else %}Email{% endif %}</h4>
+                            <a href="mailto:{% if self.location_email %}{{ self.location_email }}{% else %}mobilercornerbwp@gmail.com{% endif %}" class="text-mc-light-grey hover:text-mc-accent transition-colors">{% if self.location_email %}{{ self.location_email }}{% else %}mobilercornerbwp@gmail.com{% endif %}</a>
                         </div>
                     </div>
                     
@@ -713,8 +799,14 @@
                             <i class="fas fa-clock text-mc-black"></i>
                         </div>
                         <div>
-                            <h4 class="font-semibold text-mc-white">Store Hours</h4>
-                            <p class="text-mc-light-grey">Sat - Thu: 11:00 AM - 11:00 PM | Fri: Closed</p>
+                            <h4 class="font-semibold text-mc-white">{% if self.location_hours_label %}{{ self.location_hours_label }}{% else %}Store Hours{% endif %}</h4>
+                            <p class="text-mc-light-grey">
+                                {% if self.hours_monday_thursday and self.hours_saturday_sunday and self.hours_friday %}
+                                    Mon-Thu: {{ self.hours_monday_thursday }} | Sat-Sun: {{ self.hours_saturday_sunday }} | Fri: {{ self.hours_friday }}
+                                {% else %}
+                                    Sat - Thu: 11:00 AM - 11:00 PM | Fri: Closed
+                                {% endif %}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -752,22 +844,24 @@
     <div class="container mx-auto text-center">
         <div class="bg-mc-black rounded-2xl p-12 max-w-4xl mx-auto border border-mc-grey/30 animate-slide-up">
             <h2 class="text-3xl md:text-4xl font-bold mb-6 dark:text-white/80">
-                READY TO EXPERIENCE THE DIFFERENCE?
+                {{ page.cta_title|default:"READY TO EXPERIENCE THE DIFFERENCE?" }}
             </h2>
             <p class="text-mc-light-grey text-lg mb-8">
-                Join thousands of satisfied customers who have made Mobile Corner their trusted tech partner.
+                {{ page.cta_description|default:"Join thousands of satisfied customers who have made Mobile Corner their trusted tech partner." }}
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="{% url 'product_list' %}"
-                   hx-get="{% url 'product_list' %}"
+                <a href="{{ page.cta_button1_url|default:'#' }}"
+                   {% if page.cta_button1_url %}
+                   hx-get="{{ page.cta_button1_url }}"
                    hx-target="#content-comp"
                    hx-push-url="true"
+                   {% endif %}
                    class="bg-mc-accent text-mc-black px-8 py-3 rounded-lg font-semibold hover:bg-mc-white transition-colors">
-                    SHOP NOW
+                    {{ page.cta_button1_text|default:"SHOP NOW" }}
                 </a>
-                <a href="#contact"
+                <a href="{{ page.cta_button2_url|default:'#contact' }}"
                    class="border border-mc-accent text-mc-accent px-8 py-3 rounded-lg font-semibold hover:bg-mc-accent hover:text-mc-black transition-colors">
-                    CONTACT US
+                    {{ page.cta_button2_text|default:"CONTACT US" }}
                 </a>
             </div>
         </div>
