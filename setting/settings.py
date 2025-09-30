@@ -394,7 +394,7 @@ UNFOLD = {
                     {
                         "title": _("CMS Admin"),
                         "icon": "web",
-                        "link": "/admin/cms/",
+                        "link": "/cms-admin/",
                         "permission": lambda request: request.user.is_staff,
                     }
                 ],
