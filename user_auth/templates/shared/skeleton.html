@@ -1,4 +1,5 @@
 {% load static %}
+{% load seo_tags %}
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
@@ -8,7 +9,21 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Mobile Corner - Premium Tech Store</title>    
+    
+    <!-- SEO Meta Tags -->
+    {% if page %}
+        {% seo_meta_tags %}
+    {% else %}
+        <title>Mobile Corner - Premium Tech Store</title>
+        <meta name="description" content="Your premium destination for mobile technology. Experience excellence in every device at Mobile Corner.">
+        <meta name="keywords" content="mobile phones, smartphones, technology, premium devices, mobile corner">
+    {% endif %}
+    
+    <!-- Google Analytics -->
+    {% google_analytics %}
+    
+    <!-- Facebook Pixel -->
+    {% facebook_pixel %}    
     
     <!-- Scripts -->
     <script src="{% static 'js/tailwind.js' %}"></script>

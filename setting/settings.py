@@ -84,6 +84,8 @@ INSTALLED_APPS = [
     # Wagtail CMS apps
     'wagtail.contrib.forms',
     'wagtail.contrib.redirects',
+    'wagtail.contrib.sitemaps',
+    'wagtail.contrib.routable_page',
     'wagtail.embeds',
     'wagtail.sites',
     'wagtail.users',
@@ -388,6 +390,12 @@ UNFOLD = {
                         "title": _("Delivery Services"),
                         "icon": "delivery_dining",
                         "link": reverse_lazy("admin:store_deliveryservice_changelist"),
+                    },
+                    {
+                        "title": _("CMS Admin"),
+                        "icon": "web",
+                        "link": "/admin/cms/",
+                        "permission": lambda request: request.user.is_staff,
                     }
                 ],
             },

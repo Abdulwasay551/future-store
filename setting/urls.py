@@ -27,6 +27,7 @@ try:
     from wagtail.admin import urls as wagtailadmin_urls
     from wagtail import urls as wagtail_urls
     from wagtail.documents import urls as wagtaildocs_urls
+    from wagtail.contrib.sitemaps.views import sitemap
     WAGTAIL_AVAILABLE = True
 except ImportError:
     WAGTAIL_AVAILABLE = False
@@ -76,6 +77,7 @@ if WAGTAIL_AVAILABLE:
     urlpatterns += [
         path('cms-admin/', include(wagtailadmin_urls)),  # Wagtail CMS admin only
         path('documents/', include(wagtaildocs_urls)),  # Wagtail documents
+        path('sitemap.xml', sitemap, name='sitemap'),  # Sitemap
     ]
 
 # Serve static files in development

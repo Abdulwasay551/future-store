@@ -1,0 +1,47 @@
+{% load seo_tags %}
+
+<!-- Basic SEO Meta Tags -->
+<title>{% if page.get_meta_title %}{{ page.get_meta_title }}{% else %}{{ page.title }}{% endif %} | Mobile Corner</title>
+
+{% if page.get_meta_description %}
+<meta name="description" content="{{ page.get_meta_description }}">
+{% endif %}
+
+{% if page.get_meta_keywords %}
+<meta name="keywords" content="{{ page.get_meta_keywords }}">
+{% endif %}
+
+<!-- Canonical URL -->
+<link rel="canonical" href="{{ canonical_url }}">
+
+<!-- Open Graph Tags -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="{% if page.get_og_title %}{{ page.get_og_title }}{% else %}{{ page.title }}{% endif %}">
+{% if page.get_og_description %}
+<meta property="og:description" content="{{ page.get_og_description }}">
+{% endif %}
+<meta property="og:url" content="{{ canonical_url }}">
+<meta property="og:site_name" content="Mobile Corner">
+{% if page.og_image %}
+<meta property="og:image" content="{{ page.og_image }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+{% endif %}
+
+<!-- Twitter Card Tags -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{% if page.get_og_title %}{{ page.get_og_title }}{% else %}{{ page.title }}{% endif %}">
+{% if page.get_og_description %}
+<meta name="twitter:description" content="{{ page.get_og_description }}">
+{% endif %}
+{% if page.og_image %}
+<meta name="twitter:image" content="{{ page.og_image }}">
+{% endif %}
+
+<!-- Robots Meta Tags -->
+{% if page.noindex or page.nofollow %}
+<meta name="robots" content="{% if page.noindex %}noindex{% endif %}{% if page.noindex and page.nofollow %},{% endif %}{% if page.nofollow %}nofollow{% endif %}">
+{% endif %}
+
+<!-- Structured Data -->
+{% structured_data %}

@@ -3,26 +3,112 @@ from wagtail.models import Page
 from wagtail.fields import RichTextField
 from wagtail.admin.panels import FieldPanel, MultiFieldPanel, InlinePanel
 from wagtail.search import index
-from store.models import Product, Category, Company
-from django.core.paginator import Paginator
 from modelcluster.models import ClusterableModel
 from modelcluster.fields import ParentalKey
 
 
-# Base Page
+# Base Page with SEO support
 class CMSBasePage(Page):
-    """Base page class for CMS pages"""
+    """Base page class for CMS pages with SEO support"""
+    
+    # Additional SEO Fields (seo_title and search_description are already in Page model)
+    keywords = models.CharField(
+        max_length=500, 
+        blank=True, 
+        help_text="Comma-separated keywords for SEO. e.g., mobile phones, smartphones, technology"
+    )
+    canonical_url = models.URLField(
+        blank=True, 
+        help_text="Optional canonical URL to prevent duplicate content issues"
+    )
+    og_title = models.CharField(
+        max_length=95, 
+        blank=True, 
+        help_text="Title for social media sharing (Open Graph). Maximum 95 characters."
+    )
+    og_description = models.TextField(
+        max_length=200, 
+        blank=True, 
+        help_text="Description for social media sharing. Maximum 200 characters."
+    )
+    og_image = models.URLField(
+        blank=True, 
+        help_text="Image URL for social media sharing (1200x630px recommended)"
+    )
+    
+    # Analytics
+    google_analytics_id = models.CharField(
+        max_length=20, 
+        blank=True, 
+        help_text="Google Analytics ID (e.g., GA_MEASUREMENT_ID)"
+    )
+    facebook_pixel_id = models.CharField(
+        max_length=20, 
+        blank=True, 
+        help_text="Facebook Pixel ID"
+    )
+    
+    # Additional SEO options
+    noindex = models.BooleanField(
+        default=False, 
+        help_text="Prevent search engines from indexing this page"
+    )
+    nofollow = models.BooleanField(
+        default=False, 
+        help_text="Prevent search engines from following links on this page"
+    )
+    
+    promote_panels = Page.promote_panels + [
+        MultiFieldPanel([
+            FieldPanel('keywords'),
+            FieldPanel('canonical_url'),
+        ], heading='Additional SEO'),
+        MultiFieldPanel([
+            FieldPanel('og_title'),
+            FieldPanel('og_description'),
+            FieldPanel('og_image'),
+        ], heading='Social Media (Open Graph)'),
+        MultiFieldPanel([
+            FieldPanel('google_analytics_id'),
+            FieldPanel('facebook_pixel_id'),
+        ], heading='Analytics & Tracking'),
+        MultiFieldPanel([
+            FieldPanel('noindex'),
+            FieldPanel('nofollow'),
+        ], heading='Search Engine Directives'),
+    ]
     
     class Meta:
         abstract = True
 
     def get_context(self, request):
         context = super().get_context(request)
-        # Add categories for navigation
-        context['categories'] = Category.objects.all()[:10]
-        # Add featured products for home page
-        context['featured_products'] = Product.objects.filter(is_featured=True, is_available=True)[:3]
+        # Remove references to store models - CMS only handles static content
         return context
+
+    def get_meta_title(self):
+        """Return the SEO title if available, otherwise the page title"""
+        return self.seo_title if self.seo_title else self.title
+
+    def get_meta_description(self):
+        """Return the meta description"""
+        return self.search_description
+
+    def get_meta_keywords(self):
+        """Return the meta keywords"""
+        return self.keywords
+
+    def get_og_title(self):
+        """Return the Open Graph title"""
+        return self.og_title if self.og_title else self.get_meta_title()
+
+    def get_og_description(self):
+        """Return the Open Graph description"""
+        return self.og_description if self.og_description else self.get_meta_description()
+
+    def get_canonical_url(self):
+        """Return the canonical URL"""
+        return self.canonical_url if self.canonical_url else self.get_full_url()
 
 
 # Inline models for reusable content blocks
@@ -228,10 +314,8 @@ class HomePage(CMSBasePage):
     
     def get_context(self, request):
         context = super().get_context(request)
-        # Add data for the existing template
-        context['featured_products'] = Product.objects.filter(is_featured=True)[:8]
-        context['categories'] = Category.objects.all()[:6]
-        context['companies'] = Company.objects.filter(is_featured=True)[:8]
+        # This page no longer shows store products
+        # Add any additional context variables here
         return context
 
 
@@ -391,10 +475,8 @@ class AboutPage(CMSBasePage):
     
     def get_context(self, request):
         context = super().get_context(request)
-        # Add data for the existing template
-        context['companies'] = Company.objects.all()
-        context['total_products'] = Product.objects.count()
-        context['total_categories'] = Category.objects.count()
+        # This page no longer shows store data
+        # Add any additional context variables here
         return context
 
 
@@ -456,277 +538,4 @@ class ContactPage(CMSBasePage):
             FieldPanel('hours_friday_label'),
             FieldPanel('hours_friday_time'),
         ], heading='Business Hours'),
-    ]
-
-
-# Store Pages
-class StorePage(CMSBasePage):
-    """CMS Store Page - main store listing page"""
-    template = 'store/product_list.html'  # Use existing template
-    
-    # Page Header
-    page_title = models.CharField(max_length=100, default="Our Products")
-    page_subtitle = models.TextField(default="Discover our premium collection of mobile devices and accessories")
-    page_banner_url = models.URLField(blank=True, help_text="Page banner image URL")
-    
-    # Filter Options
-    show_categories = models.BooleanField(default=True, help_text="Show category filter")
-    show_companies = models.BooleanField(default=True, help_text="Show brand filter")
-    show_price_filter = models.BooleanField(default=True, help_text="Show price filter")
-    show_search = models.BooleanField(default=True, help_text="Show search functionality")
-    
-    # Display Options
-    products_per_page = models.IntegerField(default=12, help_text="Number of products per page")
-    show_product_badges = models.BooleanField(default=True, help_text="Show featured/new badges")
-    
-    content_panels = Page.content_panels + [
-        MultiFieldPanel([
-            FieldPanel('page_title'),
-            FieldPanel('page_subtitle'),
-            FieldPanel('page_banner_url'),
-        ], heading='Page Header'),
-        MultiFieldPanel([
-            FieldPanel('show_categories'),
-            FieldPanel('show_companies'),
-            FieldPanel('show_price_filter'),
-            FieldPanel('show_search'),
-        ], heading='Filter Options'),
-        MultiFieldPanel([
-            FieldPanel('products_per_page'),
-            FieldPanel('show_product_badges'),
-        ], heading='Display Options'),
-    ]
-    
-    def get_context(self, request):
-        context = super().get_context(request)
-        # Get query parameters for filtering
-        category_id = request.GET.get('category')
-        company_id = request.GET.get('company')
-        search_query = request.GET.get('search')
-        min_price = request.GET.get('min_price')
-        max_price = request.GET.get('max_price')
-        
-        # Start with all products
-        products = Product.objects.filter(is_available=True)
-        
-        # Apply filters
-        if category_id:
-            products = products.filter(category_id=category_id)
-        if company_id:
-            products = products.filter(company_id=company_id)
-        if search_query:
-            products = products.filter(
-                models.Q(name__icontains=search_query) |
-                models.Q(description__icontains=search_query)
-            )
-        if min_price:
-            products = products.filter(selling_price__gte=min_price)
-        if max_price:
-            products = products.filter(selling_price__lte=max_price)
-        
-        # Pagination
-        from django.core.paginator import Paginator
-        paginator = Paginator(products, self.products_per_page)
-        page_number = request.GET.get('page')
-        page_obj = paginator.get_page(page_number)
-        
-        context.update({
-            'products': page_obj.object_list,
-            'page_obj': page_obj,
-            'categories': Category.objects.all() if self.show_categories else None,
-            'companies': Company.objects.all() if self.show_companies else None,
-            'current_category': category_id,
-            'current_company': company_id,
-            'search_query': search_query,
-            'min_price': min_price,
-            'max_price': max_price,
-        })
-        return context
-
-
-# Product Detail Page
-class ProductPage(CMSBasePage):
-    """CMS Product Detail Page - individual product pages"""
-    template = 'store/product_detail.html'  # Use existing template
-    
-    # Related product to display
-    product = models.ForeignKey(
-        'store.Product',
-        on_delete=models.PROTECT,
-        related_name='cms_pages'
-    )
-    
-    # SEO and Display Options
-    show_related_products = models.BooleanField(default=True)
-    show_specifications = models.BooleanField(default=True)
-    show_reviews = models.BooleanField(default=True)
-    show_company_products = models.BooleanField(default=True)
-    
-    # Custom Content
-    additional_description = RichTextField(blank=True, help_text="Additional product description")
-    warranty_info = models.TextField(blank=True, help_text="Warranty information")
-    delivery_info = models.TextField(blank=True, help_text="Delivery information")
-    
-    content_panels = Page.content_panels + [
-        FieldPanel('product'),
-        MultiFieldPanel([
-            FieldPanel('show_related_products'),
-            FieldPanel('show_specifications'),
-            FieldPanel('show_reviews'),
-            FieldPanel('show_company_products'),
-        ], heading='Display Options'),
-        MultiFieldPanel([
-            FieldPanel('additional_description'),
-            FieldPanel('warranty_info'),
-            FieldPanel('delivery_info'),
-        ], heading='Additional Information'),
-    ]
-    
-    def get_context(self, request):
-        context = super().get_context(request)
-        context['product'] = self.product
-        
-        if self.show_related_products:
-            context['related_products'] = Product.objects.filter(
-                category=self.product.category
-            ).exclude(id=self.product.id)[:4]
-            
-        if self.show_company_products:
-            context['company_products'] = Product.objects.filter(
-                company=self.product.company
-            ).exclude(id=self.product.id)[:4]
-            
-        return context
-    
-    def save(self, *args, **kwargs):
-        # Auto-set title and slug from product
-        if self.product:
-            self.title = self.product.name
-            self.slug = self.product.slug
-        super().save(*args, **kwargs)
-
-
-# Category Page
-class CategoryPage(CMSBasePage):
-    """CMS Category Page"""
-    template = 'store/category_products.html'  # Use existing template
-    
-    # Link to the actual category
-    category = models.ForeignKey(
-        'store.Category',
-        on_delete=models.PROTECT,
-        related_name='cms_pages'
-    )
-    
-    introduction = RichTextField(blank=True)
-    products_per_page = models.IntegerField(default=12)
-    
-    content_panels = Page.content_panels + [
-        FieldPanel('category'),
-        FieldPanel('introduction'),
-        FieldPanel('products_per_page'),
-    ]
-    
-    def get_context(self, request):
-        context = super().get_context(request)
-        
-        # Get products for this category
-        products = Product.objects.filter(
-            category=self.category,
-            is_available=True
-        )
-        
-        # Filter by company if provided
-        company_slug = request.GET.get('company')
-        if company_slug:
-            try:
-                company = Company.objects.get(slug=company_slug)
-                products = products.filter(company=company)
-                context['current_company'] = company
-            except Company.DoesNotExist:
-                pass
-        
-        # Pagination
-        paginator = Paginator(products, self.products_per_page)
-        page = request.GET.get('page')
-        products_page = paginator.get_page(page)
-        
-        context['category'] = self.category
-        context['products'] = products_page
-        context['companies'] = Company.objects.filter(
-            category=self.category
-        ).distinct()
-        return context
-    
-    def save(self, *args, **kwargs):
-        # Auto-set title and slug from category
-        if self.category:
-            self.title = self.category.name
-            self.slug = self.category.slug
-        super().save(*args, **kwargs)
-
-
-# Company Page
-class CompanyPage(CMSBasePage):
-    """CMS Company Page"""
-    template = 'store/company_products.html'  # Use existing template
-    
-    # Link to the actual company
-    company = models.ForeignKey(
-        'store.Company',
-        on_delete=models.PROTECT,
-        related_name='cms_pages'
-    )
-    
-    introduction = RichTextField(blank=True)
-    products_per_page = models.IntegerField(default=12)
-    
-    content_panels = Page.content_panels + [
-        FieldPanel('company'),
-        FieldPanel('introduction'),
-        FieldPanel('products_per_page'),
-    ]
-    
-    def get_context(self, request):
-        context = super().get_context(request)
-        
-        # Get products for this company
-        products = Product.objects.filter(
-            company=self.company,
-            is_available=True
-        )
-        
-        # Pagination
-        paginator = Paginator(products, self.products_per_page)
-        page = request.GET.get('page')
-        products_page = paginator.get_page(page)
-        
-        context['company'] = self.company
-        context['products'] = products_page
-        return context
-    
-    def save(self, *args, **kwargs):
-        # Auto-set title and slug from company
-        if self.company:
-            self.title = f"{self.company.name} - {self.company.category.name}"
-            self.slug = f"{self.company.slug}-{self.company.category.slug}"
-        super().save(*args, **kwargs)
-
-
-# General Content Page
-class ContentPage(CMSBasePage):
-    """General CMS Content Page"""
-    template = 'cms_store/content_page.html'
-    
-    introduction = RichTextField(blank=True)
-    body = RichTextField(blank=True)
-    
-    content_panels = Page.content_panels + [
-        FieldPanel('introduction'),
-        FieldPanel('body'),
-    ]
-    
-    search_fields = Page.search_fields + [
-        index.SearchField('introduction'),
-        index.SearchField('body'),
     ]
