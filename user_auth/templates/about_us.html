@@ -366,7 +366,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {% if self.gallery_images.all %}
                 {% for image in self.gallery_images.all %}
-                <div class="group cursor-pointer animate-slide-up" {% if forloop.counter0 > 0 %}style="animation-delay: {{ forloop.counter0|add:1|mul:200 }}ms;"{% endif %}>
+                <div class="group cursor-pointer animate-slide-up" {% if forloop.counter == 1 %}{% elif forloop.counter == 2 %}style="animation-delay: 200ms;"{% elif forloop.counter == 3 %}style="animation-delay: 400ms;"{% elif forloop.counter == 4 %}style="animation-delay: 600ms;"{% elif forloop.counter == 5 %}style="animation-delay: 800ms;"{% elif forloop.counter == 6 %}style="animation-delay: 1000ms;"{% elif forloop.counter == 7 %}style="animation-delay: 1200ms;"{% elif forloop.counter == 8 %}style="animation-delay: 1400ms;"{% endif %}>
                     <div class="relative overflow-hidden rounded-2xl">
                         <img src="{{ image.image_url }}" 
                              alt="{{ image.title }}" 
@@ -514,8 +514,8 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {% if self.why_choose_us_items.all %}
                 {% for item in self.why_choose_us_items.all %}
-                <div class="text-center group animate-slide-up" {% if forloop.counter0 > 0 %}style="animation-delay: {{ forloop.counter0|add:1|mul:200 }}ms;"{% endif %}>
-                    <div class="w-20 h-20 bg-mc-accent rounded-full mx-auto mb-6 flex items-center justify-center animate-float" {% if forloop.counter0 > 0 %}style="animation-delay: {{ forloop.counter0|add:1|mul:0.5 }}s;"{% endif %}>
+                <div class="text-center group animate-slide-up" {% if forloop.counter == 1 %}{% elif forloop.counter == 2 %}style="animation-delay: 200ms;"{% elif forloop.counter == 3 %}style="animation-delay: 400ms;"{% elif forloop.counter == 4 %}style="animation-delay: 600ms;"{% elif forloop.counter == 5 %}style="animation-delay: 800ms;"{% elif forloop.counter == 6 %}style="animation-delay: 1000ms;"{% endif %}>
+                    <div class="w-20 h-20 bg-mc-accent rounded-full mx-auto mb-6 flex items-center justify-center animate-float" {% if forloop.counter == 1 %}{% elif forloop.counter == 2 %}style="animation-delay: 0.5s;"{% elif forloop.counter == 3 %}style="animation-delay: 1s;"{% elif forloop.counter == 4 %}style="animation-delay: 1.5s;"{% elif forloop.counter == 5 %}style="animation-delay: 2s;"{% elif forloop.counter == 6 %}style="animation-delay: 2.5s;"{% endif %}>
                         <i class="{{ item.icon_class }} text-2xl text-mc-black"></i>
                     </div>
                     <h3 class="text-xl font-bold mb-4 group-hover:text-mc-accent transition-colors">

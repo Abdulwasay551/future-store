@@ -467,8 +467,8 @@ CSRF_TRUSTED_ORIGINS = [
     'https://www.mobilecorner.pk',
     'https://future-store-one.vercel.app',
     'https://*.now.sh',
-    'https://localhost:*',
-    'https://127.0.0.1:*',
+    'http://localhost:*',
+    'http://127.0.0.1:*',
 ]
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'  # For Gmail
