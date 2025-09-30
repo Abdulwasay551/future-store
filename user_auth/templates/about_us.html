@@ -8,13 +8,14 @@
 <section class="relative min-h-[70vh] flex items-center justify-center" style="z-index: 1;">
     <!-- Background Video -->
     <div class="absolute inset-0 overflow-hidden">
+        {% if self.hero_background_video_url %}
         <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover opacity-30">
-            {% if self.hero_background_video_url %}
             <source src="{{ self.hero_background_video_url }}" type="video/mp4">
-            {% else %}
-            <source src="{% static 'videos/tech-hero-bg.mp4' %}" type="video/mp4">
-            {% endif %}
         </video>
+        {% else %}
+        <!-- Fallback: Use static image instead of video -->
+        <div class="absolute inset-0 w-full h-full bg-cover bg-center opacity-30" style="background-image: url('{% static 'bg.jpg' %}');"></div>
+        {% endif %}
         <div class="absolute inset-0 bg-gradient-to-br from-mc-black/70 to-mc-dark/70"></div>
     </div>
 
@@ -254,7 +255,7 @@
             {% if self.brand_logos.all %}
                 {% for logo in self.brand_logos.all %}
                 <div class="dark:bg-mc-dark bg-black rounded-xl p-6 flex items-center justify-center h-24 card-hover animate-slide-up" {% if forloop.counter0 > 0 %}style="animation-delay: {{ forloop.counter0|add:1 }}00ms;"{% endif %}>
-                    <img src="{{ logo.logo.url }}" alt="{{ logo.name }}" class="max-h-12 max-w-full object-contain filter brightness-0 invert opacity-70 hover:opacity-100 transition-opacity">
+                    <img src="{{ logo.logo_url }}" alt="{{ logo.name }}" class="max-h-12 max-w-full object-contain filter brightness-0 invert opacity-70 hover:opacity-100 transition-opacity">
                 </div>
                 {% endfor %}
             {% else %}
