@@ -207,21 +207,26 @@
             
             <!-- Company Video -->
             <div class="animate-slide-up" style="animation-delay: 300ms;">
-                <div class="relative rounded-2xl overflow-hidden">
+                <div class="relative rounded-2xl overflow-hidden bg-mc-black border border-mc-grey/30">
                     {% if cms_about.story_video %}
-                    <video controls poster="{% if cms_about.story_video_thumbnail %}{{ cms_about.story_video_thumbnail.url }}{% else %}{% static 'videos/company-story-thumb.jpg' %}{% endif %}" 
-                           class="w-full h-auto rounded-2xl">
+                    <video controls 
+                           poster="{% if cms_about.story_video_thumbnail %}{{ cms_about.story_video_thumbnail.url }}{% else %}{% static 'videos/company-story-thumb.jpg' %}{% endif %}" 
+                           class="w-full aspect-video rounded-2xl bg-mc-black"
+                           preload="metadata">
                         <source src="{{ cms_about.story_video.url }}" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
                     {% else %}
-                    <video controls poster="{% static 'videos/company-story-thumb.jpg' %}" 
-                           class="w-full h-auto rounded-2xl">
+                    <video controls 
+                           poster="{% static 'videos/company-story-thumb.jpg' %}" 
+                           class="w-full aspect-video rounded-2xl bg-mc-black"
+                           preload="metadata">
                         <source src="https://scontent-ams2-1.cdninstagram.com/o1/v/t2/f2/m86/AQMpT4mc-Tz68r7dM9XpmbmGyk_XlYKfVpay-qVma6D20jZhj9SwrA6kkHmuhWc5Z7S_LFXiWzPPfjhE2-53gvcgIPdqfm0W83PyWSk.mp4?_nc_cat=100&_nc_sid=5e9851&_nc_ht=scontent-ams2-1.cdninstagram.com&_nc_ohc=SMWwEPkoyz0Q7kNvwE698gU&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6MTIwNDEyNDg1NDM1MjI3NSwidmlfdXNlY2FzZV9pZCI6MTAwOTksImR1cmF0aW9uX3MiOjE5LCJ1cmxnZW5fc291cmNlIjoid3d3In0%3D&ccb=17-1&vs=fad498cb9a113957&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC82NzRFMUVBMTZGNzU0MzhFM0RBREE0MTY4NjcxRUI4MF92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYOnBhc3N0aHJvdWdoX2V2ZXJzdG9yZS9HSnktQ1I3TnliQXpZQUVFQVB0dXNHQVF3cGdYYnFfRUFBQUYVAgLIARIAKAAYABsCiAd1c2Vfb2lsATEScHJvZ3Jlc3NpdmVfcmVjaXBlATEVAAAmpuaro6XJowQVAigCQzMsF0AzAAAAAAAAGBJkYXNoX2Jhc2VsaW5lXzFfdjERAHX-B2XmnQEA&_nc_gid=ke2d4S5N0HLGJmWWhr9rRA&_nc_zt=28&oh=00_Afa1vPk7ww5GE0L6Sn_4EOtmsqNDSvXytZUhdKT1A4B9yA&oe=68DE141D" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
                     {% endif %}
-                    <div class="absolute inset-0 bg-gradient-to-t from-mc-black/50 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                    <!-- Play button overlay - only shows when video is paused -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-mc-black/50 to-transparent opacity-0 pointer-events-none transition-opacity duration-300 flex items-center justify-center story-video-overlay">
                         <div class="text-center text-white">
                             <i class="fas fa-play text-4xl mb-2"></i>
                             <p class="text-lg font-semibold">Watch Our Story</p>
@@ -571,14 +576,23 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <!-- Testimonial Video -->
             <div class="animate-slide-up">
-                <div class="relative rounded-2xl overflow-hidden">
-                    <video controls poster="{% static 'videos/testimonial-thumb.jpg' %}" 
-                           class="w-full h-auto rounded-2xl">
+                <div class="relative rounded-2xl overflow-hidden bg-mc-black border border-mc-grey/30">
+                    <video controls 
+                           poster="{% static 'videos/testimonial-thumb.jpg' %}" 
+                           class="w-full aspect-video rounded-2xl bg-mc-black"
+                           preload="metadata">
                         <source src="{% static 'videos/customer-testimonials.mp4' %}" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
-                    <div class="absolute top-4 left-4 bg-mc-accent text-mc-black px-3 py-1 rounded-full text-sm font-semibold">
+                    <div class="absolute top-4 left-4 bg-mc-accent text-mc-black px-3 py-1 rounded-full text-sm font-semibold pointer-events-none">
                         Customer Stories
+                    </div>
+                    <!-- Play button overlay - only shows when video is paused -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-mc-black/50 to-transparent opacity-0 pointer-events-none transition-opacity duration-300 flex items-center justify-center testimonial-video-overlay">
+                        <div class="text-center text-white">
+                            <i class="fas fa-play text-4xl mb-2"></i>
+                            <p class="text-lg font-semibold">Watch Testimonials</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -921,6 +935,33 @@
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
     }
 
+    /* Video overlay handling */
+    .story-video-overlay,
+    .testimonial-video-overlay {
+        transition: opacity 0.3s ease;
+    }
+
+    /* Show overlay when video is paused */
+    video:not([data-playing="true"]) + .story-video-overlay,
+    video:not([data-playing="true"]) + * + .story-video-overlay,
+    video:not([data-playing="true"]) + .testimonial-video-overlay,
+    video:not([data-playing="true"]) + * + .testimonial-video-overlay {
+        opacity: 1;
+    }
+
+    /* Hide overlay when video is playing */
+    video[data-playing="true"] + .story-video-overlay,
+    video[data-playing="true"] + * + .story-video-overlay,
+    video[data-playing="true"] + .testimonial-video-overlay,
+    video[data-playing="true"] + * + .testimonial-video-overlay {
+        opacity: 0;
+    }
+
+    /* Ensure aspect ratio */
+    .aspect-video {
+        aspect-ratio: 16 / 9;
+    }
+
     /* Brand logo hover effects */
     .brand-logo:hover {
         transform: scale(1.1);
@@ -1045,12 +1086,30 @@
         setupImageGallery();
         setupVirtualTour();
 
-        // Auto-play video on scroll
+        // Auto-play video on scroll and handle overlays
         const videos = document.querySelectorAll('video');
         videos.forEach(video => {
             video.addEventListener('loadedmetadata', () => {
                 video.currentTime = 0;
             });
+
+            // Handle play state for overlay visibility
+            video.addEventListener('play', () => {
+                video.setAttribute('data-playing', 'true');
+            });
+
+            video.addEventListener('pause', () => {
+                video.removeAttribute('data-playing');
+            });
+
+            video.addEventListener('ended', () => {
+                video.removeAttribute('data-playing');
+            });
+
+            // Initialize overlay state
+            if (video.paused) {
+                video.removeAttribute('data-playing');
+            }
         });
     }
 
