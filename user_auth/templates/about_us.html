@@ -70,14 +70,18 @@
                 {% for cert in self.certifications.all %}
                 <div class="bg-mc-black rounded-2xl p-8 border border-mc-grey/30 card-hover animate-slide-up text-center" {% if forloop.counter0 > 0 %}style="animation-delay: {{ forloop.counter0|add:1|floatformat:0 }}00ms;"{% endif %}>
                     <div class="mb-6">
-                        {% if cert.icon %}
-                        <img src="{{ cert.icon.url }}" 
+                        {% if cert.image_url %}
+                        <img src="{{ cert.image_url }}" 
                              alt="{{ cert.title }}" 
                              class="w-32 h-32 mx-auto object-contain">
+                        {% elif cert.icon_class %}
+                        <div class="w-16 h-16 bg-mc-accent rounded-full mx-auto mb-6 flex items-center justify-center">
+                            <i class="{{ cert.icon_class }} text-mc-black text-2xl"></i>
+                        </div>
                         {% else %}
-                        <img src="{% static 'certifications/default-cert.png' %}" 
-                             alt="{{ cert.title }}" 
-                             class="w-32 h-32 mx-auto object-contain">
+                        <div class="w-16 h-16 bg-mc-accent rounded-full mx-auto mb-6 flex items-center justify-center">
+                            <i class="fas fa-certificate text-mc-black text-2xl"></i>
+                        </div>
                         {% endif %}
                     </div>
                     <h3 class="text-xl font-bold text-mc-white mb-4">{{ cert.title }}</h3>
@@ -156,26 +160,59 @@
 
         <!-- Certification Proof Images -->
         <div class="bg-mc-black rounded-2xl p-8 border border-mc-grey/30">
-            <h3 class="text-2xl font-bold text-center mb-8 text-mc-white">Official Documentation</h3>
+            <h3 class="text-2xl font-bold text-center mb-8 text-mc-white">
+                {% if self.documentation_title %}{{ self.documentation_title }}{% else %}Official Documentation{% endif %}
+            </h3>
+            {% if self.documentation_description %}
+            <p class="text-mc-light-grey text-center mb-8">{{ self.documentation_description }}</p>
+            {% endif %}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% if self.documentation_image1_url %}
                 <div class="group cursor-pointer">
-                    <img src="{% static 'proof/apple-certificate.jpg' %}" 
-                         alt="Apple Authorization Certificate" 
+                    <img src="{{ self.documentation_image1_url }}" 
+                         alt="{{ self.documentation_image1_title }}" 
                          class="w-full h-48 object-cover rounded-lg group-hover:scale-105 transition-transform duration-300">
+                    <p class="text-mc-light-grey text-center mt-2">{{ self.documentation_image1_title }}</p>
+                </div>
+                {% endif %}
+                {% if self.documentation_image2_url %}
+                <div class="group cursor-pointer">
+                    <img src="{{ self.documentation_image2_url }}" 
+                         alt="{{ self.documentation_image2_title }}" 
+                         class="w-full h-48 object-cover rounded-lg group-hover:scale-105 transition-transform duration-300">
+                    <p class="text-mc-light-grey text-center mt-2">{{ self.documentation_image2_title }}</p>
+                </div>
+                {% endif %}
+                {% if self.documentation_image3_url %}
+                <div class="group cursor-pointer">
+                    <img src="{{ self.documentation_image3_url }}" 
+                         alt="{{ self.documentation_image3_title }}" 
+                         class="w-full h-48 object-cover rounded-lg group-hover:scale-105 transition-transform duration-300">
+                    <p class="text-mc-light-grey text-center mt-2">{{ self.documentation_image3_title }}</p>
+                </div>
+                {% endif %}
+                
+                <!-- Fallback content if no images are provided -->
+                {% if not self.documentation_image1_url and not self.documentation_image2_url and not self.documentation_image3_url %}
+                <div class="group cursor-pointer">
+                    <div class="w-full h-48 bg-mc-dark rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+                        <i class="fas fa-certificate text-mc-accent text-4xl"></i>
+                    </div>
                     <p class="text-mc-light-grey text-center mt-2">Apple Authorization</p>
                 </div>
                 <div class="group cursor-pointer">
-                    <img src="{% static 'proof/samsung-agreement.jpg' %}" 
-                         alt="Samsung Partnership Agreement" 
-                         class="w-full h-48 object-cover rounded-lg group-hover:scale-105 transition-transform duration-300">
+                    <div class="w-full h-48 bg-mc-dark rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+                        <i class="fas fa-handshake text-mc-accent text-4xl"></i>
+                    </div>
                     <p class="text-mc-light-grey text-center mt-2">Samsung Partnership</p>
                 </div>
                 <div class="group cursor-pointer">
-                    <img src="{% static 'proof/business-license.jpg' %}" 
-                         alt="Business License" 
-                         class="w-full h-48 object-cover rounded-lg group-hover:scale-105 transition-transform duration-300">
+                    <div class="w-full h-48 bg-mc-dark rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+                        <i class="fas fa-award text-mc-accent text-4xl"></i>
+                    </div>
                     <p class="text-mc-light-grey text-center mt-2">Business License</p>
                 </div>
+                {% endif %}
             </div>
         </div>
     </div>

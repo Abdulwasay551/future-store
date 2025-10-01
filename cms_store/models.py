@@ -358,6 +358,18 @@ class AboutPage(CMSBasePage):
         default="We are proud to be officially certified and authorized by leading mobile brands"
     )
     
+    # Official Documentation Section
+    documentation_title = models.CharField(max_length=100, default="Official Documentation")
+    documentation_description = models.TextField(
+        default="View our official certifications and authorization documents"
+    )
+    documentation_image1_url = models.URLField(blank=True, help_text="First documentation image URL")
+    documentation_image1_title = models.CharField(max_length=100, default="Apple Authorization")
+    documentation_image2_url = models.URLField(blank=True, help_text="Second documentation image URL")
+    documentation_image2_title = models.CharField(max_length=100, default="Samsung Partnership")
+    documentation_image3_url = models.URLField(blank=True, help_text="Third documentation image URL")
+    documentation_image3_title = models.CharField(max_length=100, default="Quality Certificate")
+    
     # Story Section
     story_title = models.CharField(max_length=100, default="Our Story")
     story_content = RichTextField(blank=True)
@@ -447,6 +459,16 @@ class AboutPage(CMSBasePage):
             FieldPanel('certifications_description'),
             InlinePanel('certifications', label="Certifications"),
         ], heading='Certifications Section'),
+        MultiFieldPanel([
+            FieldPanel('documentation_title'),
+            FieldPanel('documentation_description'),
+            FieldPanel('documentation_image1_url'),
+            FieldPanel('documentation_image1_title'),
+            FieldPanel('documentation_image2_url'),
+            FieldPanel('documentation_image2_title'),
+            FieldPanel('documentation_image3_url'),
+            FieldPanel('documentation_image3_title'),
+        ], heading='Official Documentation'),
         MultiFieldPanel([
             FieldPanel('story_title'),
             FieldPanel('story_content'),
