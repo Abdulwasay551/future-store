@@ -5,9 +5,9 @@
 {% block content %}
 <!-- Blog Post Hero -->
 <section class="relative min-h-[70vh] flex items-end justify-center">
-    {% if self.featured_image_url %}
+    {% if self.featured_image %}
     <div class="absolute inset-0">
-        <img src="{{ self.featured_image_url }}" 
+        <img src="{{ self.featured_image }}" 
              alt="{{ self.title }}" 
              class="w-full h-full object-cover">
         <div class="absolute inset-0 bg-gradient-to-t from-mc-black via-mc-black/50 to-transparent"></div>
@@ -107,13 +107,6 @@
             <!-- Main Content -->
             <div class="lg:col-span-3">
                 <article class="bg-mc-black rounded-2xl p-8 md:p-12 border border-mc-grey/30">
-                    <!-- Content -->
-                    {% if self.content %}
-                    <div class="text-lg text-mc-light-grey mb-8 leading-relaxed">
-                        {{ self.content|richtext }}
-                    </div>
-                    {% endif %}
-
                     <!-- Main Content -->
                     <div class="prose prose-invert prose-lg max-w-none blog-content">
                         {{ self.content|richtext }}
@@ -132,6 +125,29 @@
                         </div>
                     </div>
                     {% endif %}
+
+                    <!-- About the Author -->
+                    <div class="mt-12 pt-8 border-t border-mc-grey/30">
+                        <h3 class="text-mc-white font-semibold mb-6">About the Author</h3>
+                        <div class="flex items-start gap-4">
+                            {% if self.author_image %}
+                            <img src="{{ self.author_image }}" 
+                                 alt="{{ self.author_name }}" 
+                                 class="w-16 h-16 rounded-full object-cover flex-shrink-0">
+                            {% else %}
+                            <div class="w-16 h-16 bg-mc-accent rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-user text-mc-black text-xl"></i>
+                            </div>
+                            {% endif %}
+                            <div class="flex-1">
+                                <h4 class="text-mc-white font-semibold text-lg mb-1">{{ self.author_name|default:"Mobile Corner Team" }}</h4>
+                                <p class="text-mc-light-grey text-sm mb-3">Tech Expert & Mobile Technology Enthusiast</p>
+                                <p class="text-mc-light-grey text-sm leading-relaxed">
+                                    Expert writer and mobile technology enthusiast at Mobile Corner, sharing insights on the latest trends and innovations in the mobile industry.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- Social Share -->
                     <div class="mt-12 pt-8 border-t border-mc-grey/30">
@@ -168,9 +184,9 @@
                         {% for post in related_posts %}
                         <article class="group">
                             <div class="bg-mc-black rounded-2xl overflow-hidden border border-mc-grey/30 card-hover">
-                                {% if post.featured_image_url %}
+                                {% if post.featured_image %}
                                 <div class="aspect-video overflow-hidden">
-                                    <img src="{{ post.featured_image_url }}" 
+                                    <img src="{{ post.featured_image }}" 
                                          alt="{{ post.title }}" 
                                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                 </div>
@@ -233,9 +249,9 @@
                         {% for post in recent_posts %}
                         <article class="group">
                             <div class="flex gap-3">
-                                {% if post.featured_image_url %}
+                                {% if post.featured_image %}
                                 <div class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
-                                    <img src="{{ post.featured_image_url }}" 
+                                    <img src="{{ post.featured_image }}" 
                                          alt="{{ post.title }}" 
                                          class="w-full h-full object-cover group-hover:scale-105 transition-transform">
                                 </div>
