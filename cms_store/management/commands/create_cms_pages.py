@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.contrib.contenttypes.models import ContentType
 from cms_store.models import (
-    HomePage, AboutPage, ContactPage, 
+    HomePage, AboutPage, ContactPage, BlogIndexPage, BlogPost, BlogCategory, BlogTag,
     HeroButton, FeatureItem, CertificationItem, BrandLogo, 
     GalleryImage, WhyChooseUsItem, Testimonial
 )
@@ -283,5 +283,103 @@ class Command(BaseCommand):
             )
             home_page.add_child(instance=contact_page)
             self.stdout.write(self.style.SUCCESS(f'Created contact page: {contact_page.title}'))
+
+        # Create Blog Section
+        if home_page and not BlogIndexPage.objects.exists():            
+            # Create Blog Index Page
+            blog_index = BlogIndexPage(
+                title='Tech Blog',
+                slug='blog',
+                hero_title='TECH BLOG',
+                hero_description='Stay updated with the latest mobile technology trends, reviews, and insights from our experts.',
+                # SEO fields
+                search_description='Mobile Corner Tech Blog - Latest smartphone reviews, mobile technology trends, buying guides, and expert insights from Bahawalpur\'s premier mobile store.',
+                keywords='mobile blog, smartphone reviews, tech trends, mobile technology, buying guides, mobile corner blog',
+            )
+            home_page.add_child(instance=blog_index)
+            self.stdout.write(self.style.SUCCESS(f'Created blog index: {blog_index.title}'))
+            
+            # Create Blog Categories
+            categories_data = [
+                {'name': 'Reviews', 'slug': 'reviews', 'description': 'In-depth smartphone and device reviews'},
+                {'name': 'Tech News', 'slug': 'tech-news', 'description': 'Latest technology news and updates'},
+                {'name': 'Buying Guide', 'slug': 'buying-guide', 'description': 'Help choosing the right device'},
+                {'name': 'Tips & Tricks', 'slug': 'tips-tricks', 'description': 'Mobile tips and optimization guides'}
+            ]
+            
+            blog_categories = []
+            for cat_data in categories_data:
+                category, created = BlogCategory.objects.get_or_create(
+                    name=cat_data['name'],
+                    defaults={
+                        'slug': cat_data['slug'],
+                        'description': cat_data['description']
+                    }
+                )
+                blog_categories.append(category)
+            
+            # Create Blog Tags
+            tags_data = ['smartphone', 'android', 'ios', 'review', 'tips', 'technology', 'mobile', 'apps']
+            blog_tags = []
+            for tag_name in tags_data:
+                tag, created = BlogTag.objects.get_or_create(name=tag_name)
+                blog_tags.append(tag)
+            
+            # Create Sample Blog Posts
+            posts_data = [
+                {
+                    'title': 'iPhone 15 Pro Max vs Samsung Galaxy S24 Ultra: The Ultimate Comparison',
+                    'slug': 'iphone-15-pro-max-vs-samsung-galaxy-s24-ultra',
+                    'excerpt': 'Detailed comparison of the two flagship smartphones that dominate the premium market in 2024.',
+                    'intro': '<p>In the premium smartphone segment, two devices stand out as the clear leaders: Apple\'s iPhone 15 Pro Max and Samsung\'s Galaxy S24 Ultra. Both offer cutting-edge technology, but which one offers better value for Pakistani consumers?</p>',
+                    'body': '<h2>Design and Build Quality</h2><p>Both phones feature premium materials and excellent build quality. The iPhone 15 Pro Max sports a titanium frame with ceramic shield glass, while the Galaxy S24 Ultra uses an aluminum frame with Gorilla Glass Victus 2.</p><h2>Performance Comparison</h2><p>The iPhone 15 Pro Max is powered by the A17 Pro chip, while the Galaxy S24 Ultra runs on the Snapdragon 8 Gen 3. Both offer flagship-level performance for demanding tasks.</p><h2>Camera Systems</h2><p>Photography enthusiasts will find both phones excellent, with the iPhone excelling in video recording and the Galaxy offering more versatility with its zoom capabilities.</p>',
+                    'category': blog_categories[0],  # Reviews
+                    'featured_image_url': 'https://via.placeholder.com/800x450/007AFF/FFFFFF?text=iPhone+vs+Samsung',
+                    'author': 'Tech Expert Team',
+                    'is_featured': True,
+                    'tags': ['smartphone', 'review', 'ios', 'android']
+                },
+                {
+                    'title': '5 Essential Android Tips Every User Should Know',
+                    'slug': '5-essential-android-tips-every-user-should-know',
+                    'excerpt': 'Unlock your Android phone\'s potential with these simple but powerful tips and tricks.',
+                    'intro': '<p>Android phones offer incredible flexibility and customization options. Here are five essential tips that will help you get the most out of your Android device.</p>',
+                    'body': '<h2>1. Master Your Battery Settings</h2><p>Learn how to optimize your battery life with adaptive battery settings and background app limitations.</p><h2>2. Customize Your Home Screen</h2><p>Make your phone truly yours with widgets, custom launchers, and icon packs.</p><h2>3. Use Google Assistant Effectively</h2><p>Voice commands and automation can save you time throughout the day.</p>',
+                    'category': blog_categories[3],  # Tips & Tricks
+                    'featured_image_url': 'https://via.placeholder.com/800x450/34A853/FFFFFF?text=Android+Tips',
+                    'author': 'Mobile Expert',
+                    'is_featured': True,
+                    'tags': ['android', 'tips', 'mobile']
+                },
+                {
+                    'title': 'Best Budget Smartphones Under PKR 50,000 in 2024',
+                    'slug': 'best-budget-smartphones-under-pkr-50000-2024',
+                    'excerpt': 'Find the perfect smartphone that offers great value without breaking the bank.',
+                    'intro': '<p>You don\'t need to spend a fortune to get a great smartphone. Here are our top picks for budget-friendly phones under PKR 50,000 that deliver excellent performance and features.</p>',
+                    'body': '<h2>Xiaomi Redmi Note 13 Pro</h2><p>Excellent camera system and fast charging at an affordable price point.</p><h2>Realme 11 Pro</h2><p>Great design and solid performance for everyday tasks and gaming.</p><h2>Samsung Galaxy A54</h2><p>Reliable performance with Samsung\'s ecosystem integration.</p>',
+                    'category': blog_categories[2],  # Buying Guide
+                    'featured_image_url': 'https://via.placeholder.com/800x450/FF6B6B/FFFFFF?text=Budget+Phones',
+                    'author': 'Pricing Expert',
+                    'tags': ['smartphone', 'buying-guide', 'budget']
+                }
+            ]
+            
+            for post_data in posts_data:
+                tags = post_data.pop('tags', [])
+                post = BlogPost(
+                    **post_data,
+                    # SEO fields
+                    search_description=post_data['excerpt'],
+                    keywords=', '.join(tags),
+                )
+                blog_index.add_child(instance=post)
+                
+                # Add tags to the post
+                for tag_name in tags:
+                    tag = next((t for t in blog_tags if t.name == tag_name), None)
+                    if tag:
+                        post.tags.add(tag)
+                
+                self.stdout.write(self.style.SUCCESS(f'Created blog post: {post.title}'))
 
         self.stdout.write(self.style.SUCCESS('Initial CMS pages created successfully with sample content and SEO optimization!'))

@@ -1,0 +1,301 @@
+{% extends "shared/skeleton.html" %}
+{% load static %}
+{% load wagtailcore_tags %}
+
+{% block content %}
+<!-- Blog Hero Section -->
+<section class="relative min-h-[60vh] flex items-center justify-center bg-gradient-to-br from-mc-black via-mc-dark to-mc-black overflow-hidden">
+    <!-- Background Elements -->
+    <div class="absolute inset-0">
+        {% if self.hero_background_image %}
+        <div class="absolute inset-0 bg-cover bg-center opacity-20" style="background-image: url('{{ self.hero_background_image }}');"></div>
+        {% endif %}
+        <!-- Animated Grid Pattern -->
+        <div class="absolute inset-0 opacity-5">
+            <div class="w-full h-full bg-repeat pattern-grid"></div>
+        </div>
+        <!-- Floating Elements -->
+        <div class="absolute top-20 left-10 w-32 h-32 bg-mc-accent/10 rounded-full filter blur-3xl animate-float"></div>
+        <div class="absolute bottom-20 right-10 w-48 h-48 bg-mc-accent/10 rounded-full filter blur-3xl animate-float" style="animation-delay: 1s;"></div>
+        <div class="absolute top-1/2 left-1/3 w-20 h-20 bg-mc-accent/10 rounded-full filter blur-2xl animate-float" style="animation-delay: 2s;"></div>
+    </div>
+
+    <!-- Content -->
+    <div class="relative z-10 pt-32 pb-20 px-6 text-center">
+        <div class="container mx-auto">
+            <div class="animate-fade-in">
+                <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 tracking-wider">
+                    <span class="bg-gradient-to-r from-mc-white via-mc-accent to-mc-white bg-clip-text text-transparent">
+                        {{ self.hero_title|default:"MOBILE CORNER BLOG" }}
+                    </span>
+                </h1>
+                <p class="text-xl md:text-2xl mb-4 max-w-3xl mx-auto text-mc-text">
+                    {{ self.hero_subtitle|default:"Latest Tech News, Reviews & Insights" }}
+                </p>
+                <p class="text-lg mb-8 max-w-2xl mx-auto text-mc-light-grey">
+                    {{ self.hero_description|default:"Stay updated with the latest mobile technology trends, product reviews, and expert insights from Mobile Corner." }}
+                </p>
+                
+                <!-- Search Bar -->
+                <div class="max-w-md mx-auto">
+                    <div class="relative">
+                        <input type="text" 
+                               placeholder="Search articles..." 
+                               class="w-full px-6 py-4 bg-mc-dark border border-mc-grey/30 rounded-full text-mc-white placeholder-mc-light-grey focus:border-mc-accent focus:outline-none transition-colors">
+                        <button class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-mc-accent text-mc-black p-3 rounded-full hover:bg-mc-white transition-colors">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Categories Section -->
+{% if self.show_categories and categories %}
+<section class="py-16 px-6 bg-mc-dark">
+    <div class="container mx-auto">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4 text-mc-white">
+                {{ self.categories_title|default:"Browse by Category" }}
+            </h2>
+            <p class="text-mc-light-grey text-lg">Explore our diverse range of mobile technology topics</p>
+        </div>
+        
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {% for category in categories %}
+            <div class="bg-mc-black rounded-2xl p-6 text-center card-hover animate-slide-up border border-mc-grey/30 group"
+                 style="animation-delay: {{ forloop.counter0|add:1 }}00ms;">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center transition-all duration-300"
+                     style="background-color: {{ category.color }}20; border: 2px solid {{ category.color }};">
+                    <i class="{{ category.icon_class }} text-2xl" style="color: {{ category.color }};"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-mc-white mb-2 group-hover:text-mc-accent transition-colors">
+                    {{ category.name }}
+                </h3>
+                <p class="text-mc-light-grey text-sm mb-4">{{ category.description|truncatechars:60 }}</p>
+                <a href="#" class="inline-flex items-center text-sm font-medium transition-colors"
+                   style="color: {{ category.color }};">
+                    Explore <i class="fas fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Featured Posts Section -->
+{% if featured_posts %}
+<section class="py-20 px-6 bg-mc-black">
+    <div class="container mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl md:text-5xl font-bold mb-6">
+                <span class="text-mc-white">{{ self.featured_posts_title|default:"FEATURED" }} </span>
+                <span class="text-mc-accent">ARTICLES</span>
+            </h2>
+            <p class="text-mc-light-grey text-lg max-w-2xl mx-auto">
+                Don't miss these essential reads about mobile technology and innovation
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for post in featured_posts %}
+            <article class="group cursor-pointer animate-slide-up" style="animation-delay: {{ forloop.counter0|add:1 }}00ms;">
+                <div class="bg-mc-dark rounded-2xl overflow-hidden border border-mc-grey/30 card-hover">
+                    <!-- Featured Image -->
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="{{ post.featured_image }}" 
+                             alt="{{ post.title }}"
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-mc-black/50 to-transparent"></div>
+                        
+                        <!-- Category Badge -->
+                        {% if post.category %}
+                        <div class="absolute top-4 left-4">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium text-mc-black"
+                                  style="background-color: {{ post.category.color }};">
+                                <i class="{{ post.category.icon_class }} mr-1"></i>
+                                {{ post.category.name }}
+                            </span>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Reading Time -->
+                        <div class="absolute top-4 right-4">
+                            <span class="bg-mc-black/70 text-mc-white px-3 py-1 rounded-full text-xs">
+                                <i class="fas fa-clock mr-1"></i>{{ post.reading_time }} min
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- Content -->
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-mc-white mb-3 group-hover:text-mc-accent transition-colors line-clamp-2">
+                            {{ post.title }}
+                        </h3>
+                        <p class="text-mc-light-grey mb-4 line-clamp-3">
+                            {{ post.excerpt }}
+                        </p>
+                        
+                        <!-- Meta Info -->
+                        <div class="flex items-center justify-between text-sm text-mc-light-grey">
+                            <div class="flex items-center space-x-2">
+                                {% if post.author_image %}
+                                <img src="{{ post.author_image }}" 
+                                     alt="{{ post.author_name }}"
+                                     class="w-6 h-6 rounded-full">
+                                {% else %}
+                                <div class="w-6 h-6 bg-mc-accent rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user text-mc-black text-xs"></i>
+                                </div>
+                                {% endif %}
+                                <span>{{ post.author_name }}</span>
+                            </div>
+                            <span>{{ post.first_published_at|date:"M d, Y" }}</span>
+                        </div>
+                        
+                        <!-- Read More -->
+                        <div class="mt-4 pt-4 border-t border-mc-grey/30">
+                            <a href="{{ post.url }}" 
+                               class="inline-flex items-center text-mc-accent font-medium hover:text-mc-white transition-colors">
+                                Read Full Article <i class="fas fa-arrow-right ml-2"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Recent Posts Section -->
+{% if recent_posts %}
+<section class="py-20 px-6 bg-mc-dark">
+    <div class="container mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl md:text-5xl font-bold mb-6">
+                <span class="text-mc-white">RECENT </span>
+                <span class="text-mc-accent">ARTICLES</span>
+            </h2>
+            <p class="text-mc-light-grey text-lg max-w-2xl mx-auto">
+                Stay up-to-date with our latest insights and mobile technology news
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for post in recent_posts %}
+            <article class="group cursor-pointer animate-slide-up" style="animation-delay: {{ forloop.counter0|add:1 }}00ms;">
+                <div class="bg-mc-black rounded-2xl overflow-hidden border border-mc-grey/30 card-hover">
+                    <!-- Featured Image -->
+                    <div class="relative h-40 overflow-hidden">
+                        <img src="{{ post.featured_image }}" 
+                             alt="{{ post.title }}"
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        
+                        <!-- Category Badge -->
+                        {% if post.category %}
+                        <div class="absolute top-3 left-3">
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium text-mc-black"
+                                  style="background-color: {{ post.category.color }};">
+                                {{ post.category.name }}
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Content -->
+                    <div class="p-5">
+                        <h3 class="text-lg font-bold text-mc-white mb-2 group-hover:text-mc-accent transition-colors line-clamp-2">
+                            {{ post.title }}
+                        </h3>
+                        <p class="text-mc-light-grey text-sm mb-3 line-clamp-2">
+                            {{ post.excerpt }}
+                        </p>
+                        
+                        <!-- Meta Info -->
+                        <div class="flex items-center justify-between text-xs text-mc-light-grey mb-3">
+                            <span>{{ post.author_name }}</span>
+                            <span>{{ post.first_published_at|date:"M d" }}</span>
+                        </div>
+                        
+                        <!-- Read More -->
+                        <a href="{{ post.url }}" 
+                           class="inline-flex items-center text-sm text-mc-accent font-medium hover:text-mc-white transition-colors">
+                            Read More <i class="fas fa-arrow-right ml-1 text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        
+        <!-- Load More Button -->
+        <div class="text-center mt-12">
+            <button class="bg-mc-accent text-mc-black px-8 py-3 rounded-lg font-semibold hover:bg-mc-white transition-colors">
+                Load More Articles
+            </button>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Newsletter Subscription -->
+<section class="py-16 px-6 bg-mc-black">
+    <div class="container mx-auto text-center">
+        <div class="bg-mc-dark rounded-2xl p-12 max-w-4xl mx-auto border border-mc-grey/30">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4 text-mc-white">
+                Stay in the Loop
+            </h2>
+            <p class="text-mc-light-grey text-lg mb-8">
+                Get the latest mobile tech news and exclusive insights delivered to your inbox
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
+                <input type="email" 
+                       placeholder="Enter your email"
+                       class="flex-1 px-6 py-3 bg-mc-black border border-mc-grey/30 rounded-lg text-mc-white placeholder-mc-light-grey focus:border-mc-accent focus:outline-none">
+                <button class="bg-mc-accent text-mc-black px-6 py-3 rounded-lg font-semibold hover:bg-mc-white transition-colors">
+                    Subscribe
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .pattern-grid {
+        background-image: 
+            linear-gradient(var(--mc-accent) 1px, transparent 1px),
+            linear-gradient(90deg, var(--mc-accent) 1px, transparent 1px);
+        background-size: 40px 40px;
+    }
+    
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .line-clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+    }
+    
+    .animate-float {
+        animation: float 6s ease-in-out infinite;
+    }
+</style>
+
+{% endblock %}

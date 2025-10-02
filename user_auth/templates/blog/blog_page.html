@@ -1,0 +1,501 @@
+{% extends "shared/skeleton.html" %}
+{% load static %}
+{% load wagtailcore_tags %}
+
+{% block content %}
+<!-- Blog Post Hero -->
+<section class="relative min-h-[70vh] flex items-end justify-center">
+    {% if self.featured_image_url %}
+    <div class="absolute inset-0">
+        <img src="{{ self.featured_image_url }}" 
+             alt="{{ self.title }}" 
+             class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-gradient-to-t from-mc-black via-mc-black/50 to-transparent"></div>
+    </div>
+    {% else %}
+    <div class="absolute inset-0 bg-gradient-to-br from-mc-black via-mc-dark to-mc-black">
+        <!-- Animated background patterns -->
+        <div class="absolute inset-0 opacity-5">
+            <div class="absolute bg-transparent/40 inset-0 bg-repeat pattern-grid"></div>
+        </div>
+        <!-- Animated Circles -->
+        <div class="absolute bg-transparent/40 top-20 left-10 w-64 h-96 bg-mc-accent/10 rounded-full filter blur-3xl animate-float"></div>
+        <div class="absolute bg-transparent/20 bottom-20 right-10 w-96 h-96 bg-mc-accent/10 rounded-full filter blur-3xl animate-float" style="animation-delay: 1s"></div>
+    </div>
+    {% endif %}
+
+    <div class="relative z-10 pb-20 px-6 w-full">
+        <div class="container mx-auto">
+            <!-- Breadcrumb -->
+            <nav class="mb-8">
+                <div class="flex items-center gap-2 text-sm">
+                    <a href="/" 
+                       hx-get="/"
+                       hx-target="#content-comp"
+                       hx-push-url="true"
+                       class="text-mc-light-grey hover:text-mc-accent transition-colors">
+                        Home
+                    </a>
+                    <i class="fas fa-chevron-right text-mc-light-grey text-xs"></i>
+                    <a href="{% url 'cms_store:blog_index' %}" 
+                       hx-get="{% url 'cms_store:blog_index' %}"
+                       hx-target="#content-comp"
+                       hx-push-url="true"
+                       class="text-mc-light-grey hover:text-mc-accent transition-colors">
+                        Blog
+                    </a>
+                    <i class="fas fa-chevron-right text-mc-light-grey text-xs"></i>
+                    <span class="text-mc-accent">{{ self.title|truncatewords:3 }}</span>
+                </div>
+            </nav>
+
+            <div class="max-w-4xl">
+                <!-- Category & Date -->
+                <div class="flex items-center gap-4 mb-6">
+                    {% if self.category %}
+                    <span class="px-4 py-2 bg-mc-accent text-mc-black font-semibold rounded-full">
+                        {{ self.category.name }}
+                    </span>
+                    {% endif %}
+                    <span class="text-mc-light-grey">
+                        <i class="fas fa-calendar-alt mr-2"></i>
+                        {{ self.publish_date|date:"F d, Y" }}
+                    </span>
+                    <span class="text-mc-light-grey">
+                        <i class="fas fa-clock mr-2"></i>
+                        {{ self.read_time|default:"5" }} min read
+                    </span>
+                </div>
+
+                <!-- Title -->
+                <h1 class="text-4xl md:text-6xl font-bold mb-6 text-mc-white leading-tight">
+                    {{ self.title }}
+                </h1>
+
+                <!-- Excerpt -->
+                {% if self.excerpt %}
+                <p class="text-xl text-mc-light-grey mb-8 leading-relaxed">
+                    {{ self.excerpt }}
+                </p>
+                {% endif %}
+
+                <!-- Author Info -->
+                <div class="flex items-center gap-4">
+                    {% if self.author_image_url %}
+                    <img src="{{ self.author_image_url }}" 
+                         alt="{{ self.author }}" 
+                         class="w-12 h-12 rounded-full object-cover">
+                    {% else %}
+                    <div class="w-12 h-12 bg-mc-accent rounded-full flex items-center justify-center">
+                        <i class="fas fa-user text-mc-black"></i>
+                    </div>
+                    {% endif %}
+                    <div>
+                        <p class="text-mc-white font-semibold">{{ self.author|default:"Mobile Corner Team" }}</p>
+                        <p class="text-mc-light-grey text-sm">Tech Expert</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Blog Content -->
+<section class="py-20 px-6 bg-mc-dark">
+    <div class="container mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-12">
+            <!-- Main Content -->
+            <div class="lg:col-span-3">
+                <article class="bg-mc-black rounded-2xl p-8 md:p-12 border border-mc-grey/30">
+                    <!-- Intro -->
+                    {% if self.intro %}
+                    <div class="text-lg text-mc-light-grey mb-8 leading-relaxed">
+                        {{ self.intro|richtext }}
+                    </div>
+                    {% endif %}
+
+                    <!-- Main Content -->
+                    <div class="prose prose-invert prose-lg max-w-none blog-content">
+                        {{ self.body|richtext }}
+                    </div>
+
+                    <!-- Tags -->
+                    {% if self.tags.all %}
+                    <div class="mt-12 pt-8 border-t border-mc-grey/30">
+                        <h3 class="text-mc-white font-semibold mb-4">Tags:</h3>
+                        <div class="flex flex-wrap gap-2">
+                            {% for tag in self.tags.all %}
+                            <span class="px-3 py-1 bg-mc-dark text-mc-light-grey text-sm rounded-full border border-mc-grey/30">
+                                #{{ tag.name }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Social Share -->
+                    <div class="mt-12 pt-8 border-t border-mc-grey/30">
+                        <h3 class="text-mc-white font-semibold mb-4">Share this article:</h3>
+                        <div class="flex gap-4">
+                            <a href="https://twitter.com/intent/tweet?text={{ self.title|urlencode }}&url={{ request.build_absolute_uri }}" 
+                               target="_blank"
+                               class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white hover:bg-blue-600 transition-colors">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" 
+                               target="_blank"
+                               class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white hover:bg-blue-700 transition-colors">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.build_absolute_uri }}" 
+                               target="_blank"
+                               class="w-12 h-12 bg-blue-700 rounded-full flex items-center justify-center text-white hover:bg-blue-800 transition-colors">
+                                <i class="fab fa-linkedin-in"></i>
+                            </a>
+                            <button onclick="copyToClipboard('{{ request.build_absolute_uri }}')"
+                                    class="w-12 h-12 bg-mc-accent rounded-full flex items-center justify-center text-mc-black hover:bg-mc-white transition-colors">
+                                <i class="fas fa-link"></i>
+                            </button>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Related Posts -->
+                {% if related_posts %}
+                <section class="mt-16">
+                    <h2 class="text-3xl font-bold text-mc-white mb-8">Related Articles</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {% for post in related_posts %}
+                        <article class="group">
+                            <div class="bg-mc-black rounded-2xl overflow-hidden border border-mc-grey/30 card-hover">
+                                {% if post.featured_image_url %}
+                                <div class="aspect-video overflow-hidden">
+                                    <img src="{{ post.featured_image_url }}" 
+                                         alt="{{ post.title }}" 
+                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                </div>
+                                {% endif %}
+                                
+                                <div class="p-6">
+                                    <div class="flex items-center gap-2 mb-3">
+                                        {% if post.category %}
+                                        <span class="px-2 py-1 bg-mc-accent text-mc-black text-xs font-semibold rounded-full">
+                                            {{ post.category.name }}
+                                        </span>
+                                        {% endif %}
+                                        <span class="text-mc-light-grey text-xs">
+                                            {{ post.publish_date|date:"M d" }}
+                                        </span>
+                                    </div>
+                                    
+                                    <h3 class="text-lg font-bold text-mc-white mb-3 group-hover:text-mc-accent transition-colors line-clamp-2">
+                                        <a href="{% url 'cms_store:blog_post_detail' post.slug %}" 
+                                           hx-get="{% url 'cms_store:blog_post_detail' post.slug %}"
+                                           hx-target="#content-comp"
+                                           hx-push-url="true">
+                                            {{ post.title }}
+                                        </a>
+                                    </h3>
+                                    
+                                    <p class="text-mc-light-grey text-sm line-clamp-2">
+                                        {{ post.excerpt|default:post.intro|truncatewords:12 }}
+                                    </p>
+                                </div>
+                            </div>
+                        </article>
+                        {% endfor %}
+                    </div>
+                </section>
+                {% endif %}
+            </div>
+
+            <!-- Sidebar -->
+            <div class="lg:col-span-1">
+                <!-- Table of Contents (if applicable) -->
+                <div class="bg-mc-black rounded-2xl p-6 border border-mc-grey/30 mb-8 sticky top-8">
+                    <h3 class="text-mc-white font-bold mb-4">
+                        <i class="fas fa-list mr-2"></i>
+                        Table of Contents
+                    </h3>
+                    <nav id="toc" class="space-y-2">
+                        <!-- Will be populated by JavaScript -->
+                    </nav>
+                </div>
+
+                <!-- Recent Posts -->
+                {% if recent_posts %}
+                <div class="bg-mc-black rounded-2xl p-6 border border-mc-grey/30 mb-8">
+                    <h3 class="text-mc-white font-bold mb-4">
+                        <i class="fas fa-clock mr-2"></i>
+                        Recent Posts
+                    </h3>
+                    <div class="space-y-4">
+                        {% for post in recent_posts %}
+                        <article class="group">
+                            <div class="flex gap-3">
+                                {% if post.featured_image_url %}
+                                <div class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+                                    <img src="{{ post.featured_image_url }}" 
+                                         alt="{{ post.title }}" 
+                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform">
+                                </div>
+                                {% endif %}
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="text-mc-white text-sm font-semibold line-clamp-2 group-hover:text-mc-accent transition-colors">
+                                        <a href="{% url 'cms_store:blog_post_detail' post.slug %}" 
+                                           hx-get="{% url 'cms_store:blog_post_detail' post.slug %}"
+                                           hx-target="#content-comp"
+                                           hx-push-url="true">
+                                            {{ post.title }}
+                                        </a>
+                                    </h4>
+                                    <p class="text-mc-light-grey text-xs mt-1">
+                                        {{ post.publish_date|date:"M d, Y" }}
+                                    </p>
+                                </div>
+                            </div>
+                        </article>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Categories -->
+                {% if categories %}
+                <div class="bg-mc-black rounded-2xl p-6 border border-mc-grey/30">
+                    <h3 class="text-mc-white font-bold mb-4">
+                        <i class="fas fa-folder mr-2"></i>
+                        Categories
+                    </h3>
+                    <div class="space-y-2">
+                        {% for category in categories %}
+                        <a href="{% url 'cms_store:blog_category' category.slug %}" 
+                           hx-get="{% url 'cms_store:blog_category' category.slug %}"
+                           hx-target="#content-comp"
+                           hx-push-url="true"
+                           class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-mc-dark transition-colors group">
+                            <span class="text-mc-light-grey group-hover:text-mc-white transition-colors">
+                                {{ category.name }}
+                            </span>
+                            <span class="text-mc-accent text-sm">
+                                {{ category.posts.count }}
+                            </span>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.pattern-grid {
+    background-image: 
+        linear-gradient(var(--mc-accent) 1px, transparent 1px),
+        linear-gradient(90deg, var(--mc-accent) 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+}
+
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.card-hover {
+    transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* Blog content styling */
+.blog-content {
+    color: var(--mc-light-grey);
+    line-height: 1.8;
+}
+
+.blog-content h1,
+.blog-content h2,
+.blog-content h3,
+.blog-content h4,
+.blog-content h5,
+.blog-content h6 {
+    color: var(--mc-white);
+    font-weight: 700;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+.blog-content h2 {
+    font-size: 1.75rem;
+    border-bottom: 2px solid var(--mc-accent);
+    padding-bottom: 0.5rem;
+}
+
+.blog-content h3 {
+    font-size: 1.5rem;
+}
+
+.blog-content p {
+    margin-bottom: 1.5rem;
+}
+
+.blog-content a {
+    color: var(--mc-accent);
+    text-decoration: underline;
+}
+
+.blog-content a:hover {
+    color: var(--mc-white);
+}
+
+.blog-content ul,
+.blog-content ol {
+    margin: 1.5rem 0;
+    padding-left: 2rem;
+}
+
+.blog-content li {
+    margin-bottom: 0.5rem;
+}
+
+.blog-content blockquote {
+    border-left: 4px solid var(--mc-accent);
+    padding-left: 1.5rem;
+    margin: 2rem 0;
+    font-style: italic;
+    color: var(--mc-white);
+}
+
+.blog-content code {
+    background-color: var(--mc-dark);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-family: monospace;
+    color: var(--mc-accent);
+}
+
+.blog-content pre {
+    background-color: var(--mc-dark);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    margin: 1.5rem 0;
+}
+
+.blog-content img {
+    border-radius: 0.5rem;
+    margin: 2rem 0;
+    max-width: 100%;
+    height: auto;
+}
+
+/* Table of Contents */
+#toc a {
+    display: block;
+    padding: 0.25rem 0;
+    color: var(--mc-light-grey);
+    text-decoration: none;
+    border-radius: 0.25rem;
+    padding-left: 0.5rem;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+}
+
+#toc a:hover,
+#toc a.active {
+    color: var(--mc-accent);
+    background-color: var(--mc-dark);
+    padding-left: 1rem;
+}
+
+#toc a.level-2 {
+    padding-left: 1rem;
+}
+
+#toc a.level-3 {
+    padding-left: 1.5rem;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Generate Table of Contents
+    const content = document.querySelector('.blog-content');
+    const toc = document.getElementById('toc');
+    
+    if (content && toc) {
+        const headings = content.querySelectorAll('h1, h2, h3, h4, h5, h6');
+        
+        if (headings.length > 0) {
+            headings.forEach((heading, index) => {
+                // Add IDs to headings
+                heading.id = `heading-${index}`;
+                
+                // Create TOC link
+                const link = document.createElement('a');
+                link.href = `#heading-${index}`;
+                link.textContent = heading.textContent;
+                link.className = `level-${heading.tagName.slice(1)}`;
+                
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    heading.scrollIntoView({ 
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    
+                    // Update active state
+                    toc.querySelectorAll('a').forEach(a => a.classList.remove('active'));
+                    this.classList.add('active');
+                });
+                
+                toc.appendChild(link);
+            });
+        } else {
+            toc.innerHTML = '<p class="text-mc-light-grey text-sm">No headings found</p>';
+        }
+    }
+    
+    // Copy to clipboard function
+    window.copyToClipboard = function(text) {
+        navigator.clipboard.writeText(text).then(function() {
+            // Show toast notification if available
+            if (typeof showToast === 'function') {
+                showToast('Link copied to clipboard!');
+            }
+        });
+    };
+    
+    // Smooth scroll for internal links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+});
+</script>
+
+{% endblock %}

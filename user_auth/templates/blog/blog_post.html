@@ -1,0 +1,375 @@
+{% extends "shared/skeleton.html" %}
+{% load static %}
+{% load wagtailcore_tags %}
+
+{% block content %}
+<!-- Blog Post Hero -->
+<article class="relative">
+    <!-- Featured Image Hero -->
+    <section class="relative h-[70vh] overflow-hidden">
+        <div class="absolute inset-0">
+            <img src="{{ self.featured_image }}" 
+                 alt="{{ self.title }}"
+                 class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-t from-mc-black via-mc-black/50 to-transparent"></div>
+        </div>
+        
+        <!-- Content Overlay -->
+        <div class="relative z-10 h-full flex items-end">
+            <div class="container mx-auto px-6 pb-12">
+                <div class="max-w-4xl">
+                    <!-- Category & Meta -->
+                    <div class="flex items-center gap-4 mb-6">
+                        {% if self.category %}
+                        <span class="inline-flex items-center px-4 py-2 rounded-full font-medium text-mc-black"
+                              style="background-color: {{ self.category.color }};">
+                            <i class="{{ self.category.icon_class }} mr-2"></i>
+                            {{ self.category.name }}
+                        </span>
+                        {% endif %}
+                        
+                        <div class="flex items-center gap-4 text-mc-light-grey text-sm">
+                            <span><i class="fas fa-clock mr-1"></i>{{ self.reading_time }} min read</span>
+                            <span><i class="fas fa-calendar mr-1"></i>{{ self.first_published_at|date:"F d, Y" }}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Title -->
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-mc-white mb-6 leading-tight">
+                        {{ self.title }}
+                    </h1>
+                    
+                    <!-- Excerpt -->
+                    <p class="text-xl md:text-2xl text-mc-light-grey mb-8 leading-relaxed">
+                        {{ self.excerpt }}
+                    </p>
+                    
+                    <!-- Author Info -->
+                    <div class="flex items-center gap-4">
+                        {% if self.author_image %}
+                        <img src="{{ self.author_image }}" 
+                             alt="{{ self.author_name }}"
+                             class="w-12 h-12 rounded-full border-2 border-mc-accent">
+                        {% else %}
+                        <div class="w-12 h-12 bg-mc-accent rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-mc-black"></i>
+                        </div>
+                        {% endif %}
+                        <div>
+                            <p class="text-mc-white font-semibold">{{ self.author_name }}</p>
+                            {% if self.author_bio %}
+                            <p class="text-mc-light-grey text-sm">{{ self.author_bio|truncatechars:50 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Blog Content -->
+    <section class="py-16 px-6 bg-mc-dark">
+        <div class="container mx-auto">
+            <div class="max-w-4xl mx-auto">
+                <!-- Social Share Bar (Sticky) -->
+                {% if self.show_social_share %}
+                <div class="fixed left-8 top-1/2 transform -translate-y-1/2 z-40 hidden lg:flex flex-col gap-3">
+                    <div class="bg-mc-black rounded-full p-3 border border-mc-grey/30">
+                        <a href="#" class="text-mc-light-grey hover:text-mc-accent transition-colors">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                    </div>
+                    <div class="bg-mc-black rounded-full p-3 border border-mc-grey/30">
+                        <a href="#" class="text-mc-light-grey hover:text-mc-accent transition-colors">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                    </div>
+                    <div class="bg-mc-black rounded-full p-3 border border-mc-grey/30">
+                        <a href="#" class="text-mc-light-grey hover:text-mc-accent transition-colors">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                    <div class="bg-mc-black rounded-full p-3 border border-mc-grey/30">
+                        <a href="#" class="text-mc-light-grey hover:text-mc-accent transition-colors">
+                            <i class="fas fa-copy"></i>
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Main Content -->
+                <div class="prose prose-lg prose-invert max-w-none">
+                    <div class="blog-content text-mc-text leading-relaxed">
+                        {{ self.content|richtext }}
+                    </div>
+                </div>
+                
+                <!-- Tags -->
+                {% if self.tags.all %}
+                <div class="mt-12 pt-8 border-t border-mc-grey/30">
+                    <h3 class="text-lg font-semibold text-mc-white mb-4">Tags</h3>
+                    <div class="flex flex-wrap gap-2">
+                        {% for tag in self.tags.all %}
+                        <span class="bg-mc-black text-mc-light-grey px-3 py-1 rounded-full text-sm border border-mc-grey/30 hover:border-mc-accent hover:text-mc-accent transition-colors cursor-pointer">
+                            #{{ tag.name }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Author Bio Section -->
+                <div class="mt-12 pt-8 border-t border-mc-grey/30">
+                    <div class="bg-mc-black rounded-2xl p-8 border border-mc-grey/30">
+                        <h3 class="text-xl font-bold text-mc-white mb-6">About the Author</h3>
+                        <div class="flex flex-col md:flex-row gap-6">
+                            {% if self.author_image %}
+                            <img src="{{ self.author_image }}" 
+                                 alt="{{ self.author_name }}"
+                                 class="w-20 h-20 rounded-full border-2 border-mc-accent mx-auto md:mx-0">
+                            {% else %}
+                            <div class="w-20 h-20 bg-mc-accent rounded-full flex items-center justify-center mx-auto md:mx-0">
+                                <i class="fas fa-user text-mc-black text-2xl"></i>
+                            </div>
+                            {% endif %}
+                            <div class="flex-1 text-center md:text-left">
+                                <h4 class="text-lg font-semibold text-mc-white mb-2">{{ self.author_name }}</h4>
+                                {% if self.author_bio %}
+                                <p class="text-mc-light-grey leading-relaxed">{{ self.author_bio }}</p>
+                                {% else %}
+                                <p class="text-mc-light-grey leading-relaxed">
+                                    Expert writer and mobile technology enthusiast at Mobile Corner, sharing insights on the latest trends and innovations in the mobile industry.
+                                </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mobile Social Share -->
+                {% if self.show_social_share %}
+                <div class="mt-8 lg:hidden">
+                    <h3 class="text-lg font-semibold text-mc-white mb-4">Share this article</h3>
+                    <div class="flex gap-3">
+                        <button class="flex-1 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+                            <i class="fab fa-facebook-f mr-2"></i>Facebook
+                        </button>
+                        <button class="flex-1 bg-blue-400 text-white py-3 rounded-lg font-medium hover:bg-blue-500 transition-colors">
+                            <i class="fab fa-twitter mr-2"></i>Twitter
+                        </button>
+                        <button class="flex-1 bg-blue-800 text-white py-3 rounded-lg font-medium hover:bg-blue-900 transition-colors">
+                            <i class="fab fa-linkedin-in mr-2"></i>LinkedIn
+                        </button>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+    
+    <!-- Related Posts -->
+    {% if related_posts %}
+    <section class="py-16 px-6 bg-mc-black">
+        <div class="container mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                    <span class="text-mc-white">RELATED </span>
+                    <span class="text-mc-accent">ARTICLES</span>
+                </h2>
+                <p class="text-mc-light-grey">Continue reading with these related articles</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                {% for post in related_posts %}
+                <article class="group cursor-pointer animate-slide-up">
+                    <div class="bg-mc-dark rounded-2xl overflow-hidden border border-mc-grey/30 card-hover">
+                        <!-- Featured Image -->
+                        <div class="relative h-40 overflow-hidden">
+                            <img src="{{ post.featured_image }}" 
+                                 alt="{{ post.title }}"
+                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            
+                            {% if post.category %}
+                            <div class="absolute top-3 left-3">
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium text-mc-black"
+                                      style="background-color: {{ post.category.color }};">
+                                    {{ post.category.name }}
+                                </span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Content -->
+                        <div class="p-5">
+                            <h3 class="text-lg font-bold text-mc-white mb-2 group-hover:text-mc-accent transition-colors line-clamp-2">
+                                {{ post.title }}
+                            </h3>
+                            <p class="text-mc-light-grey text-sm mb-3 line-clamp-2">
+                                {{ post.excerpt }}
+                            </p>
+                            
+                            <!-- Meta -->
+                            <div class="flex items-center justify-between text-xs text-mc-light-grey mb-3">
+                                <span>{{ post.reading_time }} min read</span>
+                                <span>{{ post.first_published_at|date:"M d" }}</span>
+                            </div>
+                            
+                            <!-- Read More -->
+                            <a href="{{ post.url }}" 
+                               class="inline-flex items-center text-sm text-mc-accent font-medium hover:text-mc-white transition-colors">
+                                Read Article <i class="fas fa-arrow-right ml-1 text-xs"></i>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+</article>
+
+<style>
+    /* Blog Content Styling */
+    .blog-content h1,
+    .blog-content h2,
+    .blog-content h3,
+    .blog-content h4,
+    .blog-content h5,
+    .blog-content h6 {
+        color: var(--mc-white);
+        font-weight: 700;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        line-height: 1.2;
+    }
+    
+    .blog-content h1 { font-size: 2.5rem; }
+    .blog-content h2 { font-size: 2rem; }
+    .blog-content h3 { font-size: 1.75rem; }
+    .blog-content h4 { font-size: 1.5rem; }
+    .blog-content h5 { font-size: 1.25rem; }
+    .blog-content h6 { font-size: 1.125rem; }
+    
+    .blog-content p {
+        margin-bottom: 1.5rem;
+        color: var(--mc-light-grey);
+        line-height: 1.8;
+    }
+    
+    .blog-content a {
+        color: var(--mc-accent);
+        text-decoration: none;
+        border-bottom: 1px solid transparent;
+        transition: all 0.3s ease;
+    }
+    
+    .blog-content a:hover {
+        color: var(--mc-white);
+        border-bottom-color: var(--mc-accent);
+    }
+    
+    .blog-content ul,
+    .blog-content ol {
+        margin-bottom: 1.5rem;
+        padding-left: 2rem;
+        color: var(--mc-light-grey);
+    }
+    
+    .blog-content li {
+        margin-bottom: 0.5rem;
+        line-height: 1.7;
+    }
+    
+    .blog-content blockquote {
+        border-left: 4px solid var(--mc-accent);
+        padding-left: 1.5rem;
+        margin: 2rem 0;
+        font-style: italic;
+        color: var(--mc-white);
+        background: var(--mc-black);
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+    }
+    
+    .blog-content code {
+        background: var(--mc-black);
+        color: var(--mc-accent);
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9em;
+    }
+    
+    .blog-content pre {
+        background: var(--mc-black);
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        overflow-x: auto;
+        margin: 1.5rem 0;
+        border: 1px solid var(--mc-grey);
+    }
+    
+    .blog-content pre code {
+        background: none;
+        padding: 0;
+    }
+    
+    .blog-content img {
+        border-radius: 0.5rem;
+        margin: 2rem 0;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .blog-content table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 2rem 0;
+        background: var(--mc-black);
+        border-radius: 0.5rem;
+        overflow: hidden;
+    }
+    
+    .blog-content th,
+    .blog-content td {
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid var(--mc-grey);
+    }
+    
+    .blog-content th {
+        background: var(--mc-dark);
+        color: var(--mc-white);
+        font-weight: 600;
+    }
+    
+    .blog-content td {
+        color: var(--mc-light-grey);
+    }
+    
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>
+
+<script>
+    // Copy to clipboard functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const copyBtn = document.querySelector('.fa-copy').parentElement;
+        if (copyBtn) {
+            copyBtn.addEventListener('click', function() {
+                navigator.clipboard.writeText(window.location.href).then(function() {
+                    // Show toast notification
+                    if (typeof showToast === 'function') {
+                        showToast('Link copied to clipboard!');
+                    }
+                });
+            });
+        }
+    });
+</script>
+
+{% endblock %}

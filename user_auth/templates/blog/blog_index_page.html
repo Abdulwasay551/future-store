@@ -1,0 +1,360 @@
+{% extends "shared/skeleton.html" %}
+{% load static %}
+{% load wagtailcore_tags %}
+
+{% block content %}
+<!-- Blog Hero Section -->
+<section class="relative min-h-[60vh] flex items-center justify-center bg-gradient-to-br from-mc-black via-mc-dark to-mc-black">
+    <!-- Animated background patterns -->
+    <div class="absolute inset-0 opacity-5">
+        <div class="absolute bg-transparent/40 inset-0 bg-repeat pattern-grid dark:opacity-20 light:opacity-10"></div>
+    </div>
+    <!-- Animated Circles -->
+    <div class="absolute bg-transparent/40 top-20 left-10 w-64 h-96 bg-mc-accent/10 rounded-full filter blur-3xl animate-float"></div>
+    <div class="absolute bg-transparent/20 bottom-20 right-10 w-96 h-96 bg-mc-accent/10 rounded-full filter blur-3xl animate-float" style="animation-delay: 1s"></div>
+
+    <div class="relative z-10 pt-32 pb-20 px-6">
+        <div class="container mx-auto text-center">
+            <div class="animate-fade-in">
+                <h1 class="text-5xl md:text-7xl font-bold mb-8 tracking-wider">
+                    <span class="bg-gradient-to-r from-mc-white via-mc-accent to-mc-white bg-clip-text text-transparent">
+                        {% if self.hero_title %}{{ self.hero_title }}{% else %}TECH BLOG{% endif %}
+                    </span>
+                </h1>
+                <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-mc-text">
+                    {% if self.hero_description %}{{ self.hero_description }}{% else %}Stay updated with the latest mobile technology trends, reviews, and insights{% endif %}
+                </p>
+                
+                <!-- Search Bar -->
+                <div class="max-w-md mx-auto">
+                    <div class="relative">
+                        <input type="text" 
+                               placeholder="Search articles..." 
+                               class="w-full px-6 py-3 bg-mc-dark border border-mc-grey/30 rounded-full text-mc-white placeholder-mc-light-grey focus:border-mc-accent focus:outline-none transition-colors">
+                        <button class="absolute right-3 top-1/2 transform -translate-y-1/2 text-mc-accent hover:text-mc-white transition-colors">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Posts -->
+{% if featured_posts %}
+<section class="py-20 px-6 bg-mc-dark">
+    <div class="container mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl md:text-5xl font-bold mb-6">
+                <span class="text-mc-white">FEATURED </span>
+                <span class="text-mc-accent">ARTICLES</span>
+            </h2>
+            <p class="text-mc-light-grey text-lg max-w-2xl mx-auto">
+                Must-read articles about mobile technology and industry insights
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {% for post in featured_posts %}
+            <article class="group cursor-pointer animate-slide-up">
+                <div class="bg-mc-black rounded-2xl overflow-hidden border border-mc-grey/30 card-hover">
+                    {% if post.featured_image_url %}
+                    <div class="aspect-video overflow-hidden">
+                        <img src="{{ post.featured_image_url }}" 
+                             alt="{{ post.title }}" 
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                    {% endif %}
+                    
+                    <div class="p-8">
+                        <div class="flex items-center gap-4 mb-4">
+                            {% if post.category %}
+                            <span class="px-3 py-1 bg-mc-accent text-mc-black text-sm font-semibold rounded-full">
+                                {{ post.category.name }}
+                            </span>
+                            {% endif %}
+                            <span class="text-mc-light-grey text-sm">
+                                {{ post.publish_date|date:"M d, Y" }}
+                            </span>
+                        </div>
+                        
+                        <h3 class="text-xl font-bold text-mc-white mb-4 group-hover:text-mc-accent transition-colors">
+                            {{ post.title }}
+                        </h3>
+                        
+                        <p class="text-mc-light-grey mb-6">
+                            {{ post.excerpt|default:post.intro|truncatewords:20 }}
+                        </p>
+                        
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                {% if post.author_image_url %}
+                                <img src="{{ post.author_image_url }}" 
+                                     alt="{{ post.author }}" 
+                                     class="w-8 h-8 rounded-full object-cover">
+                                {% else %}
+                                <div class="w-8 h-8 bg-mc-accent rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user text-mc-black text-sm"></i>
+                                </div>
+                                {% endif %}
+                                <span class="text-mc-light-grey text-sm">{{ post.author }}</span>
+                            </div>
+                            
+                            <a href="{% url 'cms_store:blog_post_detail' post.slug %}" 
+                               hx-get="{% url 'cms_store:blog_post_detail' post.slug %}"
+                               hx-target="#content-comp"
+                               hx-push-url="true"
+                               class="text-mc-accent hover:text-mc-white transition-colors">
+                                Read More <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Categories -->
+<section class="py-20 px-6 bg-mc-black">
+    <div class="container mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl md:text-5xl font-bold mb-6">
+                <span class="text-mc-white">EXPLORE </span>
+                <span class="text-mc-accent">CATEGORIES</span>
+            </h2>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
+            {% for category in categories %}
+            <a href="{% url 'cms_store:blog_category' category.slug %}" 
+               hx-get="{% url 'cms_store:blog_category' category.slug %}"
+               hx-target="#content-comp"
+               hx-push-url="true"
+               class="group bg-mc-dark rounded-2xl p-6 text-center card-hover border border-mc-grey/30">
+                <div class="w-16 h-16 bg-mc-accent rounded-full mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <i class="{{ category.icon_class|default:'fas fa-folder' }} text-mc-black text-xl"></i>
+                </div>
+                <h3 class="text-mc-white font-semibold mb-2">{{ category.name }}</h3>
+                <p class="text-mc-light-grey text-sm">{{ category.posts.count }} article{{ category.posts.count|pluralize }}</p>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Recent Posts -->
+<section class="py-20 px-6 bg-mc-dark">
+    <div class="container mx-auto">
+        <div class="flex items-center justify-between mb-16">
+            <h2 class="text-4xl md:text-5xl font-bold">
+                <span class="text-mc-white">LATEST </span>
+                <span class="text-mc-accent">POSTS</span>
+            </h2>
+            
+            <!-- Filter Pills -->
+            <div class="hidden md:flex gap-2">
+                <button class="filter-btn active px-4 py-2 bg-mc-accent text-mc-black rounded-full font-semibold" data-filter="all">
+                    All
+                </button>
+                {% for category in categories %}
+                <button class="filter-btn px-4 py-2 bg-mc-black text-mc-light-grey rounded-full border border-mc-grey/30 hover:bg-mc-accent hover:text-mc-black transition-colors" data-filter="{{ category.slug }}">
+                    {{ category.name }}
+                </button>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="posts-grid">
+            {% for post in posts %}
+            <article class="group cursor-pointer animate-slide-up post-card" data-category="{{ post.category.slug|default:'all' }}">
+                <div class="bg-mc-black rounded-2xl overflow-hidden border border-mc-grey/30 card-hover h-full flex flex-col">
+                    {% if post.featured_image_url %}
+                    <div class="aspect-video overflow-hidden">
+                        <img src="{{ post.featured_image_url }}" 
+                             alt="{{ post.title }}" 
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                    {% endif %}
+                    
+                    <div class="p-6 flex-1 flex flex-col">
+                        <div class="flex items-center gap-4 mb-4">
+                            {% if post.category %}
+                            <span class="px-3 py-1 bg-mc-accent text-mc-black text-sm font-semibold rounded-full">
+                                {{ post.category.name }}
+                            </span>
+                            {% endif %}
+                            <span class="text-mc-light-grey text-sm">
+                                {{ post.publish_date|date:"M d" }}
+                            </span>
+                        </div>
+                        
+                        <h3 class="text-lg font-bold text-mc-white mb-3 group-hover:text-mc-accent transition-colors line-clamp-2">
+                            {{ post.title }}
+                        </h3>
+                        
+                        <p class="text-mc-light-grey text-sm mb-4 flex-1 line-clamp-3">
+                            {{ post.excerpt|default:post.intro|truncatewords:15 }}
+                        </p>
+                        
+                        <div class="flex items-center justify-between pt-4 border-t border-mc-grey/30">
+                            <div class="flex items-center gap-2">
+                                {% if post.author_image_url %}
+                                <img src="{{ post.author_image_url }}" 
+                                     alt="{{ post.author }}" 
+                                     class="w-6 h-6 rounded-full object-cover">
+                                {% else %}
+                                <div class="w-6 h-6 bg-mc-accent rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user text-mc-black text-xs"></i>
+                                </div>
+                                {% endif %}
+                                <span class="text-mc-light-grey text-xs">{{ post.author }}</span>
+                            </div>
+                            
+                            <a href="{% url 'cms_store:blog_post_detail' post.slug %}" 
+                               hx-get="{% url 'cms_store:blog_post_detail' post.slug %}"
+                               hx-target="#content-comp"
+                               hx-push-url="true"
+                               class="text-mc-accent hover:text-mc-white transition-colors text-sm">
+                                Read <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+
+        <!-- Load More -->
+        <div class="text-center mt-12">
+            <button class="bg-mc-accent text-mc-black px-8 py-3 rounded-full font-semibold hover:bg-mc-white transition-colors">
+                Load More Articles
+            </button>
+        </div>
+    </div>
+</section>
+
+<style>
+.pattern-grid {
+    background-image: 
+        linear-gradient(var(--mc-accent) 1px, transparent 1px),
+        linear-gradient(90deg, var(--mc-accent) 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes fade-in {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+    animation: fade-in 1s ease-out;
+}
+
+@keyframes slide-up {
+    from { opacity: 0; transform: translateY(50px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide-up {
+    animation: slide-up 0.8s ease-out forwards;
+    opacity: 0;
+}
+
+.card-hover {
+    transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.filter-btn.active {
+    background-color: var(--mc-accent);
+    color: var(--mc-black);
+}
+
+/* Responsive grid adjustments */
+@media (max-width: 768px) {
+    .grid-cols-2 {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Category filter functionality
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const postCards = document.querySelectorAll('.post-card');
+    
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const filter = this.dataset.filter;
+            
+            // Update active button
+            filterBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Filter posts
+            postCards.forEach(card => {
+                const category = card.dataset.category;
+                if (filter === 'all' || category === filter) {
+                    card.style.display = 'block';
+                    card.style.animation = 'slide-up 0.5s ease-out forwards';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    });
+    
+    // Search functionality
+    const searchInput = document.querySelector('input[placeholder="Search articles..."]');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            
+            postCards.forEach(card => {
+                const title = card.querySelector('h3').textContent.toLowerCase();
+                const content = card.querySelector('p').textContent.toLowerCase();
+                
+                if (title.includes(searchTerm) || content.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    }
+});
+</script>
+
+{% endblock %}

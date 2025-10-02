@@ -621,3 +621,166 @@ class ContactPage(CMSBasePage):
             FieldPanel('hours_friday_time'),
         ], heading='Business Hours'),
     ]
+
+
+# Blog Models
+class BlogCategory(models.Model):
+    """Blog categories"""
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=True)
+    description = models.TextField(blank=True)
+    color = models.CharField(max_length=7, default="#00D4FF", help_text="Hex color code for category")
+    icon_class = models.CharField(max_length=100, default="fas fa-tag", help_text="FontAwesome icon class")
+    order = models.IntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['order', 'name']
+        verbose_name_plural = "Blog Categories"
+
+    def __str__(self):
+        return self.name
+
+    panels = [
+        FieldPanel('name'),
+        FieldPanel('slug'),
+        FieldPanel('description'),
+        FieldPanel('color'),
+        FieldPanel('icon_class'),
+        FieldPanel('order'),
+        FieldPanel('is_active'),
+    ]
+
+
+class BlogTag(models.Model):
+    """Blog tags"""
+    name = models.CharField(max_length=50, unique=True)
+    slug = models.SlugField(max_length=50, unique=True)
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
+class BlogIndexPage(CMSBasePage):
+    """Blog listing page"""
+    template = 'blog/blog_index.html'
+    
+    # Hero Section
+    hero_title = models.CharField(max_length=100, default="MOBILE CORNER BLOG")
+    hero_subtitle = models.CharField(max_length=200, default="Latest Tech News, Reviews & Insights")
+    hero_description = models.TextField(default="Stay updated with the latest mobile technology trends, product reviews, and expert insights from Mobile Corner.")
+    hero_background_image = models.URLField(blank=True, help_text="Hero background image URL")
+    
+    # Featured Section
+    featured_posts_title = models.CharField(max_length=100, default="Featured Articles")
+    featured_posts_count = models.IntegerField(default=3, help_text="Number of featured posts to display")
+    
+    # Categories Section
+    show_categories = models.BooleanField(default=True, help_text="Show categories section")
+    categories_title = models.CharField(max_length=100, default="Browse by Category")
+    
+    content_panels = Page.content_panels + [
+        MultiFieldPanel([
+            FieldPanel('hero_title'),
+            FieldPanel('hero_subtitle'),
+            FieldPanel('hero_description'),
+            FieldPanel('hero_background_image'),
+        ], heading='Hero Section'),
+        MultiFieldPanel([
+            FieldPanel('featured_posts_title'),
+            FieldPanel('featured_posts_count'),
+        ], heading='Featured Posts'),
+        MultiFieldPanel([
+            FieldPanel('show_categories'),
+            FieldPanel('categories_title'),
+        ], heading='Categories Section'),
+    ]
+    
+    def get_context(self, request):
+        context = super().get_context(request)
+        
+        # Get published blog posts
+        blog_posts = BlogPost.objects.live().public().order_by('-first_published_at')
+        
+        # Featured posts
+        featured_posts = blog_posts.filter(is_featured=True)[:self.featured_posts_count]
+        
+        # Recent posts (excluding featured)
+        recent_posts = blog_posts.exclude(id__in=featured_posts.values_list('id', flat=True))[:6]
+        
+        # Categories
+        categories = BlogCategory.objects.filter(is_active=True)
+        
+        context.update({
+            'featured_posts': featured_posts,
+            'recent_posts': recent_posts,
+            'categories': categories,
+        })
+        return context
+
+
+class BlogPost(CMSBasePage):
+    """Individual blog post"""
+    template = 'blog/blog_post.html'
+    parent_page_types = ['BlogIndexPage']
+    
+    # Post metadata
+    featured_image = models.URLField(help_text="Main blog post image URL")
+    excerpt = models.TextField(max_length=300, help_text="Short description for blog listing")
+    author_name = models.CharField(max_length=100, default="Mobile Corner Team")
+    author_image = models.URLField(blank=True, help_text="Author profile image URL")
+    author_bio = models.TextField(blank=True, help_text="Author bio")
+    
+    # Content
+    content = RichTextField(help_text="Main blog post content")
+    
+    # Organization
+    category = models.ForeignKey(BlogCategory, on_delete=models.SET_NULL, null=True, blank=True)
+    tags = models.ManyToManyField(BlogTag, blank=True)
+    
+    # Display options
+    is_featured = models.BooleanField(default=False, help_text="Show in featured posts section")
+    reading_time = models.IntegerField(default=5, help_text="Estimated reading time in minutes")
+    
+    # Social sharing
+    show_social_share = models.BooleanField(default=True, help_text="Show social media sharing buttons")
+    
+    content_panels = Page.content_panels + [
+        MultiFieldPanel([
+            FieldPanel('featured_image'),
+            FieldPanel('excerpt'),
+            FieldPanel('category'),
+            FieldPanel('tags'),
+        ], heading='Post Metadata'),
+        MultiFieldPanel([
+            FieldPanel('author_name'),
+            FieldPanel('author_image'),
+            FieldPanel('author_bio'),
+        ], heading='Author Information'),
+        FieldPanel('content'),
+        MultiFieldPanel([
+            FieldPanel('is_featured'),
+            FieldPanel('reading_time'),
+            FieldPanel('show_social_share'),
+        ], heading='Display Options'),
+    ]
+    
+    search_fields = CMSBasePage.search_fields + [
+        index.SearchField('excerpt'),
+        index.SearchField('content'),
+        index.SearchField('author_name'),
+    ]
+    
+    def get_context(self, request):
+        context = super().get_context(request)
+        
+        # Related posts (same category, excluding current post)
+        related_posts = BlogPost.objects.live().public().filter(
+            category=self.category
+        ).exclude(id=self.id)[:3]
+        
+        context['related_posts'] = related_posts
+        return context

@@ -66,6 +66,7 @@ urlpatterns = [
     # Keep your existing user auth and store URLs working
     path('', include('user_auth.urls')),  # Keep user_auth at root for compatibility
     path('store/', include('store.urls')),  # Store URLs (both views and API)
+    path('', include('cms_store.urls')),  # CMS/Blog URLs
     path('chatbot/', include('chatbot.urls')),  # Include chatbot app URLs
     path('erp/', include('inventory_erp.urls')),  # Include inventory_erp app URLs
     path('social-auth/', include('social_django.urls', namespace='social')),
