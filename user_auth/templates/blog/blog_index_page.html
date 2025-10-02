@@ -75,7 +75,7 @@
                             </span>
                             {% endif %}
                             <span class="text-mc-light-grey text-sm">
-                                {{ post.publish_date|date:"M d, Y" }}
+                                {{ post.first_published_at|date:"M d, Y" }}
                             </span>
                         </div>
                         
@@ -84,21 +84,21 @@
                         </h3>
                         
                         <p class="text-mc-light-grey mb-6">
-                            {{ post.excerpt|default:post.intro|truncatewords:20 }}
+                            {{ post.excerpt|default:post.content|truncatewords:20 }}
                         </p>
                         
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-3">
-                                {% if post.author_image_url %}
-                                <img src="{{ post.author_image_url }}" 
-                                     alt="{{ post.author }}" 
+                                {% if post.author_image %}
+                                <img src="{{ post.author_image }}" 
+                                     alt="{{ post.author_name }}" 
                                      class="w-8 h-8 rounded-full object-cover">
                                 {% else %}
                                 <div class="w-8 h-8 bg-mc-accent rounded-full flex items-center justify-center">
                                     <i class="fas fa-user text-mc-black text-sm"></i>
                                 </div>
                                 {% endif %}
-                                <span class="text-mc-light-grey text-sm">{{ post.author }}</span>
+                                <span class="text-mc-light-grey text-sm">{{ post.author_name }}</span>
                             </div>
                             
                             <a href="{% url 'cms_store:blog_post_detail' post.slug %}" 
@@ -172,9 +172,9 @@
             {% for post in posts %}
             <article class="group cursor-pointer animate-slide-up post-card" data-category="{{ post.category.slug|default:'all' }}">
                 <div class="bg-mc-black rounded-2xl overflow-hidden border border-mc-grey/30 card-hover h-full flex flex-col">
-                    {% if post.featured_image_url %}
+                    {% if post.featured_image %}
                     <div class="aspect-video overflow-hidden">
-                        <img src="{{ post.featured_image_url }}" 
+                        <img src="{{ post.featured_image }}" 
                              alt="{{ post.title }}" 
                              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                     </div>
@@ -188,7 +188,7 @@
                             </span>
                             {% endif %}
                             <span class="text-mc-light-grey text-sm">
-                                {{ post.publish_date|date:"M d" }}
+                                {{ post.first_published_at|date:"M d" }}
                             </span>
                         </div>
                         
@@ -197,21 +197,21 @@
                         </h3>
                         
                         <p class="text-mc-light-grey text-sm mb-4 flex-1 line-clamp-3">
-                            {{ post.excerpt|default:post.intro|truncatewords:15 }}
+                            {{ post.excerpt|default:post.content|truncatewords:15 }}
                         </p>
                         
                         <div class="flex items-center justify-between pt-4 border-t border-mc-grey/30">
                             <div class="flex items-center gap-2">
-                                {% if post.author_image_url %}
-                                <img src="{{ post.author_image_url }}" 
-                                     alt="{{ post.author }}" 
+                                {% if post.author_image %}
+                                <img src="{{ post.author_image }}" 
+                                     alt="{{ post.author_name }}" 
                                      class="w-6 h-6 rounded-full object-cover">
                                 {% else %}
                                 <div class="w-6 h-6 bg-mc-accent rounded-full flex items-center justify-center">
                                     <i class="fas fa-user text-mc-black text-xs"></i>
                                 </div>
                                 {% endif %}
-                                <span class="text-mc-light-grey text-xs">{{ post.author }}</span>
+                                <span class="text-mc-light-grey text-xs">{{ post.author_name }}</span>
                             </div>
                             
                             <a href="{% url 'cms_store:blog_post_detail' post.slug %}" 

@@ -21,7 +21,7 @@ def blog_index(request):
             return render(request, 'blog/blog_index_page.html', context)
         
         # Get all live blog posts
-        posts = BlogPost.objects.live().order_by('-publish_date')
+        posts = BlogPost.objects.live().order_by('-first_published_at')
         
         # Filter by category if specified
         category_slug = request.GET.get('category')
@@ -34,7 +34,7 @@ def blog_index(request):
             posts = posts.filter(
                 Q(title__icontains=search_query) |
                 Q(excerpt__icontains=search_query) |
-                Q(body__icontains=search_query)
+                Q(content__icontains=search_query)
             )
         
         # Pagination
@@ -49,7 +49,7 @@ def blog_index(request):
         categories = BlogCategory.objects.all()[:6]
         
         # Get recent posts for sidebar
-        recent_posts = BlogPost.objects.live().order_by('-publish_date')[:5]
+        recent_posts = BlogPost.objects.live().order_by('-first_published_at')[:5]
         
         context = {
             'page': blog_page,
@@ -85,7 +85,7 @@ def blog_post_detail(request, slug):
         # Get related posts (same category, excluding current post)
         related_posts = BlogPost.objects.live().filter(
             category=post.category
-        ).exclude(id=post.id).order_by('-publish_date')[:4]
+        ).exclude(id=post.id).order_by('-first_published_at')[:4]
         
         # If not enough related posts from same category, get recent posts
         if related_posts.count() < 4:
@@ -93,11 +93,11 @@ def blog_post_detail(request, slug):
                 id=post.id
             ).exclude(
                 id__in=[p.id for p in related_posts]
-            ).order_by('-publish_date')[:4-related_posts.count()]
+            ).order_by('-first_published_at')[:4-related_posts.count()]
             related_posts = list(related_posts) + list(additional_posts)
         
         # Get recent posts for sidebar
-        recent_posts = BlogPost.objects.live().exclude(id=post.id).order_by('-publish_date')[:5]
+        recent_posts = BlogPost.objects.live().exclude(id=post.id).order_by('-first_published_at')[:5]
         
         # Get all categories for sidebar
         categories = BlogCategory.objects.all()
@@ -122,7 +122,7 @@ def blog_category(request, slug):
     category = get_object_or_404(BlogCategory, slug=slug)
     
     # Get posts in this category
-    posts = BlogPost.objects.live().filter(category=category).order_by('-publish_date')
+    posts = BlogPost.objects.live().filter(category=category).order_by('-first_published_at')
     
     # Pagination
     paginator = Paginator(posts, 9)
@@ -151,7 +151,7 @@ def blog_tag(request, slug):
     tag = get_object_or_404(BlogTag, slug=slug)
     
     # Get posts with this tag
-    posts = BlogPost.objects.live().filter(tags=tag).order_by('-publish_date')
+    posts = BlogPost.objects.live().filter(tags=tag).order_by('-first_published_at')
     
     # Pagination
     paginator = Paginator(posts, 9)

@@ -59,7 +59,7 @@
                     {% endif %}
                     <span class="text-mc-light-grey">
                         <i class="fas fa-calendar-alt mr-2"></i>
-                        {{ self.publish_date|date:"F d, Y" }}
+                        {{ self.first_published_at|date:"F d, Y" }}
                     </span>
                     <span class="text-mc-light-grey">
                         <i class="fas fa-clock mr-2"></i>
@@ -81,9 +81,9 @@
 
                 <!-- Author Info -->
                 <div class="flex items-center gap-4">
-                    {% if self.author_image_url %}
-                    <img src="{{ self.author_image_url }}" 
-                         alt="{{ self.author }}" 
+                    {% if self.author_image %}
+                    <img src="{{ self.author_image }}" 
+                         alt="{{ self.author_name }}" 
                          class="w-12 h-12 rounded-full object-cover">
                     {% else %}
                     <div class="w-12 h-12 bg-mc-accent rounded-full flex items-center justify-center">
@@ -91,7 +91,7 @@
                     </div>
                     {% endif %}
                     <div>
-                        <p class="text-mc-white font-semibold">{{ self.author|default:"Mobile Corner Team" }}</p>
+                        <p class="text-mc-white font-semibold">{{ self.author_name|default:"Mobile Corner Team" }}</p>
                         <p class="text-mc-light-grey text-sm">Tech Expert</p>
                     </div>
                 </div>
@@ -107,16 +107,16 @@
             <!-- Main Content -->
             <div class="lg:col-span-3">
                 <article class="bg-mc-black rounded-2xl p-8 md:p-12 border border-mc-grey/30">
-                    <!-- Intro -->
-                    {% if self.intro %}
+                    <!-- Content -->
+                    {% if self.content %}
                     <div class="text-lg text-mc-light-grey mb-8 leading-relaxed">
-                        {{ self.intro|richtext }}
+                        {{ self.content|richtext }}
                     </div>
                     {% endif %}
 
                     <!-- Main Content -->
                     <div class="prose prose-invert prose-lg max-w-none blog-content">
-                        {{ self.body|richtext }}
+                        {{ self.content|richtext }}
                     </div>
 
                     <!-- Tags -->
@@ -184,7 +184,7 @@
                                         </span>
                                         {% endif %}
                                         <span class="text-mc-light-grey text-xs">
-                                            {{ post.publish_date|date:"M d" }}
+                                            {{ post.first_published_at|date:"M d" }}
                                         </span>
                                     </div>
                                     
@@ -198,7 +198,7 @@
                                     </h3>
                                     
                                     <p class="text-mc-light-grey text-sm line-clamp-2">
-                                        {{ post.excerpt|default:post.intro|truncatewords:12 }}
+                                        {{ post.excerpt|default:post.content|truncatewords:12 }}
                                     </p>
                                 </div>
                             </div>
@@ -250,7 +250,7 @@
                                         </a>
                                     </h4>
                                     <p class="text-mc-light-grey text-xs mt-1">
-                                        {{ post.publish_date|date:"M d, Y" }}
+                                        {{ post.first_published_at|date:"M d, Y" }}
                                     </p>
                                 </div>
                             </div>

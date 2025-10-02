@@ -285,6 +285,7 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS(f'Created contact page: {contact_page.title}'))
 
         # Create Blog Section
+        blog_index = None
         if home_page and not BlogIndexPage.objects.exists():            
             # Create Blog Index Page
             blog_index = BlogIndexPage(
@@ -298,6 +299,12 @@ class Command(BaseCommand):
             )
             home_page.add_child(instance=blog_index)
             self.stdout.write(self.style.SUCCESS(f'Created blog index: {blog_index.title}'))
+        else:
+            # Get existing blog index
+            blog_index = BlogIndexPage.objects.first()
+            
+        # Always create blog categories, tags, and posts if blog_index exists
+        if blog_index:
             
             # Create Blog Categories
             categories_data = [
@@ -319,67 +326,76 @@ class Command(BaseCommand):
                 blog_categories.append(category)
             
             # Create Blog Tags
-            tags_data = ['smartphone', 'android', 'ios', 'review', 'tips', 'technology', 'mobile', 'apps']
+            tags_data = ['smartphone', 'android', 'ios', 'review', 'tips', 'technology', 'mobile', 'apps', 'battery', 'security', 'maintenance', 'buying-guide', 'comparison', 'budget', 'flagship', 'camera', 'gaming', 'productivity', 'accessories']
             blog_tags = []
             for tag_name in tags_data:
-                tag, created = BlogTag.objects.get_or_create(name=tag_name)
+                from django.utils.text import slugify
+                tag, created = BlogTag.objects.get_or_create(
+                    name=tag_name,
+                    defaults={'slug': slugify(tag_name)}
+                )
                 blog_tags.append(tag)
             
-            # Create Sample Blog Posts
+            # Create Comprehensive Blog Posts
             posts_data = [
+                # Buying Guides
                 {
-                    'title': 'iPhone 15 Pro Max vs Samsung Galaxy S24 Ultra: The Ultimate Comparison',
-                    'slug': 'iphone-15-pro-max-vs-samsung-galaxy-s24-ultra',
-                    'excerpt': 'Detailed comparison of the two flagship smartphones that dominate the premium market in 2024.',
-                    'intro': '<p>In the premium smartphone segment, two devices stand out as the clear leaders: Apple\'s iPhone 15 Pro Max and Samsung\'s Galaxy S24 Ultra. Both offer cutting-edge technology, but which one offers better value for Pakistani consumers?</p>',
-                    'body': '<h2>Design and Build Quality</h2><p>Both phones feature premium materials and excellent build quality. The iPhone 15 Pro Max sports a titanium frame with ceramic shield glass, while the Galaxy S24 Ultra uses an aluminum frame with Gorilla Glass Victus 2.</p><h2>Performance Comparison</h2><p>The iPhone 15 Pro Max is powered by the A17 Pro chip, while the Galaxy S24 Ultra runs on the Snapdragon 8 Gen 3. Both offer flagship-level performance for demanding tasks.</p><h2>Camera Systems</h2><p>Photography enthusiasts will find both phones excellent, with the iPhone excelling in video recording and the Galaxy offering more versatility with its zoom capabilities.</p>',
-                    'category': blog_categories[0],  # Reviews
-                    'featured_image_url': 'https://via.placeholder.com/800x450/007AFF/FFFFFF?text=iPhone+vs+Samsung',
-                    'author': 'Tech Expert Team',
-                    'is_featured': True,
-                    'tags': ['smartphone', 'review', 'ios', 'android']
-                },
-                {
-                    'title': '5 Essential Android Tips Every User Should Know',
-                    'slug': '5-essential-android-tips-every-user-should-know',
-                    'excerpt': 'Unlock your Android phone\'s potential with these simple but powerful tips and tricks.',
-                    'intro': '<p>Android phones offer incredible flexibility and customization options. Here are five essential tips that will help you get the most out of your Android device.</p>',
-                    'body': '<h2>1. Master Your Battery Settings</h2><p>Learn how to optimize your battery life with adaptive battery settings and background app limitations.</p><h2>2. Customize Your Home Screen</h2><p>Make your phone truly yours with widgets, custom launchers, and icon packs.</p><h2>3. Use Google Assistant Effectively</h2><p>Voice commands and automation can save you time throughout the day.</p>',
-                    'category': blog_categories[3],  # Tips & Tricks
-                    'featured_image_url': 'https://via.placeholder.com/800x450/34A853/FFFFFF?text=Android+Tips',
-                    'author': 'Mobile Expert',
-                    'is_featured': True,
-                    'tags': ['android', 'tips', 'mobile']
-                },
-                {
-                    'title': 'Best Budget Smartphones Under PKR 50,000 in 2024',
-                    'slug': 'best-budget-smartphones-under-pkr-50000-2024',
-                    'excerpt': 'Find the perfect smartphone that offers great value without breaking the bank.',
-                    'intro': '<p>You don\'t need to spend a fortune to get a great smartphone. Here are our top picks for budget-friendly phones under PKR 50,000 that deliver excellent performance and features.</p>',
-                    'body': '<h2>Xiaomi Redmi Note 13 Pro</h2><p>Excellent camera system and fast charging at an affordable price point.</p><h2>Realme 11 Pro</h2><p>Great design and solid performance for everyday tasks and gaming.</p><h2>Samsung Galaxy A54</h2><p>Reliable performance with Samsung\'s ecosystem integration.</p>',
+                    'title': 'How to Choose the Right Smartphone: Complete Buyer\'s Guide 2024',
+                    'slug': 'how-to-choose-right-smartphone-complete-guide',
+                    'excerpt': 'Everything you need to know before buying your next smartphone - from budget considerations to technical specifications.',
+                    'content': '<p>Choosing the perfect smartphone can be overwhelming with hundreds of options available. This comprehensive guide will help you make an informed decision based on your needs, budget, and preferences.</p><h2>1. Determine Your Budget</h2><p>Set a realistic budget range. Consider that expensive doesn\'t always mean better for your specific needs. Great phones are available in every price segment.</p><h2>2. Operating System Choice</h2><p>Decide between iOS and Android based on your ecosystem preferences and technical comfort level.</p><h2>3. Essential Features to Consider</h2><ul><li><strong>Display:</strong> Size, resolution, refresh rate</li><li><strong>Camera:</strong> Megapixels, number of lenses, night mode</li><li><strong>Battery:</strong> Capacity, fast charging support</li><li><strong>Storage:</strong> Internal storage and expandability</li><li><strong>Performance:</strong> Processor, RAM for your usage patterns</li></ul><h2>4. Research and Compare</h2><p>Read reviews, compare specifications, and if possible, test the phone in-store before making your final decision.</p><h2>5. Consider After-Sales Support</h2><p>Check warranty terms, service center availability, and brand reputation for customer support in Pakistan.</p>',
                     'category': blog_categories[2],  # Buying Guide
-                    'featured_image_url': 'https://via.placeholder.com/800x450/FF6B6B/FFFFFF?text=Budget+Phones',
-                    'author': 'Pricing Expert',
-                    'tags': ['smartphone', 'buying-guide', 'budget']
+                    'featured_image': 'https://via.placeholder.com/800x450/6366F1/FFFFFF?text=Smartphone+Buying+Guide',
+                    'author_name': 'Mobile Consultant',
+                    'is_featured': True,
+                    'tags': ['buying-guide', 'smartphone', 'tips', 'technology']
+                },
+                {
+                    'title': 'Android vs iOS: Which Operating System is Better for You?',
+                    'slug': 'android-vs-ios-which-operating-system-better',
+                    'excerpt': 'Detailed comparison of Android and iOS to help you choose the right mobile operating system for your needs.',
+                    'content': '<p>The eternal debate: Android or iOS? Both have their strengths and weaknesses. Let\'s break down the key differences to help you make the right choice for your lifestyle and preferences.</p><h2>Customization and Flexibility</h2><p><strong>Android Wins:</strong> Android offers extensive customization options. You can change launchers, install apps from multiple sources, and modify almost every aspect of your phone\'s interface.</p><p><strong>iOS:</strong> Limited customization but offers a consistent, polished experience across all devices.</p><h2>App Ecosystem</h2><p><strong>iOS:</strong> Apps often launch first on iOS, generally higher quality control, and better optimization for the platform.</p><p><strong>Android:</strong> Larger variety of apps, including more free options and alternative app stores.</p><h2>Hardware Variety</h2><p><strong>Android:</strong> Massive selection from budget to premium, different sizes, features, and price points.</p><p><strong>iOS:</strong> Limited to Apple devices but guaranteed quality and long-term software support.</p><h2>Privacy and Security</h2><p><strong>iOS:</strong> Generally considered more secure with better privacy controls and longer security update support.</p><p><strong>Android:</strong> Google has improved security significantly, but update consistency varies by manufacturer.</p><h2>Integration and Ecosystem</h2><p><strong>iOS:</strong> Seamless integration with Mac, iPad, Apple Watch, and other Apple products.</p><p><strong>Android:</strong> Better integration with Google services and more flexibility with third-party services.</p><h2>The Verdict</h2><p>Choose iOS if you want simplicity, security, and seamless ecosystem integration. Choose Android if you prefer customization, variety, and flexibility.</p>',
+                    'category': blog_categories[2],  # Buying Guide
+                    'featured_image': 'https://via.placeholder.com/800x450/FF3B30/FFFFFF?text=Android+vs+iOS',
+                    'author_name': 'OS Expert',
+                    'is_featured': True,
+                    'tags': ['android', 'ios', 'comparison', 'buying-guide']
+                },
+                {
+                    'title': '10 Proven Battery Optimization Tips to Extend Your Phone\'s Life',
+                    'slug': '10-proven-battery-optimization-tips-extend-phone-life',
+                    'excerpt': 'Expert-tested methods to maximize your smartphone battery life and improve daily usage time.',
+                    'content': '<p>Battery life is one of the most common smartphone complaints. These scientifically-backed tips will help you squeeze every hour out of your phone\'s battery and extend its overall lifespan.</p><h2>Display Settings Optimization</h2><ul><li><strong>Reduce Screen Brightness:</strong> Use automatic brightness or keep it at 50% or lower</li><li><strong>Shorter Screen Timeout:</strong> Set to 30 seconds or 1 minute</li><li><strong>Dark Mode:</strong> Use dark themes, especially on OLED displays</li><li><strong>Reduce Refresh Rate:</strong> Switch from 120Hz to 60Hz if available</li></ul><h2>Background App Management</h2><ul><li>Disable background refresh for unnecessary apps</li><li>Close apps you\'re not actively using</li><li>Turn off location services for apps that don\'t need it</li></ul><h2>Connectivity Tweaks</h2><ul><li><strong>WiFi Over Cellular:</strong> Use WiFi whenever possible</li><li><strong>Airplane Mode:</strong> Use in low signal areas to prevent battery drain</li><li><strong>Bluetooth:</strong> Turn off when not in use</li><li><strong>Hotspot:</strong> Disable when not sharing internet</li></ul><h2>Advanced Battery Tips</h2><ul><li>Enable low power mode when battery drops below 20%</li><li>Keep your phone between 20-80% charge for optimal battery health</li><li>Avoid extreme temperatures</li><li>Use original or certified chargers</li></ul>',
+                    'category': blog_categories[3],  # Tips & Tricks
+                    'featured_image': 'https://via.placeholder.com/800x450/10B981/FFFFFF?text=Battery+Optimization',
+                    'author_name': 'Battery Expert',
+                    'is_featured': True,
+                    'tags': ['battery', 'tips', 'optimization', 'smartphone']
                 }
             ]
             
-            for post_data in posts_data:
-                tags = post_data.pop('tags', [])
-                post = BlogPost(
-                    **post_data,
-                    # SEO fields
-                    search_description=post_data['excerpt'],
-                    keywords=', '.join(tags),
-                )
-                blog_index.add_child(instance=post)
-                
-                # Add tags to the post
-                for tag_name in tags:
-                    tag = next((t for t in blog_tags if t.name == tag_name), None)
-                    if tag:
-                        post.tags.add(tag)
-                
-                self.stdout.write(self.style.SUCCESS(f'Created blog post: {post.title}'))
+            # Only create blog posts if none exist yet
+            if BlogPost.objects.count() == 0:
+                for post_data in posts_data:
+                    tags = post_data.pop('tags', [])
+                    excerpt = post_data.get('excerpt', '')
+                    post = BlogPost(
+                        **post_data,
+                        # SEO fields
+                        search_description=excerpt,
+                        keywords=', '.join(tags),
+                    )
+                    blog_index.add_child(instance=post)
+                    post.save()
+                    
+                    # Add tags to the post
+                    for tag_name in tags:
+                        tag = next((t for t in blog_tags if t.name == tag_name), None)
+                        if tag:
+                            post.tags.add(tag)
+                    
+                    self.stdout.write(self.style.SUCCESS(f'Created blog post: {post.title}'))
+            else:
+                self.stdout.write(self.style.WARNING('Blog posts already exist, skipping creation.'))
 
         self.stdout.write(self.style.SUCCESS('Initial CMS pages created successfully with sample content and SEO optimization!'))
