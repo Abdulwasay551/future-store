@@ -153,12 +153,27 @@
         }
 
         /* Loader Animation */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
         @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
         }
         
         .loader {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--mc-grey);
+            border-top: 4px solid var(--mc-accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        .loader-pulse {
             animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
         
@@ -259,6 +274,14 @@
             </div>
         </div>
 
+        <!-- Loading Overlay -->
+        <div id="loading-overlay" class="fixed inset-0 bg-mc-black bg-opacity-50 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+            <div class="bg-mc-dark rounded-2xl p-8 border border-mc-grey/30 text-center">
+                <div class="loader mb-4"></div>
+                <p class="text-mc-white font-semibold">Loading...</p>
+            </div>
+        </div>
+
         <div id="content-comp" class="fade-in">
             {% block content %}{% endblock %}
         </div>
@@ -318,6 +341,37 @@
                 // Initialize on load and after HTMX swaps
                 initializeAnimations();
                 document.body.addEventListener('htmx:afterSwap', initializeAnimations);
+            });
+
+            // HTMX Loading Events
+            document.addEventListener('DOMContentLoaded', function() {
+                const loadingOverlay = document.getElementById('loading-overlay');
+                
+                // Show loader when HTMX request starts
+                document.body.addEventListener('htmx:beforeRequest', function(event) {
+                    // Only show loader for navigation requests (not form submissions)
+                    if (event.detail.target.id === 'content-comp') {
+                        loadingOverlay.classList.remove('opacity-0', 'pointer-events-none');
+                        loadingOverlay.classList.add('opacity-100');
+                    }
+                });
+                
+                // Hide loader when HTMX request completes
+                document.body.addEventListener('htmx:afterSwap', function(event) {
+                    if (event.detail.target.id === 'content-comp') {
+                        loadingOverlay.classList.remove('opacity-100');
+                        loadingOverlay.classList.add('opacity-0', 'pointer-events-none');
+                    }
+                });
+                
+                // Hide loader on error
+                document.body.addEventListener('htmx:responseError', function(event) {
+                    if (event.detail.target.id === 'content-comp') {
+                        loadingOverlay.classList.remove('opacity-100');
+                        loadingOverlay.classList.add('opacity-0', 'pointer-events-none');
+                        showToast('Failed to load page. Please try again.', 5000);
+                    }
+                });
             });
 
             // Dark mode toggle (only if element exists)
